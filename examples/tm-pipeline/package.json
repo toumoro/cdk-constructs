@@ -1,0 +1,13 @@
+{
+  "name": "pipelinecdk",
+  "version": "0.1.0",
+  "bin": {
+    "tm-pipeline": "bin/tm-pipeline.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  }
+}

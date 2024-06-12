@@ -1,0 +1,13 @@
+{
+  "name": "rdsauroramysqlserverless",
+  "version": "0.1.0",
+  "bin": {
+    "tm-rds-aurora-mysql-serverless": "bin/tm-rds-aurora-mysql-serverless.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  }
+}

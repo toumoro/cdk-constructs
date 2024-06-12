@@ -1,0 +1,13 @@
+{
+  "name": "vpcbase",
+  "version": "0.1.0",
+  "bin": {
+    "tm-vpc-base": "bin/tm-vpc-base.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  }
+}
