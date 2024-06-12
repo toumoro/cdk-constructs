@@ -3,7 +3,7 @@
   "description": "A CDK construct library",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tm-lcarvalho/cdk-constructs.git"
+    "url": "https://github.com/toumoro/cdk-constructs.git"
   },
   "scripts": {
     "build": "npx projen build",
@@ -31,9 +31,9 @@
     "projen": "npx projen"
   },
   "author": {
-    "name": "tm-lcarvalho",
-    "email": "lucio.carvalho@toumoro.com",
-    "organization": false
+    "name": "Toumoro ",
+    "url": "https://www.toumoro.com/",
+    "organization": true
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
