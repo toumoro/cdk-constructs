@@ -16,6 +16,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   npmignore: ['examples'],
   devDeps: [
     'cdk',
+    'ts-node',
   ],
 
   deps: ['cdk-nag'], /* Runtime dependencies of this module. */
