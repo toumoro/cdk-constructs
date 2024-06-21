@@ -2,34 +2,35 @@
 
 ```bash
 cd examples
-mkdir cdk-<nom-du-stack-exemple-pour-le-developpement-de-constructs>
+mkdir tm-<nom-du-stack-exemple-pour-le-developpement-de-constructs>
 ```
 
 Initialisation de CDK
 ```bash
-cd cdk-<nom-du-stack-exemple-pour-le-developpement-de-constructs>
+cd tm-<nom-du-stack-exemple-pour-le-developpement-de-constructs>
 cdk init app --language typescript
 ```
 
-Mise à jour de la version du construct et de la bibliothèque CDK utilisés dans le construct `cdk-construct-lib`, dans le fichier `package.json` du nouvel exemple:
+Remove devDependencies et dependencies from package.json
 ```json
 {
-  "devDependencies": {
-    [...]
-    "aws-cdk": "2.X.X",
-    [...]
+  "name": "tm-example",
+  "version": "0.1.0",
+  "bin": {
+    "tm-example": "bin/tm-example.js"
   },
-  "dependencies": {
-    "aws-cdk-lib": "2.X.X",
-    "constructs": "10.X.X",
-    [...]
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
   }
 }
 ```
 
-Install the dependencies version
+Remove node_modules from new example
 ```
-npm install
+rm -r tm-example/node_modules
 ```
 
 Suivez le README du projet pour déployer la nouvelle pile.

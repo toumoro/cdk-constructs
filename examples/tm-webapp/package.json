@@ -1,0 +1,13 @@
+{
+  "name": "tm-webapp",
+  "version": "0.1.0",
+  "bin": {
+    "tm-webapp": "bin/tm-webapp.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  }
+}
