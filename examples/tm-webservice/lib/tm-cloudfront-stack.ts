@@ -6,7 +6,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, LambdaEdgeEventType, OriginProtocolPolicy, OriginRequestPolicy, PriceClass, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { HttpOrigin, LoadBalancerV2Origin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { HttpOrigin, LoadBalancerV2Origin, S3Origin, OriginGroup } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -17,7 +17,7 @@ import { HostedZone } from 'aws-cdk-lib/aws-route53';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export interface TmCloudfrontStackProps extends cdk.StackProps {
-    readonly originDnsName: string;
+    //readonly originDnsName: string;
     readonly domainName: string;
     readonly hostedZoneId: string;
     readonly env?: Environment;
@@ -25,7 +25,8 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
     readonly retainLogBuckets?: boolean;
     readonly webAclId?: string;
     readonly errorCachingMinTtl?: number;
-    readonly applicationLoadbalancer: ILoadBalancerV2;
+    readonly applicationLoadbalancer1: ILoadBalancerV2;
+    readonly applicationLoadbalancer2: ILoadBalancerV2;
     readonly loadBalancerOriginProtocol?: OriginProtocolPolicy;
     readonly viewerProtocolPolicy?: ViewerProtocolPolicy;
 
@@ -37,10 +38,11 @@ export class TmCloudfrontStack extends cdk.Stack {
     private logBucket: Bucket;
     private errorsBucket: Bucket;
     private errorsBucketOrigin: S3Origin;
-    private assetsBucketOrigin: HttpOrigin;
-    private loadBalancerOrigin: HttpOrigin;
+    //private assetsBucketOrigin: HttpOrigin;
+    private loadBalancerOrigin1: HttpOrigin;
+    private loadBalancerOrigin2: HttpOrigin;
     private distribution: Distribution;
-    private s3Deployment?: BucketDeployment;
+    //private s3Deployment?: BucketDeployment;
 
 
     constructor(scope: Construct, id: string, props: TmCloudfrontStackProps) {
@@ -68,32 +70,19 @@ export class TmCloudfrontStack extends cdk.Stack {
         //     protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
         // });
 
-        this.loadBalancerOrigin = new LoadBalancerV2Origin(props.applicationLoadbalancer, {
+        this.loadBalancerOrigin1 = new LoadBalancerV2Origin(props.applicationLoadbalancer1, {
             protocolPolicy: props.loadBalancerOriginProtocol || OriginProtocolPolicy.HTTPS_ONLY,
             customHeaders: {
                 'X-Custom-Header': 'sdsdsdsdsd',
             }
         });
 
-        // const responsePagesFilesPath = path.normalize(path.join(__dirname, '/../../../cf_errors/main/', props.env.environmentName, '/'));
-        // const responsePagePathsByStatusCode: { [key: string]: string } = {};
-
-        // if (fs.existsSync(responsePagesFilesPath)) {
-        //     this.s3Deployment = new BucketDeployment(this, 'DeployErrorFiles', {
-        //         sources: [Source.asset(responsePagesFilesPath)],
-        //         destinationBucket: this.errorsBucket,
-        //         destinationKeyPrefix: 'errors/',
-        //     });
-
-        //     const responsePageFilesPaths = fs.readdirSync(responsePagesFilesPath).filter(filename =>
-        //         fs.lstatSync(path.join(responsePagesFilesPath, filename)).isFile()
-        //     );
-
-        //     responsePageFilesPaths.forEach(responsePageFilePath => {
-        //         const responseCode = path.parse(responsePageFilePath).name;
-        //         responsePagePathsByStatusCode[responseCode] = `/errors/${responsePageFilePath}`;
-        //     });
-        // }
+        this.loadBalancerOrigin2 = new LoadBalancerV2Origin(props.applicationLoadbalancer2, {
+            protocolPolicy: props.loadBalancerOriginProtocol || OriginProtocolPolicy.HTTPS_ONLY,
+            customHeaders: {
+                'X-Custom-Header': 'sdsdsdsdsd',
+            }
+        });
 
         const tmCachePolicyProps: TmCachePolicyProps = {
             /** OPTIONAL CACHING PARAMETERS */
@@ -112,8 +101,9 @@ export class TmCloudfrontStack extends cdk.Stack {
 
         };
 
+
         const defaultBehavior = {
-            origin: this.loadBalancerOrigin,
+            origin: this.loadBalancerOrigin1,
             viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: AllowedMethods.ALLOW_ALL,
             cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
@@ -126,29 +116,37 @@ export class TmCloudfrontStack extends cdk.Stack {
             priceClass: PriceClass.PRICE_CLASS_100,
             webAclId: props.webAclId,
             minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
-            defaultBehavior: defaultBehavior
+            defaultBehavior: defaultBehavior,
             // errorResponses: Object.entries(responsePagePathsByStatusCode).map(([statusCode, responsePagePath]) => ({
             //     httpStatus: parseInt(statusCode),
             //     responsePagePath,
             //     ttl: Duration.seconds(props.errorCachingMinTtl || 30),
             // })),
+            additionalBehaviors: {
+                // Placeholder path for the second origin; adjust this as necessary
+                '/unused-path': {
+                  origin: this.loadBalancerOrigin2,
+                }
+            }
         });
 
-        this.distribution.addBehavior('/typo3/*', this.loadBalancerOrigin, {
+        this.distribution.addBehavior('/typo3/*', this.loadBalancerOrigin1, {
             allowedMethods: AllowedMethods.ALLOW_ALL,
             cachePolicy: CachePolicy.CACHING_DISABLED,
             viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
         });
 
+
         this.distribution.addBehavior('/errors/*', this.errorsBucketOrigin, {
             viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         });
 
-        this.distribution.addBehavior('/assets/*', this.loadBalancerOrigin, {
+        this.distribution.addBehavior('/assets/*', this.loadBalancerOrigin1, {
             viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
         });
+
 
         new CfnOutput(this, 'DistributionID', {
             value: this.distribution.distributionId,
