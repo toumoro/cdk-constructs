@@ -18,9 +18,9 @@ const usEast1Env = {
   region: 'us-east-1',
 }
 
-const usEast2Env = {
+const caWest1Env = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: 'us-east-2',
+  region: 'ca-west-1',
 }
 
 const vpcStackProps1: TmVpcStackProps = {
@@ -34,7 +34,7 @@ const vpcStackProps1: TmVpcStackProps = {
 
 const vpcStackProps2: TmVpcStackProps = {
   crossRegionReferences: true,
-  env: usEast2Env,
+  env: caWest1Env,
   rangeCidr: '10.0.0.0/16',
   vpcName: 'myVpc',
   //enableEndpoints:['s3', 'dynamodb'],
@@ -72,7 +72,7 @@ const ecsStackProps2: TmEcsStackProps = {
   // minTaskCount: 1,
   // maxTaskCount: 3,
   // containerPort: 80,
-  env: usEast2Env,
+  env: caWest1Env,
   vpc: vpcStack2.vpc,
   domainName: 'www.tm-efosso.quebec.ca',
   hostedZoneId: 'Z09593181OB8J3H92ORGI',
