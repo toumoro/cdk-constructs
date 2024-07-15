@@ -1,17 +1,19 @@
-# Pour créer un nouvel exemple
+# To create a new example
 
 ```bash
 cd examples
-mkdir tm-<nom-du-stack-exemple-pour-le-developpement-de-constructs>
+mkdir tm-<name-of-the-example-stack-for-construct-development>
 ```
 
-Initialisation de CDK
+### Initializing CDK
+
 ```bash
-cd tm-<nom-du-stack-exemple-pour-le-developpement-de-constructs>
+cd tm-<name-of-the-example-stack-for-construct-development>
 cdk init app --language typescript
 ```
 
-Remove devDependencies et dependencies from package.json
+### Remove devDependencies and dependencies from `package.json`
+
 ```json
 {
   "name": "tm-example",
@@ -28,9 +30,14 @@ Remove devDependencies et dependencies from package.json
 }
 ```
 
-Remove node_modules from new example
-```
+### Remove `node_modules` from the new example
+
+```bash
 rm -r tm-example/node_modules
 ```
 
-Suivez le README du projet pour déployer la nouvelle pile.
+### Remove `tsconfig.json` from examples because we are going to use the one from the root
+
+```bash
+rm -rf tsconfig.json
+```
