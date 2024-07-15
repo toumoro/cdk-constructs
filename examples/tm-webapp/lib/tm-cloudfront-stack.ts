@@ -1,16 +1,16 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 //import { VpcBase, TmVpcProps } from './vpc/vpc-base';
-import { CfnOutput, Duration, Environment, RemovalPolicy } from 'aws-cdk-lib';
-import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { AllowedMethods, CacheCookieBehavior, CacheHeaderBehavior, CachePolicy, CacheQueryStringBehavior, Distribution, LambdaEdgeEventType, OriginProtocolPolicy, OriginRequestPolicy, PriceClass, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { CfnOutput, Environment, RemovalPolicy } from 'aws-cdk-lib';
+//import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import { AllowedMethods, CachePolicy, Distribution, OriginProtocolPolicy, OriginRequestPolicy, PriceClass, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { HttpOrigin, LoadBalancerV2Origin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+//import { BucketDeployment } from 'aws-cdk-lib/aws-s3-deployment';
 //import * as path from 'path';
 //import * as fs from 'fs';
-import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
+//import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { ILoadBalancerV2 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { TmCachePolicy, TmCachePolicyProps } from './cloudfront/cachePolicy';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
@@ -37,10 +37,10 @@ export class TmCloudfrontStack extends cdk.Stack {
     private logBucket: Bucket;
     private errorsBucket: Bucket;
     private errorsBucketOrigin: S3Origin;
-    private assetsBucketOrigin: HttpOrigin;
+    //private assetsBucketOrigin: HttpOrigin;
     private loadBalancerOrigin: HttpOrigin;
     private distribution: Distribution;
-    private s3Deployment?: BucketDeployment;
+    //private s3Deployment?: BucketDeployment;
 
 
     constructor(scope: Construct, id: string, props: TmCloudfrontStackProps) {

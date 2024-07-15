@@ -1,5 +1,5 @@
 
-import { IPrefixList, PrefixList } from 'aws-cdk-lib/aws-ec2';
+//import { IPrefixList, PrefixList } from 'aws-cdk-lib/aws-ec2';
 import { Effect, PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';

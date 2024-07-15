@@ -4,7 +4,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { TmRdsAuroraMysqlServerless } from '../../../src';
-import { NagSuppressions } from 'cdk-nag';
+//import { NagSuppressions } from 'cdk-nag';
 
 interface TmRdsAuroraMysqlServerlessStackProps extends cdk.StackProps {
   vpc: ec2.IVpc;

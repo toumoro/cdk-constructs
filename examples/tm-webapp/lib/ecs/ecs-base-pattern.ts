@@ -1,4 +1,4 @@
-import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { Duration } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
@@ -82,7 +82,8 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         subnetType: ec2.SubnetType.PUBLIC
       },
       taskImageOptions: {
-        image: ecs.ContainerImage.fromAsset('lib/ecs/containerImage'),
+        //image: ecs.ContainerImage.fromAsset('lib/ecs/containerImage'),
+        image: ecs.ContainerImage.fromAsset('../../build/build'),
         //image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
         containerPort: props.containerPort, // Optional: Specify the container port
         enableLogging: true,
