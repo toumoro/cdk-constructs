@@ -3,15 +3,22 @@ import { Construct } from 'constructs';
 import * as pipelines from 'aws-cdk-lib/pipelines';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { TmPipelineAppStage } from './tm-app-stage';
-import * as ssm from 'aws-cdk-lib/aws-ssm';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 
 export class TmPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-  const repositoryBranch =  ssm.StringParameter.valueForStringParameter(
-    this, 'repositoryBranch');
+  const repository = codecommit.Repository.fromRepositoryName(
+    this, 'Infrastructure', 'infrastructure');
+
+  const additionalRepository = codecommit.Repository.fromRepositoryName(
+    this, 'Application', 'application');
+  
+  const branchNameParam = new cdk.CfnParameter(this, 'branchNameParam', {
+    type: 'String',
+    default: 'main',
+  });
 
   const pipeline = new pipelines.CodePipeline(this, 'TmPipelineStack', {
     crossAccountKeys: true,
@@ -20,14 +27,9 @@ export class TmPipelineStack extends cdk.Stack {
     //synth: new pipelines.ShellStep('Synth', {
     synth: new pipelines.CodeBuildStep('Synth', {
       // From codecommit.Repository.fromRepositoryName
-      //input: pipelines.CodePipelineSource.codeCommit(repository, props.repoBranch),
-      input: pipelines.CodePipelineSource.connection( 'tm-lcarvalho/cdk-constructs', repositoryBranch, {
-        connectionArn: 'arn:aws:codestar-connections:ca-central-1:654654470378:connection/72c0424f-3adc-4157-8f48-962db7dfaefd'
-      }),
+      input: pipelines.CodePipelineSource.codeCommit(repository, branchNameParam.valueAsString),
       additionalInputs: {
-        'build': pipelines.CodePipelineSource.connection( 'tm-lcarvalho/cdk-constructs-build', repositoryBranch, {
-          connectionArn: 'arn:aws:codestar-connections:ca-central-1:654654470378:connection/72c0424f-3adc-4157-8f48-962db7dfaefd'
-        }),
+        'build': pipelines.CodePipelineSource.codeCommit(additionalRepository, branchNameParam.valueAsString),
       },
       // Commands to run in the synth step
       installCommands: ['npm install', 'npm ci', 'npm install -g aws-cdk'],
