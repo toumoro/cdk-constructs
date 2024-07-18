@@ -70,7 +70,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     // Define the Docker image asset
     const dockerImageAsset = new ecr_assets.DockerImageAsset(scope, 'ApplicationImage', {
       directory: path.join(__dirname, '../../build/'),
-      file: 'Dockerfile',
+      file: 'docker/Dockerfile',
     });
 
     const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
