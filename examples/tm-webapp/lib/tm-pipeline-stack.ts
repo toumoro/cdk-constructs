@@ -29,7 +29,7 @@ export class TmPipelineStack extends cdk.Stack {
       // From codecommit.Repository.fromRepositoryName
       input: pipelines.CodePipelineSource.codeCommit(repository, branchNameParam.valueAsString),
       additionalInputs: {
-        'build': pipelines.CodePipelineSource.codeCommit(additionalRepository, branchNameParam.valueAsString),
+        'examples/tm-webapp/build': pipelines.CodePipelineSource.codeCommit(additionalRepository, branchNameParam.valueAsString),
       },
       // Commands to run in the synth step
       installCommands: ['npm install', 'npm ci', 'npm install -g aws-cdk'],

@@ -60,8 +60,8 @@ export class TmPipelineAppStage extends cdk.Stage {
         // containerPort: 80,
         env: caCentral1Env,
         vpc: vpcCaCentralStack.vpc,
-        domainName: 'www.pguv3-accept.quebec.ca',
-        hostedZoneId: 'Z09506881MQ4TUQ1SCU3U',
+        domainName: 'www.pguv3-tm-lcarvalho.quebec.ca',
+        hostedZoneId: 'Z07847823JL2AK0VT9BYU',
       }
 
       /*
