@@ -2,9 +2,11 @@ import { Duration } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
+import * as path from 'path';
 
 
 /**
@@ -65,6 +67,11 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
 export class TmApplicationLoadBalancedFargateService extends ecsPatterns.ApplicationLoadBalancedFargateService {
 
   constructor(scope: Construct, id: string, props: TmApplicationLoadBalancedFargateServiceProps,) {
+    // Define the Docker image asset
+    const dockerImageAsset = new ecr_assets.DockerImageAsset(scope, 'ApplicationImage', {
+      directory: path.join(__dirname, '../../build/docker'),
+    });
+
     const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
       vpc: props.vpc,
       assignPublicIp: true,
@@ -82,8 +89,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         subnetType: ec2.SubnetType.PUBLIC
       },
       taskImageOptions: {
-        //image: ecs.ContainerImage.fromAsset('lib/ecs/containerImage'),
-        image: ecs.ContainerImage.fromAsset('../../build/build'),
+        image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
         //image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
         containerPort: props.containerPort, // Optional: Specify the container port
         enableLogging: true,

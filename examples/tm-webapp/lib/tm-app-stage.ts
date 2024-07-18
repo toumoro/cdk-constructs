@@ -21,11 +21,6 @@ export class TmPipelineAppStage extends cdk.Stage {
         account: process.env.CDK_DEFAULT_ACCOUNT,
         region: 'ca-central-1',
       }
-      const caWest1Env = {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
-        //region: 'ca-west-1',
-        region: 'us-west-1',
-      }
 
       const euWest3Env = {
         account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -37,21 +32,11 @@ export class TmPipelineAppStage extends cdk.Stage {
         range: '10.3.0.0/16',
       });
 
-      const vpcCaWestStack = new TmVpcbaseStack(this, 'vpcCaWest2Stack', {
-        env: caWest1Env,
-        range: '10.4.0.0/16',
-      });
-
       const vpcEuWestStack = new TmVpcbaseStack(this, 'vpcEuWestStack', {
         env: euWest3Env,
         range: '10.5.0.0/16',
       });
-
-      const bastionCaWestStack = new BastionStack(this, 'BastionCaWestStack', {
-        vpc: vpcCaWestStack.vpc,
-        env: caWest1Env,
-      });
-      
+    
       const bastionCaCentralStack = new BastionStack(this, 'BastionCaCentralStack', {
         vpc: vpcCaCentralStack.vpc,
         env: caCentral1Env,
@@ -113,12 +98,6 @@ export class TmPipelineAppStage extends cdk.Stage {
         applicationLoadbalancer: ecsCaCentral1Stack.loadbalancer,
       }
       new TmCloudfrontStack(this, 'CustomCloudfrontStack', cloudFrontStackProps);
-
-      new TmRdsNetworkSecondaryRegionStack(this, 'rdsNetworkSecondaryRegion', {
-        env: caWest1Env,
-        vpc: vpcCaWestStack.vpc,
-        bastionHost: bastionCaWestStack.securityGroupBastion,
-      });
 
       new TmRdsNetworkSecondaryRegionStack(this, 'rdsNetworkRegionEuWest', {
         env: euWest3Env,
