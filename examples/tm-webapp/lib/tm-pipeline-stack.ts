@@ -41,6 +41,7 @@ export class TmPipelineStack extends cdk.Stack {
         'find . -iname cdk.out',
         'ls -al',
         'pwd',
+        'rm -rfv cdk.out/asset.*',
       ],
       primaryOutputDirectory: 'examples/tm-webapp/cdk.out',
       rolePolicyStatements: [
