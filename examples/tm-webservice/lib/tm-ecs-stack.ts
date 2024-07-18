@@ -5,9 +5,10 @@ import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { TmApplicationLoadBalancedFargateService, TmApplicationLoadBalancedFargateServiceProps } from './ecs/ecs-base-pattern';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
-import { ApplicationLoadBalancer, ILoadBalancerV2 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { AwsManagedPrefixList } from './cloudfront/prefixList';
-import { Cluster, FargateService, ICluster, IService } from 'aws-cdk-lib/aws-ecs';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+
 
 export interface TmEcsStackProps extends cdk.StackProps {
   readonly vpc: ec2.IVpc;
@@ -19,16 +20,18 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly desiredCount?: number;
   readonly containerPort?: number;
   readonly domainName: string;
+
   readonly hostedZoneId: string;
   readonly minTaskCount?: number;
   readonly maxTaskCount?: number;
+  readonly customHttpHeaderValue?: string;
 }
 
 export class TmEcsStack extends cdk.Stack {
 
-  public readonly loadbalancer: ILoadBalancerV2;
-  public readonly cluster: ICluster;
-  public readonly fargateService: FargateService;
+  public readonly loadbalancer: elbv2.ILoadBalancerV2;
+  public readonly cluster: ecs.ICluster;
+  public readonly fargateService: ecs.FargateService;
 
   constructor(scope: Construct, id: string, props: TmEcsStackProps) {
 
@@ -57,6 +60,7 @@ export class TmEcsStack extends cdk.Stack {
       minTaskCount: props.minTaskCount,
       maxTaskCount: props.maxTaskCount,
       containerPort: props.containerPort,
+      customHttpHeaderValue: props.customHttpHeaderValue,
       certificate: new acm.Certificate(this, 'Certificate', {
         domainName: props.domainName,
         validation: acm.CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', props.hostedZoneId)),
