@@ -1,9 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { VpcBase, TmVpcProps } from './vpc/vpc-base';
-import { CfnOutput } from 'aws-cdk-lib';
+import { VpcBase } from './vpc/vpc-base';
+//import { CfnOutput } from 'aws-cdk-lib';
 import * as ec2  from 'aws-cdk-lib/aws-ec2';
-import * as ssm  from 'aws-cdk-lib/aws-ssm';
+//import * as ssm  from 'aws-cdk-lib/aws-ssm';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export interface TmVpcStackProps extends cdk.StackProps {

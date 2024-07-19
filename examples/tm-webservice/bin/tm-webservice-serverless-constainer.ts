@@ -8,6 +8,7 @@ import { CommonStack } from '../lib/tm-common-stack';
 
 const app = new cdk.App();
 
+
 const caCentral1Env = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
   region: 'ca-central-1',
@@ -103,4 +104,4 @@ const cloudFrontStackProps: TmCloudfrontStackProps = {
   applicationLoadbalancer2: ecsStack2.loadbalancer,
 }
 
-const cloudfrontStack = new TmCloudfrontStack(app, 'CustomCloudfrontStack', cloudFrontStackProps);
+new TmCloudfrontStack(app, 'CustomCloudfrontStack', cloudFrontStackProps);

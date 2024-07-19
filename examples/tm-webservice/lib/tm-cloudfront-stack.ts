@@ -1,11 +1,11 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { CfnOutput, Duration, Environment, RemovalPolicy } from 'aws-cdk-lib';
+import { CfnOutput, Environment, RemovalPolicy } from 'aws-cdk-lib';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { HttpOrigin, LoadBalancerV2Origin, S3Origin, OriginGroup } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { HttpOrigin, LoadBalancerV2Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { ILoadBalancerV2 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { TmCachePolicy, TmCachePolicyProps } from './cloudfront/cachePolicy';
+import { TmCachePolicy, TmCachePolicyProps } from '../../../src/cdn/cloudfront/cachePolicy';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as fs from 'fs';
@@ -22,7 +22,7 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
     readonly webAclId?: string;
     readonly errorCachingMinTtl?: number;
     readonly applicationLoadbalancer1: ILoadBalancerV2;
-    readonly applicationLoadbalancer2: ILoadBalancerV2;
+    readonly applicationLoadbalancer2?: ILoadBalancerV2;
     readonly loadBalancerOriginProtocol?: cloudfront.OriginProtocolPolicy;
     readonly viewerProtocolPolicy?: cloudfront.ViewerProtocolPolicy;
     readonly customHttpHeaderValue?: string;
@@ -36,7 +36,7 @@ export class TmCloudfrontStack extends cdk.Stack {
     // private errorsBucketOrigin: S3Origin;
     //private assetsBucketOrigin: HttpOrigin;
     private loadBalancerOrigin1: HttpOrigin;
-    private loadBalancerOrigin2: HttpOrigin;
+    //private loadBalancerOrigin2: HttpOrigin;
     private distribution: cloudfront.Distribution;
     //private s3Deployment?: BucketDeployment;
 
@@ -72,13 +72,14 @@ export class TmCloudfrontStack extends cdk.Stack {
             }
         });
 
+        /*
         this.loadBalancerOrigin2 = new LoadBalancerV2Origin(props.applicationLoadbalancer2, {
             protocolPolicy: props.loadBalancerOriginProtocol || cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
             customHeaders: {
                 'X-Custom-Header': props.customHttpHeaderValue || '',
             }
         });
-
+        */
         const tmCachePolicyProps: TmCachePolicyProps = {
             /** OPTIONAL CACHING PARAMETERS */
             // cachePolicyName: 'typo3-cache-policy',

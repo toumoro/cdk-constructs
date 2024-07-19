@@ -1,11 +1,9 @@
-import { CfnOutput, Duration } from 'aws-cdk-lib';
+import { Duration } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
-import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
-
 
 /**
  * Represents the configuration for an ecsPatterns.
@@ -14,39 +12,9 @@ import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPatterns.ApplicationLoadBalancedFargateServiceProps {
 
   /**
- * The number of cpu units used by the task.
- */
-  readonly vpc?: ec2.IVpc;
-
-  /**
- * The number of cpu units used by the task.
- */
-  readonly cpu?: number;
-
-  /**
- * The amount (in MiB) of memory used by the task.
- */
-  readonly memoryLimitMiB?: number;
-
-  /**
- * The desired number of instantiations of the task definition to keep running on the service.
- */
-  readonly desiredCount?: number;
-
-  /**
 * The container port.
 */
   readonly containerPort?: number;
-
-  /**
-* The certificate .
-*/
-  readonly certificate?: ICertificate;
-
-  /**
-* The listener port.
-*/
-  readonly listenerPort?: number;
 
   /**
 * The minumun number od tasks.
@@ -57,14 +25,17 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
 * The maximum number of task.
 */
   readonly maxTaskCount?: number;
-
+  /**
+   * The custom http header value.
+   */
+  readonly customHttpHeaderValue?: string;
 
 }
 
 
 export class TmApplicationLoadBalancedFargateService extends ecsPatterns.ApplicationLoadBalancedFargateService {
 
-  constructor(scope: Construct, id: string, props: TmApplicationLoadBalancedFargateServiceProps,) {
+  constructor(scope: Construct, id: string, props: TmApplicationLoadBalancedFargateServiceProps) {
     const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
       vpc: props.vpc,
       assignPublicIp: true,
@@ -79,10 +50,11 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       protocol: elbv2.ApplicationProtocol.HTTPS,
       targetProtocol: elbv2.ApplicationProtocol.HTTP,
       taskSubnets: {
-        subnetType: ec2.SubnetType.PUBLIC
+        subnetType: ec2.SubnetType.PUBLIC,
       },
       taskImageOptions: {
-        image: ecs.ContainerImage.fromAsset('lib/ecs/containerImage'),
+        //image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
+        image: ecs.ContainerImage.fromAsset('build'),
         //image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
         containerPort: props.containerPort, // Optional: Specify the container port
         enableLogging: true,
@@ -93,7 +65,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         // secrets: { // Optional: Add secrets from AWS Secrets Manager
         //   SECRET_NAME: ecs.Secret.fromSecretsManager(secret)
         // }
-      }
+      },
     };
 
     const mergedProps = { ...defautProps, ...props };
@@ -104,7 +76,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     this.listener.addTargetGroups('HeaderConditionForward', {
       priority: 1,
       conditions: [
-        elbv2.ListenerCondition.httpHeader('X-Custom-Header', ['sdsdsdsdsd'])
+        elbv2.ListenerCondition.httpHeader('X-Custom-Header', ['sdsdsdsdsd']),
       ],
       targetGroups: [this.targetGroup],
     });
@@ -137,7 +109,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       scaleOutCooldown: Duration.seconds(60),
     });
 
- 
+
   };
 
 

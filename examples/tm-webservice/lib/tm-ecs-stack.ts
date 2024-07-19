@@ -3,10 +3,10 @@ import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { TmApplicationLoadBalancedFargateService, TmApplicationLoadBalancedFargateServiceProps } from './ecs/ecs-base-pattern';
+import { TmApplicationLoadBalancedFargateService, TmApplicationLoadBalancedFargateServiceProps } from '../../../src/containers/ecs/ecs-base-pattern';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { AwsManagedPrefixList } from './cloudfront/prefixList';
+import { AwsManagedPrefixList } from '../../../src/cdn/cloudfront/prefixList';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 
 
