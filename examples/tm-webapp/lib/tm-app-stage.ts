@@ -8,8 +8,12 @@ import { TmRdsNetworkSecondaryRegionStack } from './tm-rds-network-secondary-reg
 import { TmRdsAuroraMysqlServerlessStack } from './tm-rds-aurora-mysql-serverless-stack';
 
 interface RegionParameters {
-  range: string;
-  rdsMainRegion: boolean;
+  vpc: {
+    range: string;
+  }
+  rds: {
+    rdsMainRegion: boolean;
+  }
 }
 
 export class TmPipelineAppStage extends cdk.Stage {
@@ -20,18 +24,27 @@ export class TmPipelineAppStage extends cdk.Stage {
       function toPascalCase(input: string): string {
         return input
             .split(/[\s_\-]+/)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            //.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join('');
       }
 
       const regions: { [region: string]: RegionParameters } = {
         'ca-central-1': {
-          range: '10.3.0.0/16',
-          rdsMainRegion: true,
+          vpc: {
+            range: '10.3.0.0/16',
+          },
+          rds: {
+            rdsMainRegion: true,
+          }
         },
         'eu-west-3': {
-          range: '10.4.0.0/16',
-          rdsMainRegion: false,
+          vpc: {
+            range: '10.4.0.0/16',
+          },
+          rds: {
+            rdsMainRegion: false,
+          }
         }
       }
       
@@ -40,24 +53,25 @@ export class TmPipelineAppStage extends cdk.Stage {
           account: process.env.CDK_DEFAULT_ACCOUNT,
           region: region,
         };
+        const regionName = toPascalCase(region);
 
-        const vpc = new TmVpcbaseStack(this, toPascalCase(`TmVpc${region}Stack`), {
+        const vpc = new TmVpcbaseStack(this, `TmVpc${regionName}Stack`, {
           env: env,
-          range: regionProps.range,
+          range: regionProps.vpc.range,
         });
-        const bastion = new BastionStack(this, toPascalCase(`TmBastion${region}Stack`), {
+        const bastion = new BastionStack(this, `TmBastion${regionName}Stack`, {
           vpc: vpc.vpc,
           env: env,
         });
-        if (regionProps.rdsMainRegion) {
-          new TmRdsAuroraMysqlServerlessStack(this, toPascalCase(`TmRdsAurora${region}`), {
+        if (regionProps.rds.rdsMainRegion) {
+          new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
             env: env,
             vpc: vpc.vpc,
             bastionHost: bastion.securityGroupBastion,
             enableGlobal: true,
           });
         } else {
-          new TmRdsNetworkSecondaryRegionStack(this, toPascalCase(`TmRdsNetwork${region}Stack`), {
+          new TmRdsNetworkSecondaryRegionStack(this, `TmRdsNetwork${regionName}Stack`, {
             env: env,
             vpc: vpc.vpc,
             bastionHost: bastion.securityGroupBastion,
