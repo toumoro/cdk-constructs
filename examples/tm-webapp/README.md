@@ -15,13 +15,35 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 # Bootstrap projet
 
-## Create a mirroring before begging the deploy
+## Install packages
+
+At the root of the project:
+```
+npm install
+npx projen
+```
+
+[!WARNING]
+Do not run npm install in the examples folder. There shall be only one node_modules folder at the root of the project.
+
+## Deploy cdk bootstrap
+
+```
+cdk bootstrap
+```
+
+When adding a new region, you must bootstrap it by running the bootstrap command again.
+
+## Create two CodeCommit repositories
+
+* infrastructure
+* application
+
+## Configure mirroring if you wish to deploy from something else than CodeCommit
 
 [GitLab to CodeCommit](https://docs.gitlab.com/ee/user/project/repository/mirror/push.html)
 [Azure DevOps to CodeCommit](https://aws.amazon.com/blogs/devops/use-aws-codecommit-to-mirror-an-azure-devops-repository-using-an-azure-devops-pipeline/)
 
-## Create SSM entries for each account that is going to be used
+## Deploy
 
-* Default repository branch  main `aws ssm put-parameter --name "repositoryBranch" --type "String" --value "main"`
-* Default domain `aws ssm put-parameter --name "domain" --type "String" --value "main"`
-* Create a vakye Secure `aws ssm put-parameter --name "secure-parameter-name" --type "SecureString" --value "secure-parameter-value"`
+cdk deploy
