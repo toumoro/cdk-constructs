@@ -63,9 +63,9 @@ const ecsStackProps1: TmEcsStackProps = {
   // containerPort: 80,
   env: caCentral1Env,
   vpc: vpcStack1.vpc,
-  customHttpHeaderValue: commonStack.customHttpHeaderValue.valueAsString,
-  domainName: commonStack.domainName.valueAsString,
-  hostedZoneId: commonStack.hostedZoneId.valueAsString,
+  customHttpHeaderValue: string;
+  domainName: string;
+  hostedZoneId: string;
 }
 
 const ecsStackProps2: TmEcsStackProps = {

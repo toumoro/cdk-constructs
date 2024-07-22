@@ -2,10 +2,12 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import { TmVpcbaseStack } from './tm-vpc-base-stack';
 import { BastionStack } from './tm-bastion-stack';
-//import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
+import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
 //import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
+import { CommonStack } from './tm-common-stack';
 import { TmRdsNetworkSecondaryRegionStack } from './tm-rds-network-secondary-region';
 import { TmRdsAuroraMysqlServerlessStack } from './tm-rds-aurora-mysql-serverless-stack';
+import * as path from 'path';
 
 interface RegionParameters {
   vpc: {
@@ -13,6 +15,14 @@ interface RegionParameters {
   }
   rds: {
     rdsMainRegion: boolean;
+  }
+  ecs: {
+    crossRegionReferences: boolean;
+    customHttpHeaderValue: string;
+    domainName: string;
+    hostedZoneId: string;
+    buildContextPath: string;
+    buildDockerfile: string;
   }
 }
 
@@ -29,6 +39,23 @@ export class TmPipelineAppStage extends cdk.Stage {
             .join('');
       }
 
+      const commonStack = new CommonStack(this, 'CommonStack', {
+        crossRegionReferences: true,
+        env: {
+          account: process.env.CDK_DEFAULT_ACCOUNT,
+          region: 'ca-central-1',
+        }
+      });
+
+      const commonEcsStackProps = {
+        crossRegionReferences: true,
+        customHttpHeaderValue: commonStack.customHttpHeaderValue.valueAsString,
+        domainName: commonStack.domainName.valueAsString,
+        hostedZoneId: commonStack.hostedZoneId.valueAsString,
+        buildContextPath: path.join(__dirname, '../build/'),
+        buildDockerfile: 'docker/Dockerfile',
+      }
+      
       const regions: { [region: string]: RegionParameters } = {
         'ca-central-1': {
           vpc: {
@@ -36,7 +63,8 @@ export class TmPipelineAppStage extends cdk.Stage {
           },
           rds: {
             rdsMainRegion: true,
-          }
+          },
+          ecs: commonEcsStackProps,
         },
         'eu-west-3': {
           vpc: {
@@ -44,9 +72,10 @@ export class TmPipelineAppStage extends cdk.Stage {
           },
           rds: {
             rdsMainRegion: false,
-          }
-        }
-      }
+          },
+          ecs: commonEcsStackProps,
+        },  
+      };
       
       Object.entries(regions).forEach(([region, regionProps]) => {
         const env = {
@@ -63,6 +92,20 @@ export class TmPipelineAppStage extends cdk.Stage {
           vpc: vpc.vpc,
           env: env,
         });
+
+        const ecsStackProps: TmEcsStackProps = {
+          env: env,
+          vpc: vpc.vpc,
+          crossRegionReferences: regionProps.ecs.crossRegionReferences,
+          customHttpHeaderValue: regionProps.ecs.customHttpHeaderValue,
+          domainName: regionProps.ecs.domainName,
+          hostedZoneId: regionProps.ecs.hostedZoneId,
+          buildContextPath: regionProps.ecs.buildContextPath,
+          buildDockerfile: regionProps.ecs.buildDockerfile
+        }
+
+        new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
+
         if (regionProps.rds.rdsMainRegion) {
           new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
             env: env,

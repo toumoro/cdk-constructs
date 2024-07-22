@@ -4,6 +4,7 @@ import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
+import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 
 /**
  * Represents the configuration for an ecsPatterns.
@@ -29,13 +30,30 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
    * The custom http header value.
    */
   readonly customHttpHeaderValue?: string;
+  /*
+  * The build context path.
+  */
+  readonly buildContextPath: string;
+  /*
+  * The build dockerfile.
+  */
+  readonly buildDockerfile: string;
 
 }
+
 
 
 export class TmApplicationLoadBalancedFargateService extends ecsPatterns.ApplicationLoadBalancedFargateService {
 
   constructor(scope: Construct, id: string, props: TmApplicationLoadBalancedFargateServiceProps) {
+
+    const dockerImageAsset = new ecr_assets.DockerImageAsset(scope, 'ApplicationImage', {
+      //directory: path.join(__dirname, '../build/'),
+      //file: 'docker/Dockerfile',
+      directory: props.buildContextPath,
+      file: props.buildDockerfile,
+    });
+
     const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
       vpc: props.vpc,
       assignPublicIp: true,
@@ -52,9 +70,12 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       taskSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
+      buildContextPath: props.buildContextPath,
+      buildDockerfile: props.buildDockerfile,
       taskImageOptions: {
         //image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
-        image: ecs.ContainerImage.fromAsset('build'),
+        image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
+        //image: ecs.ContainerImage.fromAsset('build'),
         //image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
         containerPort: props.containerPort, // Optional: Specify the container port
         enableLogging: true,
