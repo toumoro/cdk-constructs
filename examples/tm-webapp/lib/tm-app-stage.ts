@@ -52,7 +52,7 @@ export class TmPipelineAppStage extends cdk.Stage {
         customHttpHeaderValue: commonStack.customHttpHeaderValue.valueAsString,
         domainName: commonStack.domainName.valueAsString,
         hostedZoneId: commonStack.hostedZoneId.valueAsString,
-        buildContextPath: path.join(__dirname, '../build/'),
+        buildContextPath: path.join(__dirname, '../../build/'),
         buildDockerfile: 'docker/Dockerfile',
       }
       
@@ -104,6 +104,8 @@ export class TmPipelineAppStage extends cdk.Stage {
           buildDockerfile: regionProps.ecs.buildDockerfile
         }
 
+        console.log(regionProps.ecs.buildContextPath)
+        console.log(regionProps.ecs.buildDockerfile)
         new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
 
         if (regionProps.rds.rdsMainRegion) {
