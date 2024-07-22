@@ -2,115 +2,70 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from "constructs";
 import { TmVpcbaseStack } from './tm-vpc-base-stack';
 import { BastionStack } from './tm-bastion-stack';
-import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
-import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
+//import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
+//import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
 import { TmRdsNetworkSecondaryRegionStack } from './tm-rds-network-secondary-region';
 import { TmRdsAuroraMysqlServerlessStack } from './tm-rds-aurora-mysql-serverless-stack';
+
+interface RegionParameters {
+  range: string;
+  rdsMainRegion: boolean;
+}
 
 export class TmPipelineAppStage extends cdk.Stage {
 
     constructor(scope: Construct, id: string, props?: cdk.StageProps) {
       super(scope, id, props);
 
-      const usEast1Env = {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
-        region: 'us-east-1',
+      function toPascalCase(input: string): string {
+        return input
+            .split(/[\s_\-]+/)
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join('');
+      }
+
+      const regions: { [region: string]: RegionParameters } = {
+        'ca-central-1': {
+          range: '10.3.0.0/16',
+          rdsMainRegion: true,
+        },
+        'eu-west-3': {
+          range: '10.4.0.0/16',
+          rdsMainRegion: false,
+        }
       }
       
-      const caCentral1Env = {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
-        region: 'ca-central-1',
-      }
+      Object.entries(regions).forEach(([region, regionProps]) => {
+        const env = {
+          account: process.env.CDK_DEFAULT_ACCOUNT,
+          region: region,
+        };
 
-      const euWest3Env = {
-        account: process.env.CDK_DEFAULT_ACCOUNT,
-        region: 'eu-west-3',
-      }
-
-      const vpcCaCentralStack = new TmVpcbaseStack(this, 'vpcCaCentral2Stack', {
-        env: caCentral1Env,
-        range: '10.3.0.0/16',
+        const vpc = new TmVpcbaseStack(this, toPascalCase(`TmVpc${region}Stack`), {
+          env: env,
+          range: regionProps.range,
+        });
+        const bastion = new BastionStack(this, toPascalCase(`TmBastion${region}Stack`), {
+          vpc: vpc.vpc,
+          env: env,
+        });
+        if (regionProps.rdsMainRegion) {
+          new TmRdsAuroraMysqlServerlessStack(this, toPascalCase(`TmRdsAurora${region}`), {
+            env: env,
+            vpc: vpc.vpc,
+            bastionHost: bastion.securityGroupBastion,
+            enableGlobal: true,
+          });
+        } else {
+          new TmRdsNetworkSecondaryRegionStack(this, toPascalCase(`TmRdsNetwork${region}Stack`), {
+            env: env,
+            vpc: vpc.vpc,
+            bastionHost: bastion.securityGroupBastion,
+          });
+        }
       });
 
-      const vpcEuWestStack = new TmVpcbaseStack(this, 'vpcEuWestStack', {
-        env: euWest3Env,
-        range: '10.5.0.0/16',
-      });
-    
-      const bastionCaCentralStack = new BastionStack(this, 'BastionCaCentralStack', {
-        vpc: vpcCaCentralStack.vpc,
-        env: caCentral1Env,
-      });
-
-      const bastionEuCentralStack = new BastionStack(this, 'BastionEuWestStack', {
-        vpc: vpcEuWestStack.vpc,
-        env: euWest3Env,
-      });
-    
-      const ecsCaCentral1StackProps: TmEcsStackProps = {
-        crossRegionReferences: true,
-        // allowPublicInternetAccess: true,
-        // listenToHttp: true,
-        // listenToHttps: false,
-        // memoryLimitMiB: 512,
-        // cpu: 256,
-        // desiredCount: 1,
-        // minTaskCount: 1,
-        // maxTaskCount: 3,
-        // containerPort: 80,
-        env: caCentral1Env,
-        vpc: vpcCaCentralStack.vpc,
-        domainName: 'www.pguv3-tm-lcarvalho.quebec.ca',
-        hostedZoneId: 'Z07847823JL2AK0VT9BYU',
-      }
-
-      /*
-      const ecsCaWest1StackProps: TmEcsStackProps = {
-        crossRegionReferences: true,
-        // allowPublicInternetAccess: true,
-        // listenToHttp: true,
-        // listenToHttps: false,
-        // memoryLimitMiB: 512,
-        // cpu: 256,
-        // desiredCount: 1,
-        // minTaskCount: 1,
-        // maxTaskCount: 3,
-        // containerPort: 80,
-        env: caWest1Env,
-        vpc: vpcCaWestStack.vpc,
-        domainName: 'www.pguv3-accept.quebec.ca',
-        hostedZoneId: 'Z09506881MQ4TUQ1SCU3U',
-      } */
-      const ecsCaCentral1Stack = new TmEcsStack(this, 'EcsCaCentral1Stack', ecsCaCentral1StackProps);
-
-      //const ecsCaWest1Stack = new TmEcsStack(this, 'EcsCaWest1Stack', ecsCaWest1StackProps);
-
-      const cloudFrontStackProps: TmCloudfrontStackProps = {
-        crossRegionReferences: true,
-        originDnsName: ecsCaCentral1Stack.loadbalancer.loadBalancerDnsName,
-        domainName: ecsCaCentral1StackProps.domainName,
-        hostedZoneId: ecsCaCentral1StackProps.hostedZoneId,
-        env: usEast1Env,
-        // additionalCookies: [],
-        // retainLogBuckets: false,
-        // webAclId: '',
-        // errorCachingMinTtl: 300,
-        applicationLoadbalancer: ecsCaCentral1Stack.loadbalancer,
-      }
-      new TmCloudfrontStack(this, 'CustomCloudfrontStack', cloudFrontStackProps);
-
-      new TmRdsNetworkSecondaryRegionStack(this, 'rdsNetworkRegionEuWest', {
-        env: euWest3Env,
-        vpc: vpcEuWestStack.vpc,
-        bastionHost: bastionEuCentralStack.securityGroupBastion,
-      });
-
-      new TmRdsAuroraMysqlServerlessStack(this, 'TmRdsAuroraMysqlServerless', {
-        env: caCentral1Env,
-        vpc: vpcCaCentralStack.vpc,
-        bastionHost: bastionCaCentralStack.securityGroupBastion,
-        enableGlobal: true,
-      });
+     
     }
 
 }
