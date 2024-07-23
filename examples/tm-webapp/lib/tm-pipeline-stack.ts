@@ -24,6 +24,7 @@ export class TmPipelineStack extends cdk.Stack {
     crossAccountKeys: true,
     //reuseCrossRegionSupportStacks: true,
     pipelineName: 'TmPipelineStack',
+    dockerEnabledForSelfMutation: true,
     //synth: new pipelines.ShellStep('Synth', {
     synth: new pipelines.CodeBuildStep('Synth', {
       // From codecommit.Repository.fromRepositoryName
