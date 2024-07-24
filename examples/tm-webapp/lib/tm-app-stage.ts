@@ -4,10 +4,18 @@ import { TmVpcbaseStack } from './tm-vpc-base-stack';
 import { BastionStack } from './tm-bastion-stack';
 import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
 //import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
-import { CommonStack } from './tm-common-stack';
+//import { CommonStack } from './tm-common-stack';
 import { TmRdsNetworkSecondaryRegionStack } from './tm-rds-network-secondary-region';
 import { TmRdsAuroraMysqlServerlessStack } from './tm-rds-aurora-mysql-serverless-stack';
 import * as path from 'path';
+
+/*
+export interface TmPipelineAppStageProps extends cdk.StageProps {
+  customHttpHeader: string;
+  domainName: string;
+  hostedZoneId: string;
+}
+*/
 
 interface RegionParameters {
   vpc: {
@@ -39,19 +47,11 @@ export class TmPipelineAppStage extends cdk.Stage {
             .join('');
       }
 
-      const commonStack = new CommonStack(this, 'CommonStack', {
-        crossRegionReferences: true,
-        env: {
-          account: process.env.CDK_DEFAULT_ACCOUNT,
-          region: 'ca-central-1',
-        }
-      });
-
       const commonEcsStackProps = {
         crossRegionReferences: true,
-        customHttpHeaderValue: commonStack.customHttpHeaderValue.valueAsString,
-        domainName: commonStack.domainName.valueAsString,
-        hostedZoneId: commonStack.hostedZoneId.valueAsString,
+        customHttpHeaderValue: cdk.Fn.importValue('CustomHttpHeaderValueExport'),
+        domainName: cdk.Fn.importValue('DomainNameExport'),
+        hostedZoneId: cdk.Fn.importValue('HostedZoneIdExport'),
         buildContextPath: path.join(__dirname, '../build/'),
         buildDockerfile: 'docker/Dockerfile',
       }

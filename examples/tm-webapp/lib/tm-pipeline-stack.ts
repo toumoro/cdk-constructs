@@ -20,6 +20,39 @@ export class TmPipelineStack extends cdk.Stack {
     default: 'main',
   });
 
+  const customHttpHeaderValue = new cdk.CfnParameter(this, 'customHttpHeaderValue', {
+    type: 'String',
+    description: 'The custom HTTP Header value',
+  });
+
+  const domainName = new cdk.CfnParameter(this, 'domainName', {
+    type: 'String',
+    description: 'The Application FQDN',
+    //allowedPattern: '^(\*\.)?(((?!-)[A-Za-z0-9-]{0,62}[A-Za-z0-9])\.)+((?!-)[A-Za-z0-9-]{1,62}[A-Za-z0-9])$',
+    //constraintDescription: 'Must be a valid domain name.',
+  });
+
+  const hostedZoneId = new cdk.CfnParameter(this, 'hostedZoneId', {
+    type: 'String',
+    description: 'The Route53 hosted zone ID',
+  });
+
+  new cdk.CfnOutput(this, 'customHttpHeaderValueOutput', {
+    value: customHttpHeaderValue.valueAsString,
+    exportName: 'CustomHttpHeaderValueExport',
+  });
+
+  new cdk.CfnOutput(this, 'DomainNameOutput', {
+    value: domainName.valueAsString,
+    exportName: 'DomainNameExport',
+  });
+
+  new cdk.CfnOutput(this, 'HostedZoneIdOutput', {
+    value: hostedZoneId.valueAsString,
+    exportName: 'HostedZoneIdExport',
+  });
+
+
   const pipeline = new pipelines.CodePipeline(this, 'TmPipelineStack', {
     crossAccountKeys: true,
     //reuseCrossRegionSupportStacks: true,
@@ -59,23 +92,8 @@ export class TmPipelineStack extends cdk.Stack {
     env: {
       account: process.env.CDK_DEFAULT_ACCOUNT,
       region: 'ca-central-1'
-    },
+    }
   }));
 
 }
 }
-
-  /* 
-  const pipeline = new TmPipeline(this, 'PipelineCdk', {
-      pipelineName: 'PipelineCdk',
-      repoName: 'tm-lcarvalho/cdk-constructs',
-      repoBranch: 'main',
-      connectionArn: 'arn:aws:codestar-connections:ca-central-1:654654470378:connection/72c0424f-3adc-4157-8f48-962db7dfaefd',
-      primaryOutputDirectory: 'examples/tm-webapp/cdk.out',
-      synthCommand: [ 'cd examples/tm-webapp', 
-                      'npm install', 
-                      'cdk synth', 
-                      'find . -iname cdk.out', 
-                      'pwd']
-    });
-    */
