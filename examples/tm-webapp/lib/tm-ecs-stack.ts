@@ -8,6 +8,7 @@ import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { AwsManagedPrefixList } from '../../../src/cdn/cloudfront/prefixList';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 export interface TmEcsStackProps extends cdk.StackProps {
   readonly vpc: ec2.IVpc;
@@ -18,12 +19,12 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly cpu?: number;
   readonly desiredCount?: number;
   readonly containerPort?: number;
-  readonly domainName: string;
+  //readonly domainName: string;
 
-  readonly hostedZoneId: string;
+  //readonly hostedZoneId: string;
   readonly minTaskCount?: number;
   readonly maxTaskCount?: number;
-  readonly customHttpHeaderValue?: string;
+  //readonly customHttpHeaderValue?: string;
 
   readonly buildContextPath?: string;
   readonly buildDockerfile?: string;
@@ -51,6 +52,13 @@ export class TmEcsStack extends cdk.Stack {
       description: 'ALB Security Group',
     });
 
+    const customHttpHeaderValue = ssm.StringParameter.valueForStringParameter(
+      this, 'customHttpHeaderValue');
+    const domainName = ssm.StringParameter.valueForStringParameter(
+      this, 'domainName');
+    const hostedZoneId = ssm.StringParameter.valueForStringParameter(
+      this, 'hostedZoneId');
+
     lbSecurityGroup.addIngressRule(ec2.Peer.prefixList(cloudFrontPrefixListId), ec2.Port.tcp(443), 'Allow HTTPS from CloudFront');
 
     /** Service Props*/
@@ -62,12 +70,13 @@ export class TmEcsStack extends cdk.Stack {
       minTaskCount: props.minTaskCount,
       maxTaskCount: props.maxTaskCount,
       containerPort: props.containerPort,
-      customHttpHeaderValue: props.customHttpHeaderValue,
+      //customHttpHeaderValue: props.customHttpHeaderValue,
+      customHttpHeaderValue: customHttpHeaderValue,
       buildContextPath: props.buildContextPath ?? './',
       buildDockerfile: props.buildDockerfile ?? 'Dockerfile',
       certificate: new acm.Certificate(this, 'Certificate', {
-        domainName: props.domainName,
-        validation: acm.CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', props.hostedZoneId)),
+        domainName: domainName,
+        validation: acm.CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', hostedZoneId)),
       }),
     }
 

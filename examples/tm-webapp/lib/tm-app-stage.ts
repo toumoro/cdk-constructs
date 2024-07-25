@@ -4,7 +4,6 @@ import { TmVpcbaseStack } from './tm-vpc-base-stack';
 import { BastionStack } from './tm-bastion-stack';
 import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
 //import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
-//import { CommonStack } from './tm-common-stack';
 import { TmRdsNetworkSecondaryRegionStack } from './tm-rds-network-secondary-region';
 import { TmRdsAuroraMysqlServerlessStack } from './tm-rds-aurora-mysql-serverless-stack';
 import * as path from 'path';
@@ -26,9 +25,6 @@ interface RegionParameters {
   }
   ecs: {
     crossRegionReferences: boolean;
-    customHttpHeaderValue: string;
-    domainName: string;
-    hostedZoneId: string;
     buildContextPath: string;
     buildDockerfile: string;
   }
@@ -46,12 +42,10 @@ export class TmPipelineAppStage extends cdk.Stage {
             //.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join('');
       }
+      
 
       const commonEcsStackProps = {
         crossRegionReferences: true,
-        customHttpHeaderValue: cdk.Fn.importValue('CustomHttpHeaderValueExport'),
-        domainName: cdk.Fn.importValue('DomainNameExport'),
-        hostedZoneId: cdk.Fn.importValue('HostedZoneIdExport'),
         buildContextPath: path.join(__dirname, '../build/'),
         buildDockerfile: 'docker/Dockerfile',
       }
@@ -88,24 +82,24 @@ export class TmPipelineAppStage extends cdk.Stage {
           env: env,
           range: regionProps.vpc.range,
         });
+      
         const bastion = new BastionStack(this, `TmBastion${regionName}Stack`, {
           vpc: vpc.vpc,
           env: env,
+          crossRegionReferences: true,
         });
-
+      
         const ecsStackProps: TmEcsStackProps = {
           env: env,
           vpc: vpc.vpc,
           crossRegionReferences: regionProps.ecs.crossRegionReferences,
-          customHttpHeaderValue: regionProps.ecs.customHttpHeaderValue,
-          domainName: regionProps.ecs.domainName,
-          hostedZoneId: regionProps.ecs.hostedZoneId,
           buildContextPath: regionProps.ecs.buildContextPath,
           buildDockerfile: regionProps.ecs.buildDockerfile
         }
+      
 
-        console.log(regionProps.ecs.buildContextPath)
-        console.log(regionProps.ecs.buildDockerfile)
+        //console.log(regionProps.ecs.buildContextPath)
+        //console.log(regionProps.ecs.buildDockerfile)
         new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
 
         if (regionProps.rds.rdsMainRegion) {

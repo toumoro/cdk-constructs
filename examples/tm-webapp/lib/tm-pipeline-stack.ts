@@ -4,6 +4,7 @@ import * as pipelines from 'aws-cdk-lib/pipelines';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { TmPipelineAppStage } from './tm-app-stage';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 export class TmPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -15,56 +16,16 @@ export class TmPipelineStack extends cdk.Stack {
   const additionalRepository = codecommit.Repository.fromRepositoryName(
     this, 'Application', 'application');
   
-  const branchNameParam = new cdk.CfnParameter(this, 'branchNameParam', {
-    type: 'String',
-    default: 'main',
-  });
-
-  const customHttpHeaderValue = new cdk.CfnParameter(this, 'customHttpHeaderValue', {
-    type: 'String',
-    description: 'The custom HTTP Header value',
-  });
-
-  const domainName = new cdk.CfnParameter(this, 'domainName', {
-    type: 'String',
-    description: 'The Application FQDN',
-    //allowedPattern: '^(\*\.)?(((?!-)[A-Za-z0-9-]{0,62}[A-Za-z0-9])\.)+((?!-)[A-Za-z0-9-]{1,62}[A-Za-z0-9])$',
-    //constraintDescription: 'Must be a valid domain name.',
-  });
-
-  const hostedZoneId = new cdk.CfnParameter(this, 'hostedZoneId', {
-    type: 'String',
-    description: 'The Route53 hosted zone ID',
-  });
-
-  new cdk.CfnOutput(this, 'customHttpHeaderValueOutput', {
-    value: customHttpHeaderValue.valueAsString,
-    exportName: 'CustomHttpHeaderValueExport',
-  });
-
-  new cdk.CfnOutput(this, 'DomainNameOutput', {
-    value: domainName.valueAsString,
-    exportName: 'DomainNameExport',
-  });
-
-  new cdk.CfnOutput(this, 'HostedZoneIdOutput', {
-    value: hostedZoneId.valueAsString,
-    exportName: 'HostedZoneIdExport',
-  });
-
+  const branchNameParam = ssm.StringParameter.valueForStringParameter(
+    this, 'branchNameParam');
 
   const pipeline = new pipelines.CodePipeline(this, 'TmPipelineStack', {
     crossAccountKeys: true,
-    //reuseCrossRegionSupportStacks: true,
     pipelineName: 'TmPipelineStack',
-    dockerEnabledForSelfMutation: true,
-    dockerEnabledForSynth: true,
-    //synth: new pipelines.ShellStep('Synth', {
     synth: new pipelines.CodeBuildStep('Synth', {
-      // From codecommit.Repository.fromRepositoryName
-      input: pipelines.CodePipelineSource.codeCommit(repository, branchNameParam.valueAsString),
+      input: pipelines.CodePipelineSource.codeCommit(repository, branchNameParam),
       additionalInputs: {
-        'examples/tm-webapp/build': pipelines.CodePipelineSource.codeCommit(additionalRepository, branchNameParam.valueAsString),
+        'examples/tm-webapp/build': pipelines.CodePipelineSource.codeCommit(additionalRepository, branchNameParam),
       },
       // Commands to run in the synth step
       installCommands: ['npm install', 'npm ci', 'npm install -g aws-cdk'],
@@ -85,8 +46,10 @@ export class TmPipelineStack extends cdk.Stack {
           resources: ['*'],
         }),
       ],
+      
     }),
   });
+
 
   pipeline.addStage(new TmPipelineAppStage(this, 'AppStage', {
     env: {
@@ -94,6 +57,6 @@ export class TmPipelineStack extends cdk.Stack {
       region: 'ca-central-1'
     }
   }));
-
+  
 }
 }
