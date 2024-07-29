@@ -21,7 +21,7 @@ interface RegionParameters {
     range: string;
   }
   rds: {
-    rdsMainRegion: boolean;
+    isRdsMainRegion: boolean;
   }
   ecs: {
     crossRegionReferences: boolean;
@@ -38,8 +38,7 @@ export class TmPipelineAppStage extends cdk.Stage {
       function toPascalCase(input: string): string {
         return input
             .split(/[\s_\-]+/)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            //.map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join('');
       }
       
@@ -56,7 +55,7 @@ export class TmPipelineAppStage extends cdk.Stage {
             range: '10.3.0.0/16',
           },
           rds: {
-            rdsMainRegion: true,
+            isRdsMainRegion: true,
           },
           ecs: commonEcsStackProps,
         },
@@ -65,7 +64,7 @@ export class TmPipelineAppStage extends cdk.Stage {
             range: '10.4.0.0/16',
           },
           rds: {
-            rdsMainRegion: false,
+            isRdsMainRegion: false,
           },
           ecs: commonEcsStackProps,
         },  
@@ -96,13 +95,10 @@ export class TmPipelineAppStage extends cdk.Stage {
           buildContextPath: regionProps.ecs.buildContextPath,
           buildDockerfile: regionProps.ecs.buildDockerfile
         }
-      
-
-        //console.log(regionProps.ecs.buildContextPath)
-        //console.log(regionProps.ecs.buildDockerfile)
+    
         new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
 
-        if (regionProps.rds.rdsMainRegion) {
+        if (regionProps.rds.isRdsMainRegion) {
           new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
             env: env,
             vpc: vpc.vpc,
