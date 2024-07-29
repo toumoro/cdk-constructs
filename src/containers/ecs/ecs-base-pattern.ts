@@ -1,10 +1,10 @@
 import { Duration } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
-import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 
 /**
  * Represents the configuration for an ecsPatterns.
@@ -40,7 +40,6 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   readonly buildDockerfile: string;
 
 }
-
 
 
 export class TmApplicationLoadBalancedFargateService extends ecsPatterns.ApplicationLoadBalancedFargateService {

@@ -1895,6 +1895,8 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.healthCheck">healthCheck</a></code> | <code>aws-cdk-lib.aws_ecs.HealthCheck</code> | The health check command and associated configuration parameters for the container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.securityGroups">securityGroups</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup[]</code> | The security groups to associate with the service. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.taskSubnets">taskSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | The subnets to associate with the service. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | The custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
@@ -2505,6 +2507,26 @@ public readonly taskSubnets: SubnetSelection;
 - *Default:* Public subnets if `assignPublicIp` is set, otherwise the first available one of Private, Isolated, Public, in that order.
 
 The subnets to associate with the service.
+
+---
+
+##### `buildContextPath`<sup>Required</sup> <a name="buildContextPath" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContextPath"></a>
+
+```typescript
+public readonly buildContextPath: string;
+```
+
+- *Type:* string
+
+---
+
+##### `buildDockerfile`<sup>Required</sup> <a name="buildDockerfile" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildDockerfile"></a>
+
+```typescript
+public readonly buildDockerfile: string;
+```
+
+- *Type:* string
 
 ---
 
