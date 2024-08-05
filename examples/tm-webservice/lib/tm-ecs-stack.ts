@@ -3,11 +3,12 @@ import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import { TmApplicationLoadBalancedFargateService, TmApplicationLoadBalancedFargateServiceProps } from '../../../src/containers/ecs/ecs-base-pattern';
+import { TmApplicationLoadBalancedFargateService, TmApplicationLoadBalancedFargateServiceProps } from './ecs/ecs-base-pattern';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { AwsManagedPrefixList } from '../../../src/cdn/cloudfront/prefixList';
+import { AwsManagedPrefixList } from './cloudfront/prefixList';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 
 export interface TmEcsStackProps extends cdk.StackProps {
@@ -19,12 +20,12 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly cpu?: number;
   readonly desiredCount?: number;
   readonly containerPort?: number;
-  readonly domainName: string;
-
-  readonly hostedZoneId: string;
+  readonly hostedZoneIdParameterName: string;
+  readonly customHttpHeaderParameterName: string;
+  readonly domainParameterName: string;
   readonly minTaskCount?: number;
   readonly maxTaskCount?: number;
-  readonly customHttpHeaderValue?: string;
+
 }
 
 export class TmEcsStack extends cdk.Stack {
@@ -60,10 +61,10 @@ export class TmEcsStack extends cdk.Stack {
       minTaskCount: props.minTaskCount,
       maxTaskCount: props.maxTaskCount,
       containerPort: props.containerPort,
-      customHttpHeaderValue: props.customHttpHeaderValue,
+      customHttpHeaderValue: ssm.StringParameter.valueForStringParameter(this, props.customHttpHeaderParameterName),
       certificate: new acm.Certificate(this, 'Certificate', {
-        domainName: props.domainName,
-        validation: acm.CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', props.hostedZoneId)),
+        domainName: ssm.StringParameter.valueForStringParameter(this, props.domainParameterName),
+        validation: acm.CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', ssm.StringParameter.valueForStringParameter(this, props.hostedZoneIdParameterName))),
       }),
     }
 
