@@ -1,7 +1,6 @@
-import { aws_elasticache as elasticache } from 'aws-cdk-lib';
+import { aws_elasticache as elasticache, Tags } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
-import { Tags } from 'aws-cdk-lib';
 
 interface RedisClusterProps {
   envName: string;
@@ -40,16 +39,16 @@ export class TmElasticacheRedisCluster extends Construct {
       allowFromConstructs,
     } = props;
 
-    this.securityGroup = new ec2.SecurityGroup(this, "RedisSecurityGroup", {
+    this.securityGroup = new ec2.SecurityGroup(this, 'RedisSecurityGroup', {
       vpc: vpc,
     });
-    Tags.of(this.securityGroup).add("Name", "redis-cluster");
+    Tags.of(this.securityGroup).add('Name', 'redis-cluster');
 
     for (const construct in allowFromConstructs) {
       this.securityGroup.connections.allowFrom(
         allowFromConstructs[construct],
         ec2.Port.tcp(6379),
-        construct
+        construct,
       );
     }
 
