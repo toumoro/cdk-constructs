@@ -4,104 +4,92 @@ import * as cdk from 'aws-cdk-lib';
 import { TmVpcStack, TmVpcStackProps } from '../lib/tm-vpc-stack';
 import { TmEcsStack, TmEcsStackProps } from '../lib/tm-ecs-stack';
 import { TmCloudfrontStack, TmCloudfrontStackProps } from '../lib/tm-cloudfront-stack';
-import { CommonStack } from '../lib/tm-common-stack';
 
 const app = new cdk.App();
+const regions = ['ca-central-1', 'eu-west-3'];
+const cidrs = ['10.1.0.0/16', '10.3.0.0/16'];
 
+// ENVIRONMENTS
 
-const caCentral1Env = {
-  account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: 'ca-central-1',
-}
-
-const usEast1Env = {
+const cloufrontEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
   region: 'us-east-1',
 }
 
-const usEast2Env = {
+const environments: cdk.Environment[] = regions.map(region => ({
   account: process.env.CDK_DEFAULT_ACCOUNT,
-  region: 'us-east-2',
-}
+  region: region,
+}));
 
-const commonStack = new CommonStack(app, 'CommonStack', {
-  crossRegionReferences: true,
-  env: caCentral1Env,
+
+// VPC STACKS CONFIGURATION
+
+const vpcStackConfigs: TmVpcStackProps[] = environments.map((environment, index) => {
+  const cidr = cidrs[index];
+  return {
+    //enableEndpoints:['s3', 'dynamodb'],
+    //maxAzs: 2,
+    crossRegionReferences: true,
+    env: environment,
+    rangeCidr: cidr,
+    vpcName: `VPC-${environment.region}`,
+  }
 });
 
-const vpcStackProps1: TmVpcStackProps = {
-  crossRegionReferences: true,
-  env: caCentral1Env,
-  rangeCidr: '10.0.0.0/16',
-  vpcName: 'myVpc',
-  //enableEndpoints:['s3', 'dynamodb'],
-  //maxAzs: 2,
-}
+console.log(vpcStackConfigs[0]);
 
-const vpcStackProps2: TmVpcStackProps = {
-  crossRegionReferences: true,
-  env: usEast2Env,
-  rangeCidr: '10.0.0.0/16',
-  vpcName: 'myVpc',
-  //enableEndpoints:['s3', 'dynamodb'],
-  //maxAzs: 2,
-}
+// VPC STACKS
 
-const vpcStack1 = new TmVpcStack(app, 'CustomVpcStack1', vpcStackProps1);
-const vpcStack2 = new TmVpcStack(app, 'CustomVpcStack2', vpcStackProps2);
+const vpcStacks: TmVpcStack[] = vpcStackConfigs.map((vpcStackProps) => {
+  return new TmVpcStack(app, `VpcStack-${vpcStackProps.env?.region}`, vpcStackProps);
+});
 
-const ecsStackProps1: TmEcsStackProps = {
-  crossRegionReferences: true,
-  // allowPublicInternetAccess: true,
-  // listenToHttp: true,
-  // listenToHttps: false,
-  // memoryLimitMiB: 512,
-  // cpu: 256,
-  // desiredCount: 1,
-  // minTaskCount: 1,
-  // maxTaskCount: 3,
-  // containerPort: 80,
-  env: caCentral1Env,
-  vpc: vpcStack1.vpc,
-  customHttpHeaderValue: string;
-  domainName: string;
-  hostedZoneId: string;
-}
-
-const ecsStackProps2: TmEcsStackProps = {
-  crossRegionReferences: true,
-  // allowPublicInternetAccess: true,
-  // listenToHttp: true,
-  // listenToHttps: false,
-  // memoryLimitMiB: 512,
-  // cpu: 256,
-  // desiredCount: 1,
-  // minTaskCount: 1,
-  // maxTaskCount: 3,
-  // containerPort: 80,
-  env: usEast2Env,
-  vpc: vpcStack2.vpc,
-  customHttpHeaderValue: commonStack.customHttpHeaderValue.valueAsString,
-  domainName: commonStack.domainName.valueAsString,
-  hostedZoneId: commonStack.hostedZoneId.valueAsString,
-}
+//console.log(vpcStacks[0]);
 
 
-const ecsStack1 = new TmEcsStack(app, 'CustomEcsStack1', ecsStackProps1);
-const ecsStack2 = new TmEcsStack(app, 'CustomEcsStack2', ecsStackProps2);
+// ECS STACKS CONFIGURATION
+
+const ecsStackConfigs: TmEcsStackProps[] = vpcStacks.map((vpcStack, index) => {
+  const environment: cdk.Environment = environments[index];
+  return {
+    // allowPublicInternetAccess: true,
+    // listenToHttp: true,
+    // listenToHttps: false,
+    // memoryLimitMiB: 512,
+    // cpu: 256,
+    // desiredCount: 1,
+    // minTaskCount: 1,
+    // maxTaskCount: 3,
+    // containerPort: 80,
+    env: environment,
+    vpc: vpcStack.vpc,
+    hostedZoneIdParameterName: '/cloudfrontStack/parameters/hostedZoneId',
+    customHttpHeaderParameterName: '/cloudfrontStack/parameters/customHttpHeader',
+    domainParameterName: '/cloudfrontStack/parameters/domanName',
+    crossRegionReferences: true,
+  };
+});
+
+//console.log(ecsStackConfigs);
+
+// ECS STACKS
+
+const ecsStacks: TmEcsStack[] = ecsStackConfigs.map((ecsStackProps) => {
+  return new TmEcsStack(app, `EcsStack-${ecsStackProps.env?.region}`, ecsStackProps);
+});
 
 const cloudFrontStackProps: TmCloudfrontStackProps = {
   // additionalCookies: [],
   // retainLogBuckets: false,
   // webAclId: '',
   // errorCachingMinTtl: 300,
-  env: usEast1Env,
+  env: cloufrontEnv,
   crossRegionReferences: true,
-  customHttpHeaderValue: commonStack.customHttpHeaderValue.valueAsString,
-  domainName: commonStack.domainName.valueAsString,
-  hostedZoneId: commonStack.hostedZoneId.valueAsString,
-  applicationLoadbalancer1: ecsStack1.loadbalancer,
-  applicationLoadbalancer2: ecsStack2.loadbalancer,
+  hostedZoneIdParameterName: '/cloudfrontStack/parameters/hostedZoneId',
+  customHttpHeaderParameterName: '/cloudfrontStack/parameters/customHttpHeader',
+  domainParameterName: '/cloudfrontStack/parameters/domanName',
+  applicationLoadbalancers: ecsStacks.map(ecsStack => ecsStack.loadbalancer),
 }
 
-new TmCloudfrontStack(app, 'CustomCloudfrontStack', cloudFrontStackProps);
+const cloudfrontStack = new TmCloudfrontStack(app, 'CustomCloudfrontStack', cloudFrontStackProps);
+// console.log(cloudfrontStack);
