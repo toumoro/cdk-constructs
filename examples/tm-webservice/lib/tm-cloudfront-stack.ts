@@ -7,6 +7,9 @@ import { HttpOrigin, LoadBalancerV2Origin, S3Origin, OriginGroup } from 'aws-cdk
 import { ILoadBalancerV2 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { TmCachePolicy, TmCachePolicyProps } from './cloudfront/cachePolicy';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as s3Deployment from 'aws-cdk-lib/aws-s3-deployment';
@@ -15,8 +18,6 @@ import * as path from 'path';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export interface TmCloudfrontStackProps extends cdk.StackProps {
-    readonly domainName: string;
-    readonly hostedZoneId: string;
     readonly env: Environment;
     readonly additionalCookies?: string[];
     readonly retainLogBuckets?: boolean;
@@ -25,7 +26,9 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
     readonly applicationLoadbalancers: ILoadBalancerV2[];
     readonly loadBalancerOriginProtocol?: cloudfront.OriginProtocolPolicy;
     readonly viewerProtocolPolicy?: cloudfront.ViewerProtocolPolicy;
-    readonly customHttpHeaderValue?: string;
+    readonly hostedZoneIdParameterName: string;
+    readonly customHttpHeaderParameterName: string;
+    readonly domainParameterName: string;
 }
 
 export class TmCloudfrontStack extends cdk.Stack {
@@ -44,8 +47,12 @@ export class TmCloudfrontStack extends cdk.Stack {
         super(scope, id, props);
         Certificate
         this.certificate = new Certificate(this, 'Certificate', {
-            domainName: props.domainName,
-            validation: CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this,'HostedZoneId',props.hostedZoneId))
+            domainName: ssm.StringParameter.valueForStringParameter(this, props.domainParameterName),
+            validation: CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this,
+                'HostedZoneId',
+                ssm.StringParameter.valueForStringParameter(this, props.hostedZoneIdParameterName)  // resolved at Deploy (For plain text)
+            ),
+            )
         });
 
         // BUCKETS
@@ -90,7 +97,8 @@ export class TmCloudfrontStack extends cdk.Stack {
             const loadBalancerOrigin = new LoadBalancerV2Origin(loadbalancer, {
                 protocolPolicy: props.loadBalancerOriginProtocol || cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
                 customHeaders: {
-                    'X-Custom-Header': props.customHttpHeaderValue || '',
+                    //'X-Custom-Header': props.customHttpHeaderValue || '',
+                    'X-Custom-Header': ssm.StringParameter.valueForStringParameter(this, props.customHttpHeaderParameterName),
                 }
             });
             this.loadBalancerOrigins.push(loadBalancerOrigin);
@@ -116,12 +124,19 @@ export class TmCloudfrontStack extends cdk.Stack {
 
         };
 
-        // CloudFront BasicAuthFunction
-        const authFunctionCode = fs.readFileSync(path.join(__dirname, 'cloudfront', 'basic-auth-function.js'), 'utf8');
-        const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
-            functionName: 'BasicAuthFunction',
-            code: cloudfront.FunctionCode.fromInline(authFunctionCode),
+        // Basic-Auth Lambda@Edge function
+        const edgeFunction = new lambda.Function(this, 'BasicAuthFunction', {
+            runtime: lambda.Runtime.NODEJS_18_X, // Use the Node.js runtime
+            code: lambda.Code.fromAsset(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.zip')), // Path to your Lambda zip code
+            handler: 'basic-auth-function.handler', // Handler file and function name
         });
+        // Add IAM policy to allow Lambda to read from SSM Parameter Store
+        edgeFunction.addToRolePolicy(new iam.PolicyStatement({
+            actions: ['ssm:GetParameter'],
+            resources: [
+                `arn:aws:ssm:${this.region}:${this.account}:parameter/*`,
+            ],
+        }));
 
         // Default Behavior
         const defaultBehavior = {
@@ -129,10 +144,12 @@ export class TmCloudfrontStack extends cdk.Stack {
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
-            functionAssociations: [{
-                function: authFunction,
-                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-            }],
+            edgeLambdas: [
+                {
+                    functionVersion: edgeFunction.currentVersion,
+                    eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+                },
+            ],
         }
 
         // Error Responses
@@ -151,7 +168,7 @@ export class TmCloudfrontStack extends cdk.Stack {
 
         // Distribution
         this.distribution = new cloudfront.Distribution(this, 'CloudFrontDistribution', {
-            domainNames: [props.domainName],
+            domainNames: [ssm.StringParameter.valueForStringParameter(this, props.domainParameterName)],
             certificate: this.certificate,
             logBucket: this.logBucket,
             priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
