@@ -147,21 +147,22 @@ export class TmPipelineAppStage extends cdk.Stage {
             { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
           ]);
           mainRegionRedisProps.globalReplicationGroupId = redisGlobal.globalReplicationGroupId;
-        } 
-        if (mainRegionRedisProps.globalReplicationGroupId) {
-          const redis = new TmRedisStack(this, `TmRedis${regionName}Stack`, {
-            env: env,
-            vpc: vpc.vpc,
-            crossRegionReferences: true,
-            globalReplicationGroupId: mainRegionRedisProps.globalReplicationGroupId,
-          });
-          cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
-          NagSuppressions.addStackSuppressions(redis, [
-            { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
-            { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
-            { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
-            { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
-          ]);
+        } else {
+          if (mainRegionRedisProps.globalReplicationGroupId) {
+            const redis = new TmRedisStack(this, `TmRedis${regionName}Stack`, {
+              env: env,
+              vpc: vpc.vpc,
+              crossRegionReferences: true,
+              globalReplicationGroupId: mainRegionRedisProps.globalReplicationGroupId,
+            });
+            cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
+            NagSuppressions.addStackSuppressions(redis, [
+              { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
+              { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
+              { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
+              { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
+            ]);
+          }
         }
 
         cdk.Aspects.of(vpc).add(new AwsSolutionsChecks());
