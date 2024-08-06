@@ -6,6 +6,8 @@ import { TmEcsStack, TmEcsStackProps } from './tm-ecs-stack';
 //import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
 import { TmRdsNetworkSecondaryRegionStack } from './tm-rds-network-secondary-region';
 import { TmRdsAuroraMysqlServerlessStack } from './tm-rds-aurora-mysql-serverless-stack';
+import { TmRedisGlobalStack } from './tm-redis-global-stack';
+import { TmRedisStack } from './tm-redis-stack';
 import { NagSuppressions, AwsSolutionsChecks } from 'cdk-nag';
 import * as path from 'path';
 
@@ -21,6 +23,13 @@ interface RegionParameters {
     buildContextPath: string;
     buildDockerfile: string;
   }
+  elasticache?: {
+    isRedisGlobalReplication?: boolean;
+  }
+}
+
+interface MainRegionRedisProps {
+  globalReplicationGroupId?: string;
 }
 
 export class TmPipelineAppStage extends cdk.Stage {
@@ -51,6 +60,9 @@ export class TmPipelineAppStage extends cdk.Stage {
             isRdsMainRegion: true,
           },
           ecs: commonEcsStackProps,
+          elasticache: {
+            isRedisGlobalReplication: true,
+          },
         },
         'eu-west-3': {
           vpc: {
@@ -60,8 +72,13 @@ export class TmPipelineAppStage extends cdk.Stage {
             isRdsMainRegion: false,
           },
           ecs: commonEcsStackProps,
+          elasticache: {
+            isRedisGlobalReplication: false,
+          },
         },  
       };
+
+      let mainRegionRedisProps: MainRegionRedisProps = {};
       
       Object.entries(regions).forEach(([region, regionProps]) => {
         const env = {
@@ -115,6 +132,38 @@ export class TmPipelineAppStage extends cdk.Stage {
           });
           cdk.Aspects.of(rds).add(new AwsSolutionsChecks());
         }
+        if (regionProps.elasticache!.isRedisGlobalReplication) {
+          const redisGlobal = new TmRedisGlobalStack(this, `TmRedisGlobal${regionName}Stack`, {
+            env: env,
+            vpc: vpc.vpc,
+            crossRegionReferences: true,
+          });
+          console.log(redisGlobal.globalReplicationGroupId);
+          cdk.Aspects.of(redisGlobal).add(new AwsSolutionsChecks());
+          NagSuppressions.addStackSuppressions(redisGlobal, [
+            { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
+            { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
+            { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
+            { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
+          ]);
+          mainRegionRedisProps.globalReplicationGroupId = redisGlobal.globalReplicationGroupId;
+        } 
+        if (mainRegionRedisProps.globalReplicationGroupId) {
+          const redis = new TmRedisStack(this, `TmRedis${regionName}Stack`, {
+            env: env,
+            vpc: vpc.vpc,
+            crossRegionReferences: true,
+            globalReplicationGroupId: mainRegionRedisProps.globalReplicationGroupId,
+          });
+          cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
+          NagSuppressions.addStackSuppressions(redis, [
+            { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
+            { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
+            { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
+            { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
+          ]);
+        }
+
         cdk.Aspects.of(vpc).add(new AwsSolutionsChecks());
         cdk.Aspects.of(bastion).add(new AwsSolutionsChecks());
         NagSuppressions.addStackSuppressions(bastion, [
