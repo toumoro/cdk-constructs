@@ -46,15 +46,16 @@ When adding a new region, you must bootstrap it by running the bootstrap command
 
 ## Deploy
 
-For the first deploy, you need to specify some parameters:
+Befor the first deploy, you need to create some parameters in Parameter Store:
 
 | Parameter                                 | Description                                          |
 |-------------------------------------------|------------------------------------------------------|
-| CommonStack:customHttpHeaderValue         | Secret header between CloudFront and Load-Balancer   |
-| CommonStack:domainName                    | Domain name for the application                      |
-| CommonStack:hostedZoneId                  | Hosted Zone ID for the domain                        |
+| branchNameParam                           | Name of the branch that will trigger the pipeline    |
+| customHttpHeaderValue                     | Secret header between CloudFront and Load-Balancer   |
+| domain                                    | Domain name for the application                      |
+| hostedZoneId                              | Hosted Zone ID for the domain                        |
 
 
 ```
-cdk deploy --all --parameters CommonStack:customHttpHeaderValue='value' --parameters CommonStack:domainName=value --parameters CommonStack:hostedZoneId=value
+aws ssm put-parameter --name "<Parameter>" --type "String" --value "<Description>"
 ```
