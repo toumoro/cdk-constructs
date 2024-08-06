@@ -9,6 +9,7 @@ import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { AwsManagedPrefixList } from './cloudfront/prefixList';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import { ApplicationLoadBalancedTaskImageOptions } from 'aws-cdk-lib/aws-ecs-patterns';
 
 
 export interface TmEcsStackProps extends cdk.StackProps {
@@ -25,7 +26,7 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly domainParameterName: string;
   readonly minTaskCount?: number;
   readonly maxTaskCount?: number;
-
+  readonly secrets_from_ssm_parameter_store?: string[]
 }
 
 export class TmEcsStack extends cdk.Stack {
@@ -52,6 +53,21 @@ export class TmEcsStack extends cdk.Stack {
 
     lbSecurityGroup.addIngressRule(ec2.Peer.prefixList(cloudFrontPrefixListId), ec2.Port.tcp(443), 'Allow HTTPS from CloudFront');
 
+    // Image config
+    const secrets_from_ssm_parameter_store: string[] = props.secrets_from_ssm_parameter_store || [];
+    //const additional_secrets_from_parameter_store:
+    const environment_secrets: { [key: string]: ecs.Secret } = {};
+    this.addEnvironmentSecrets(secrets_from_ssm_parameter_store, environment_secrets)
+
+    const imageOptions: ApplicationLoadBalancedTaskImageOptions = {
+      image: ecs.ContainerImage.fromAsset('lib/ecs/containerImage'),
+      containerPort: props.containerPort, // Optional: Specify the container port
+      enableLogging: true,
+      containerName: 'web',
+      secrets: environment_secrets
+    }
+
+
     /** Service Props*/
     const patternsProps: TmApplicationLoadBalancedFargateServiceProps = {
       vpc: props.vpc,
@@ -66,6 +82,7 @@ export class TmEcsStack extends cdk.Stack {
         domainName: ssm.StringParameter.valueForStringParameter(this, props.domainParameterName),
         validation: acm.CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', ssm.StringParameter.valueForStringParameter(this, props.hostedZoneIdParameterName))),
       }),
+      taskImageOptions: imageOptions
     }
 
     /** Service Pattern */
@@ -75,18 +92,31 @@ export class TmEcsStack extends cdk.Stack {
     tmPatterns.taskDefinition.addToExecutionRolePolicy(new iam.PolicyStatement({
       effect: iam.Effect.ALLOW,
       actions: [
-          "ecr:GetAuthorizationToken",
-          "ecr:BatchCheckLayerAvailability",
-          "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
+        "ecr:GetAuthorizationToken",
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:BatchGetImage",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
       ],
       resources: ["*"],
-  }));
+    }));
 
     this.loadbalancer = tmPatterns.loadBalancer;
     this.cluster = tmPatterns.cluster;
     this.fargateService = tmPatterns.service;
   }
+
+
+  private addEnvironmentSecrets(secrets: string[], environmentSecrets: { [key: string]: ecs.Secret }) {
+    for (const secret of secrets) {
+      const secretParameter = ssm.StringParameter.fromSecureStringParameterAttributes(this, `${secret}SSMParameter`, {
+        parameterName: `/ecsStack/application/${secret}`,
+      });
+
+      environmentSecrets[secret] = ecs.Secret.fromSsmParameter(secretParameter);
+    }
+  }
+
+
 }
