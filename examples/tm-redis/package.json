@@ -1,0 +1,13 @@
+{
+  "name": "tm-redis",
+  "version": "0.1.0",
+  "bin": {
+    "tm-redis": "bin/tm-redis.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  }
+}

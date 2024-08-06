@@ -18,11 +18,30 @@ export class BastionStack extends cdk.Stack {
             securityGroupName: 'bastion-security-group',
         });
 
+        const packageName: Array<string> = [
+          'docker',
+          'git',
+          'jq',
+          'mysql',
+        ];
+
         new ec2.BastionHostLinux(this, 'BastionHost', {
             vpc: props.vpc,
             instanceName: 'BastionHost',
             subnetSelection: { subnetType: ec2.SubnetType.PUBLIC },
             securityGroup: this.securityGroupBastion,
+            init: ec2.CloudFormationInit.fromConfigSets({
+              configSets: {
+                // Applies the configs below in this order
+                default: ['yumPreinstall', 'config'],
+              },
+              configs: {
+                yumPreinstall: new ec2.InitConfig([
+                  ...packageName.map(packageName => ec2.InitPackage.yum(packageName)),
+                ]),
+                config: new ec2.InitConfig([]),
+              },
+            }),
         });
 
     }
