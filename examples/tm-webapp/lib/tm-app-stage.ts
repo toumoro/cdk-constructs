@@ -32,6 +32,14 @@ interface MainRegionRedisProps {
   globalReplicationGroupId?: string;
 }
 
+interface Stacks {
+  vpc?: TmVpcbaseStack;
+  bastion?: BastionStack;
+  ecs?: TmEcsStack;
+  rds?: TmRdsAuroraMysqlServerlessStack | TmRdsNetworkSecondaryRegionStack;
+  redis?: TmRedisGlobalStack | TmRedisStack;
+}
+
 export class TmPipelineAppStage extends cdk.Stage {
 
     constructor(scope: Construct, id: string, props?: cdk.StageProps) {
@@ -80,6 +88,8 @@ export class TmPipelineAppStage extends cdk.Stage {
 
       let mainRegionRedisProps: MainRegionRedisProps = {};
       
+      const stacks: { [region: string]: Stacks } = {};
+
       Object.entries(regions).forEach(([region, regionProps]) => {
         const env = {
           account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -97,17 +107,8 @@ export class TmPipelineAppStage extends cdk.Stage {
           env: env,
           crossRegionReferences: true,
         });
-      
-        const ecsStackProps: TmEcsStackProps = {
-          env: env,
-          vpc: vpc.vpc,
-          crossRegionReferences: regionProps.ecs.crossRegionReferences,
-          buildContextPath: regionProps.ecs.buildContextPath,
-          buildDockerfile: regionProps.ecs.buildDockerfile
-        }
-    
-        const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
-
+        stacks[regionName] = { vpc, bastion };
+        
         if (regionProps.rds.isRdsMainRegion) {
           const rds = new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
             env: env,
@@ -124,12 +125,14 @@ export class TmPipelineAppStage extends cdk.Stage {
             { id: 'AwsSolutions-RDS14', reason: 'The RDS Aurora MySQL cluster does not have Backtrack enabled.' },
             { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.' },
           ]);
+          stacks[regionName].rds = rds;
         } else {
           const rds = new TmRdsNetworkSecondaryRegionStack(this, `TmRdsNetwork${regionName}Stack`, {
             env: env,
             vpc: vpc.vpc,
             bastionHost: bastion.securityGroupBastion,
           });
+          stacks[regionName].rds = rds;
           cdk.Aspects.of(rds).add(new AwsSolutionsChecks());
         }
         if (regionProps.elasticache!.isRedisGlobalReplication) {
@@ -137,8 +140,10 @@ export class TmPipelineAppStage extends cdk.Stage {
             env: env,
             vpc: vpc.vpc,
             crossRegionReferences: true,
+            allowFromConstructs: { bastion: bastion.securityGroupBastion },
           });
-          console.log(redisGlobal.globalReplicationGroupId);
+          stacks[regionName].redis = redisGlobal;
+          //console.log(redisGlobal.globalReplicationGroupId);
           cdk.Aspects.of(redisGlobal).add(new AwsSolutionsChecks());
           NagSuppressions.addStackSuppressions(redisGlobal, [
             { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
@@ -154,7 +159,9 @@ export class TmPipelineAppStage extends cdk.Stage {
               vpc: vpc.vpc,
               crossRegionReferences: true,
               globalReplicationGroupId: mainRegionRedisProps.globalReplicationGroupId,
+              allowFromConstructs: { bastion: bastion.securityGroupBastion },
             });
+            stacks[regionName].redis = redis;
             cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
             NagSuppressions.addStackSuppressions(redis, [
               { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
@@ -164,6 +171,17 @@ export class TmPipelineAppStage extends cdk.Stage {
             ]);
           }
         }
+
+        const ecsStackProps: TmEcsStackProps = {
+          env: env,
+          vpc: vpc.vpc,
+          crossRegionReferences: regionProps.ecs.crossRegionReferences,
+          buildContextPath: regionProps.ecs.buildContextPath,
+          buildDockerfile: regionProps.ecs.buildDockerfile
+        }
+    
+        const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
+        stacks[regionName] = { ecs };
 
         cdk.Aspects.of(vpc).add(new AwsSolutionsChecks());
         cdk.Aspects.of(bastion).add(new AwsSolutionsChecks());
@@ -182,6 +200,7 @@ export class TmPipelineAppStage extends cdk.Stage {
           { id: 'AwsSolutions-ECS4', reason: 'The ECS Cluster has CloudWatch Container Insights disabled.' },
         ]);
       });
+
     }
 
 }

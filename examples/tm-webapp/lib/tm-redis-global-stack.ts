@@ -6,6 +6,7 @@ import { TmElasticacheRedisCluster } from '../../../src/databases/elasticache-re
 
 interface TmRedisGlobalStackProps extends cdk.StackProps {
   vpc: ec2.IVpc;
+  allowFromConstructs?: { [key: string]: ec2.IConnectable  };
 }
 
 export class TmRedisGlobalStack extends cdk.Stack {
@@ -17,6 +18,7 @@ export class TmRedisGlobalStack extends cdk.Stack {
       envName: 'dev',
       vpc: props!.vpc,
       cacheNodeType: 'cache.r5.large',
+      allowFromConstructs: props?.allowFromConstructs,
     });
 
     const globalReplicationGroup = new elasticache.CfnGlobalReplicationGroup(this, "GlobalReplicationGroup", {
