@@ -18,15 +18,15 @@ import * as path from 'path';
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export interface TmCloudfrontStackProps extends cdk.StackProps {
+    readonly hostedZoneIdParameterName: string;
     readonly env: Environment;
     readonly additionalCookies?: string[];
     readonly retainLogBuckets?: boolean;
     readonly webAclId?: string;
     readonly errorCachingMinTtl?: number;
-    readonly applicationLoadbalancers: ILoadBalancerV2[];
+    readonly applicationLoadbalancersDnsNames: string[];
     readonly loadBalancerOriginProtocol?: cloudfront.OriginProtocolPolicy;
     readonly viewerProtocolPolicy?: cloudfront.ViewerProtocolPolicy;
-    readonly hostedZoneIdParameterName: string;
     readonly customHttpHeaderParameterName: string;
     readonly domainParameterName: string;
 }
@@ -38,6 +38,7 @@ export class TmCloudfrontStack extends cdk.Stack {
     private errorsBucket: Bucket;
     private errorsBucketOrigin: S3Origin;
     private loadBalancerOrigins: HttpOrigin[] = [];
+
     private distribution: cloudfront.Distribution;
     //private s3Deployment?: BucketDeployment;
 
@@ -93,15 +94,15 @@ export class TmCloudfrontStack extends cdk.Stack {
         //  Origins
         this.errorsBucketOrigin = new S3Origin(this.errorsBucket);
 
-        for (const loadbalancer of props.applicationLoadbalancers) {
-            const loadBalancerOrigin = new LoadBalancerV2Origin(loadbalancer, {
+        for (const loadBalancerDnsName of props.applicationLoadbalancersDnsNames) {
+            const httpOrigin = new HttpOrigin(loadBalancerDnsName, {
                 protocolPolicy: props.loadBalancerOriginProtocol || cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
                 customHeaders: {
-                    //'X-Custom-Header': props.customHttpHeaderValue || '',
                     'X-Custom-Header': ssm.StringParameter.valueForStringParameter(this, props.customHttpHeaderParameterName),
+
                 }
             });
-            this.loadBalancerOrigins.push(loadBalancerOrigin);
+            this.loadBalancerOrigins.push(httpOrigin);
         }
 
 
@@ -124,19 +125,26 @@ export class TmCloudfrontStack extends cdk.Stack {
 
         };
 
-        // Basic-Auth Lambda@Edge function
-        const edgeFunction = new lambda.Function(this, 'BasicAuthFunction', {
-            runtime: lambda.Runtime.NODEJS_18_X, // Use the Node.js runtime
-            code: lambda.Code.fromAsset(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.zip')), // Path to your Lambda zip code
-            handler: 'basic-auth-function.handler', // Handler file and function name
+        // Basic-Auth cloudfront function
+        const authFunctionCode = fs.readFileSync(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.js'), 'utf8');
+        const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
+            functionName: 'BasicAuthFunction',
+            code: cloudfront.FunctionCode.fromInline(authFunctionCode),
         });
-        // Add IAM policy to allow Lambda to read from SSM Parameter Store
-        edgeFunction.addToRolePolicy(new iam.PolicyStatement({
-            actions: ['ssm:GetParameter'],
-            resources: [
-                `arn:aws:ssm:${this.region}:${this.account}:parameter/*`,
-            ],
-        }));
+
+        // Basic-Auth Lambda@Edge function
+        // const edgeFunction = new lambda.Function(this, 'BasicAuthFunction', {
+        //     runtime: lambda.Runtime.NODEJS_18_X, // Use the Node.js runtime
+        //     code: lambda.Code.fromAsset(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.zip')), // Path to your Lambda zip code
+        //     handler: 'basic-auth-function.handler', // Handler file and function name
+        // });
+        // // Add IAM policy to allow Lambda to read from SSM Parameter Store
+        // edgeFunction.addToRolePolicy(new iam.PolicyStatement({
+        //     actions: ['ssm:GetParameter'],
+        //     resources: [
+        //         `arn:aws:ssm:${this.region}:${this.account}:parameter/*`,
+        //     ],
+        // }));
 
         // Default Behavior
         const defaultBehavior = {
@@ -144,12 +152,16 @@ export class TmCloudfrontStack extends cdk.Stack {
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
-            edgeLambdas: [
-                {
-                    functionVersion: edgeFunction.currentVersion,
-                    eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
-                },
-            ],
+            functionAssociations: [{
+                function: authFunction,
+                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            }],
+            // edgeLambdas: [
+            //     {
+            //         functionVersion: edgeFunction.currentVersion,
+            //         eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+            //     },
+            // ],
         }
 
         // Error Responses
