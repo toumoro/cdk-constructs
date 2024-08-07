@@ -46,7 +46,7 @@ When adding a new region, you must bootstrap it by running the bootstrap command
 
 ## Deploy
 
-Befor the first deploy, you need to create some parameters in Parameter Store:
+Before the first deploy, you need to create some parameters in Parameter Store:
 
 | Parameter                                 | Description                                          |
 |-------------------------------------------|------------------------------------------------------|
@@ -58,4 +58,15 @@ Befor the first deploy, you need to create some parameters in Parameter Store:
 
 ```
 aws ssm put-parameter --name "<Parameter>" --type "String" --value "<Description>"
+```
+### Modifying removal policy to allow destuction of everything
+
+We're using an aspect to apply the RETAIN policy to every resource in the application. Before destroying, we must deploy change it to DESTROY.
+
+```
+cdk deploy "**" --context removalPolicy=DESTROY --concurrency 10
+```
+Then we can destroy everything
+```
+cdk destroy "**" --concurrency 10
 ```
