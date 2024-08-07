@@ -5,19 +5,26 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import { TmPipelineAppStage } from './tm-app-stage';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
+import { ApplyRemovalPolicyAspect, getRemovalPolicy } from './utils/removal-policy-aspect';
+
 
 export class TmPipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+
+  const removalPolicyString = this.node.tryGetContext('removalPolicy') || 'RETAIN';
+  const removalPolicy = getRemovalPolicy(removalPolicyString);
 
   const repository = codecommit.Repository.fromRepositoryName(
     this, 'Infrastructure', 'infrastructure');
 
   const additionalRepository = codecommit.Repository.fromRepositoryName(
     this, 'Application', 'application');
-  
+
   const branchNameParam = ssm.StringParameter.valueForStringParameter(
     this, 'branchNameParam');
+
+  cdk.Aspects.of(this).add(new ApplyRemovalPolicyAspect(removalPolicy));
 
   const pipeline = new pipelines.CodePipeline(this, 'TmPipelineStack', {
     crossAccountKeys: true,
@@ -46,7 +53,7 @@ export class TmPipelineStack extends cdk.Stack {
           resources: ['*'],
         }),
       ],
-      
+
     }),
   });
 
@@ -57,6 +64,6 @@ export class TmPipelineStack extends cdk.Stack {
       region: 'ca-central-1'
     }
   }));
-  
+
 }
 }
