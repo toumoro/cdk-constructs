@@ -12,6 +12,11 @@ const app = new cdk.App();
 const regions = ['ca-central-1'];
 const cidrs = ['10.1.0.0/16'];
 
+// Function to read the parameter names from a file
+// function readParametersFromFile(filePath: string): string[] {
+//   const fileContents = fs.readFileSync(filePath, 'utf-8');
+//   return fileContents.split('\n').map((line: string) => line.trim()).filter((line: string | any[]) => line.length > 0);
+// }
 
 // ENVIRONMENTS
 
@@ -19,6 +24,7 @@ const cloufrontEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
   region: 'us-east-1',
 }
+
 
 const environments: cdk.Environment[] = regions.map(region => ({
   account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -40,15 +46,12 @@ const vpcStackConfigs: TmVpcStackProps[] = environments.map((environment, index)
   }
 });
 
-//console.log(vpcStackConfigs[0]);
 
 // VPC STACKS
 
 const vpcStacks: TmVpcStack[] = vpcStackConfigs.map((vpcStackProps) => {
   return new TmVpcStack(app, `VpcStack-${vpcStackProps.env?.region}`, vpcStackProps);
 });
-
-//console.log(vpcStacks[0]);
 
 
 // ECS STACKS CONFIGURATION
@@ -93,9 +96,10 @@ const parameters = [
   "SOLR_SDG_INDEX_SCHEME",
 ]
 
-// const additional_secrets_from_parameter_store = [
-  
-// ]
+const additional_secrets_from_parameter_store = {
+  'DB_NAME': '/RDS/Exports/DB_NAME'
+}
+
 const ecsStackConfigs: TmEcsStackProps[] = vpcStacks.map((vpcStack, index) => {
   const environment: cdk.Environment = environments[index];
   return {
@@ -115,11 +119,14 @@ const ecsStackConfigs: TmEcsStackProps[] = vpcStacks.map((vpcStack, index) => {
     customHttpHeaderParameterName: '/cloudfrontStack/parameters/customHttpHeader',
     domainParameterName: '/cloudfrontStack/parameters/domanName',
     secrets_from_ssm_parameter_store: parameters,
-    //additional_secrets_from_parameter_store: additional_secrets_from_parameter_store
+    additional_secrets_from_parameter_store: additional_secrets_from_parameter_store,
+    application_name: 'tm',
   };
 });
 
+
 // ECS STACKS
+
 const ecsStacks: TmEcsStack[] = ecsStackConfigs.map((ecsStackProps) => {
   return new TmEcsStack(app, `EcsStack-${ecsStackProps.env?.region}`, ecsStackProps);
 });
@@ -139,4 +146,3 @@ const cloudFrontStackProps: TmCloudfrontStackProps = {
 }
 
 const cloudfrontStack = new TmCloudfrontStack(app, 'CustomCloudfrontStack', cloudFrontStackProps);
-// console.log(cloudfrontStack);

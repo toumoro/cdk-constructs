@@ -26,7 +26,9 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly domainParameterName: string;
   readonly minTaskCount?: number;
   readonly maxTaskCount?: number;
-  readonly secrets_from_ssm_parameter_store?: string[]
+  readonly secrets_from_ssm_parameter_store?: string[];
+  readonly additional_secrets_from_parameter_store?: { [key: string]: string };
+  readonly application_name: string;
 }
 
 export class TmEcsStack extends cdk.Stack {
@@ -55,9 +57,12 @@ export class TmEcsStack extends cdk.Stack {
 
     // Image config
     const secrets_from_ssm_parameter_store: string[] = props.secrets_from_ssm_parameter_store || [];
-    //const additional_secrets_from_parameter_store:
+    const additional_secrets_from_ssm_parameter_store: { [key: string]: string } = props.additional_secrets_from_parameter_store || {};
+
     const environment_secrets: { [key: string]: ecs.Secret } = {};
-    this.addEnvironmentSecrets(secrets_from_ssm_parameter_store, environment_secrets)
+
+    this.addEnvironmentSecrets(secrets_from_ssm_parameter_store, environment_secrets, props.application_name);
+    this.addAdditionalEnvironmentSecrets(additional_secrets_from_ssm_parameter_store, environment_secrets);
 
     const imageOptions: ApplicationLoadBalancedTaskImageOptions = {
       image: ecs.ContainerImage.fromAsset('lib/ecs/containerImage'),
@@ -107,16 +112,26 @@ export class TmEcsStack extends cdk.Stack {
     this.fargateService = tmPatterns.service;
   }
 
-
-  private addEnvironmentSecrets(secrets: string[], environmentSecrets: { [key: string]: ecs.Secret }) {
+  private addEnvironmentSecrets(secrets: string[], environmentSecrets: { [key: string]: ecs.Secret }, application_name: string) {
     for (const secret of secrets) {
       const secretParameter = ssm.StringParameter.fromSecureStringParameterAttributes(this, `${secret}SSMParameter`, {
-        parameterName: `/ecsStack/application/${secret}`,
+        parameterName: `/applications/${application_name}/secrets/${secret}`,
       });
-
       environmentSecrets[secret] = ecs.Secret.fromSsmParameter(secretParameter);
     }
   }
+
+  private addAdditionalEnvironmentSecrets(secrets: { [key: string]: string }, environmentSecrets: { [key: string]: ecs.Secret }) {
+    Object.entries(secrets).forEach(([key, value]) => {
+      const secretParameter = ssm.StringParameter.fromSecureStringParameterAttributes(this, `${key}SSMParameter`, {
+        parameterName: `${value}`
+      });
+      environmentSecrets[`${key}`] = ecs.Secret.fromSsmParameter(secretParameter);
+    })
+
+
+  }
+
 
 
 }
