@@ -22,6 +22,10 @@ interface RegionParameters {
     crossRegionReferences: boolean;
     buildContextPath: string;
     buildDockerfile: string;
+    applicationName: string;
+    hostedZoneIdParameterName: string;
+    customHttpHeaderParameterName: string;
+    domainParameterName: string;
   }
   elasticache?: {
     isRedisGlobalReplication?: boolean;
@@ -57,6 +61,10 @@ export class TmPipelineAppStage extends cdk.Stage {
         crossRegionReferences: true,
         buildContextPath: path.join(__dirname, '../build/'),
         buildDockerfile: 'docker/Dockerfile',
+        applicationName: 'tm',
+        hostedZoneIdParameterName: 'hostedZoneId',
+        customHttpHeaderParameterName: 'customHttpHeaderValue',
+        domainParameterName: 'domainName',
       }
       
       const regions: { [region: string]: RegionParameters } = {
@@ -177,7 +185,11 @@ export class TmPipelineAppStage extends cdk.Stage {
           vpc: vpc.vpc,
           crossRegionReferences: regionProps.ecs.crossRegionReferences,
           buildContextPath: regionProps.ecs.buildContextPath,
-          buildDockerfile: regionProps.ecs.buildDockerfile
+          buildDockerfile: regionProps.ecs.buildDockerfile,
+          applicationName: regionProps.ecs.applicationName,
+          hostedZoneIdParameterName: regionProps.ecs.hostedZoneIdParameterName,
+          customHttpHeaderParameterName: regionProps.ecs.customHttpHeaderParameterName,
+          domainParameterName: regionProps.ecs.domainParameterName,
         }
     
         const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
