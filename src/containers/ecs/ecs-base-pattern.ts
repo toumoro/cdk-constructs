@@ -1,10 +1,11 @@
-import { Duration } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Construct } from 'constructs';
+
 
 /**
  * Represents the configuration for an ecsPatterns.
@@ -13,9 +14,39 @@ import { Construct } from 'constructs';
 export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPatterns.ApplicationLoadBalancedFargateServiceProps {
 
   /**
+ * The number of cpu units used by the task.
+ */
+  //readonly vpc?: ec2.IVpc;
+
+  /**
+ * The number of cpu units used by the task.
+ */
+  //readonly cpu?: number;
+
+  /**
+ * The amount (in MiB) of memory used by the task.
+ */
+  //readonly memoryLimitMiB?: number;
+
+  /**
+ * The desired number of instantiations of the task definition to keep running on the service.
+ */
+  //readonly desiredCount?: number;
+
+  /**
 * The container port.
 */
   readonly containerPort?: number;
+
+  /**
+* The certificate .
+*/
+  //readonly certificate?: ICertificate;
+
+  /**
+* The listener port.
+*/
+  //readonly listenerPort?: number;
 
   /**
 * The minumun number od tasks.
@@ -26,9 +57,10 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
 * The maximum number of task.
 */
   readonly maxTaskCount?: number;
+
   /**
-   * The custom http header value.
-   */
+* Custom http header value.
+*/
   readonly customHttpHeaderValue?: string;
   /*
   * The build context path.
@@ -38,6 +70,8 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * The build dockerfile.
   */
   readonly buildDockerfile: string;
+
+  readonly secrets?: { [key: string]: ecs.Secret };
 
 }
 
@@ -72,19 +106,11 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       buildContextPath: props.buildContextPath,
       buildDockerfile: props.buildDockerfile,
       taskImageOptions: {
-        //image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
         image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
-        //image: ecs.ContainerImage.fromAsset('build'),
-        //image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
         containerPort: props.containerPort, // Optional: Specify the container port
         enableLogging: true,
         containerName: 'web',
-        // environment: { // Optional: Add environment variables
-        //   ENV_VAR_NAME: 'value'
-        // },
-        // secrets: { // Optional: Add secrets from AWS Secrets Manager
-        //   SECRET_NAME: ecs.Secret.fromSecretsManager(secret)
-        // }
+        secrets: props.secrets,
       },
     };
 
@@ -96,7 +122,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     this.listener.addTargetGroups('HeaderConditionForward', {
       priority: 1,
       conditions: [
-        elbv2.ListenerCondition.httpHeader('X-Custom-Header', ['sdsdsdsdsd']),
+        elbv2.ListenerCondition.httpHeader('X-Custom-Header', [mergedProps.customHttpHeaderValue || '']),
       ],
       targetGroups: [this.targetGroup],
     });
@@ -118,15 +144,15 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     // Scale based on CPU utilization
     scaling.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 50,
-      scaleInCooldown: Duration.seconds(60),
-      scaleOutCooldown: Duration.seconds(60),
+      scaleInCooldown: cdk.Duration.seconds(60),
+      scaleOutCooldown: cdk.Duration.seconds(60),
     });
 
     // Scale based on Memory utilization
     scaling.scaleOnMemoryUtilization('MemoryScaling', {
       targetUtilizationPercent: 50,
-      scaleInCooldown: Duration.seconds(60),
-      scaleOutCooldown: Duration.seconds(60),
+      scaleInCooldown: cdk.Duration.seconds(60),
+      scaleOutCooldown: cdk.Duration.seconds(60),
     });
 
 
