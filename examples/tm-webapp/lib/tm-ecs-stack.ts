@@ -63,13 +63,13 @@ export class TmEcsStack extends cdk.Stack {
     //   this, 'hostedZoneId');
 
     // Image config
-    const secrets_from_ssm_parameter_store: string[] = props.secretsFromSsmParameterStore || [];
-    const additional_secrets_from_ssm_parameter_store: { [key: string]: string } = props.additionalSecretsFromParameterStore || {};
+    const secretsFromSsmParameterStore: string[] = props.secretsFromSsmParameterStore || [];
+    const additionalSecretsFromSsmParameterStore: { [key: string]: string } = props.additionalSecretsFromParameterStore || {};
 
     const environment_secrets: { [key: string]: ecs.Secret } = {};
 
-    this.addEnvironmentSecrets(secrets_from_ssm_parameter_store, environment_secrets, props.applicationName);
-    this.addAdditionalEnvironmentSecrets(additional_secrets_from_ssm_parameter_store, environment_secrets);
+    this.addEnvironmentSecrets(secretsFromSsmParameterStore, environment_secrets, props.applicationName);
+    this.addAdditionalEnvironmentSecrets(additionalSecretsFromSsmParameterStore, environment_secrets);
 
     // /** Service Props*/
     // const patternsProps: TmApplicationLoadBalancedFargateServiceProps = {
