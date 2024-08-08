@@ -24,8 +24,8 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly domainParameterName: string;
   readonly minTaskCount?: number;
   readonly maxTaskCount?: number;
-  readonly secrets_from_ssm_parameter_store?: string[];
-  readonly additional_secrets_from_parameter_store?: { [key: string]: string };
+  readonly secretsFromSsmParameterStore?: string[];
+  readonly additionalSecretsFromParameterStore?: { [key: string]: string };
   readonly applicationName: string;
   readonly buildContextPath: string;
   readonly buildDockerfile: string;
@@ -63,8 +63,8 @@ export class TmEcsStack extends cdk.Stack {
     //   this, 'hostedZoneId');
 
     // Image config
-    const secrets_from_ssm_parameter_store: string[] = props.secrets_from_ssm_parameter_store || [];
-    const additional_secrets_from_ssm_parameter_store: { [key: string]: string } = props.additional_secrets_from_parameter_store || {};
+    const secrets_from_ssm_parameter_store: string[] = props.secretsFromSsmParameterStore || [];
+    const additional_secrets_from_ssm_parameter_store: { [key: string]: string } = props.additionalSecretsFromParameterStore || {};
 
     const environment_secrets: { [key: string]: ecs.Secret } = {};
 

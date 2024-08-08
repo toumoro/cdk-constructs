@@ -26,8 +26,8 @@ interface RegionParameters {
     hostedZoneIdParameterName: string;
     customHttpHeaderParameterName: string;
     domainParameterName: string;
-    secrets_from_ssm_parameter_store?: string[];
-    additional_secrets_from_parameter_store?: { [key: string]: string };
+    secretsFromSsmParameterStore?: string[];
+    additionalSecretsFromParameterStore?: { [key: string]: string };
   }
   elasticache?: {
     isRedisGlobalReplication?: boolean;
@@ -67,8 +67,8 @@ export class TmPipelineAppStage extends cdk.Stage {
         hostedZoneIdParameterName: 'hostedZoneId',
         customHttpHeaderParameterName: 'customHttpHeaderValue',
         domainParameterName: 'domainName',
-        secrets_from_ssm_parameter_store: ["TM_SECRET"],
-        additional_secrets_from_parameter_store: {'TM_DATABASE_WRITER_HOSTNAME': '/RDS/Endpoint/Write'},
+        secretsFromSsmParameterStore: ["TM_SECRET"],
+        additionalSecretsFromParameterStore: {'TM_DATABASE_WRITER_HOSTNAME': '/RDS/Endpoint/Write'},
       }
       
       const regions: { [region: string]: RegionParameters } = {
@@ -194,8 +194,8 @@ export class TmPipelineAppStage extends cdk.Stage {
           hostedZoneIdParameterName: regionProps.ecs.hostedZoneIdParameterName,
           customHttpHeaderParameterName: regionProps.ecs.customHttpHeaderParameterName,
           domainParameterName: regionProps.ecs.domainParameterName,
-          secrets_from_ssm_parameter_store: regionProps.ecs.secrets_from_ssm_parameter_store,
-          additional_secrets_from_parameter_store: regionProps.ecs.additional_secrets_from_parameter_store,
+          secretsFromSsmParameterStore: regionProps.ecs.secretsFromSsmParameterStore,
+          additionalSecretsFromParameterStore: regionProps.ecs.additionalSecretsFromParameterStore,
         }
     
         const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
