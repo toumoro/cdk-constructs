@@ -81,19 +81,13 @@ export class TmCloudfrontStack extends cdk.Stack {
             this.errorsBucket = new Bucket(this, 'ErrorsBucket', {
                 removalPolicy: RemovalPolicy.DESTROY,
                 autoDeleteObjects: true,
-                blockPublicAccess: new s3.BlockPublicAccess({
-                    blockPublicPolicy: false,
-                    restrictPublicBuckets: false,
-                })
+                blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL
             });
         }
         else {
             this.errorsBucket = new Bucket(this, 'ErrorsBucket', {
                 removalPolicy: RemovalPolicy.DESTROY,
-                blockPublicAccess: new s3.BlockPublicAccess({
-                    blockPublicPolicy: false,
-                    restrictPublicBuckets: false,
-                })
+                blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL
             });
         }
 
