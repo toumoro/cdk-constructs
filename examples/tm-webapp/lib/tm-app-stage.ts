@@ -10,6 +10,7 @@ import { TmRedisGlobalStack } from './tm-redis-global-stack';
 import { TmRedisStack } from './tm-redis-stack';
 import { NagSuppressions, AwsSolutionsChecks } from 'cdk-nag';
 import * as path from 'path';
+import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
 
 interface RegionParameters {
   vpc: {
@@ -44,6 +45,7 @@ interface Stacks {
   ecs?: TmEcsStack;
   rds?: TmRdsAuroraMysqlServerlessStack | TmRdsNetworkSecondaryRegionStack;
   redis?: TmRedisGlobalStack | TmRedisStack;
+  cloudfront?: TmCloudfrontStack;
 }
 
 export class TmPipelineAppStage extends cdk.Stage {
@@ -67,10 +69,10 @@ export class TmPipelineAppStage extends cdk.Stage {
         hostedZoneIdParameterName: 'hostedZoneId',
         customHttpHeaderParameterName: 'customHttpHeaderValue',
         domainParameterName: 'domainName',
-        secretsFromSsmParameterStore: ["TM_SECRET"],
+        secretsFromSsmParameterStore: ['TM_SECRET'],
         additionalSecretsFromParameterStore: {'TM_DATABASE_WRITER_HOSTNAME': '/RDS/Endpoint/Write'},
       }
-      
+     
       const regions: { [region: string]: RegionParameters } = {
         'ca-central-1': {
           vpc: {
@@ -95,7 +97,7 @@ export class TmPipelineAppStage extends cdk.Stage {
           elasticache: {
             isRedisGlobalReplication: false,
           },
-        },  
+        }, 
       };
 
       let mainRegionRedisProps: MainRegionRedisProps = {};
@@ -218,6 +220,31 @@ export class TmPipelineAppStage extends cdk.Stage {
           { id: 'AwsSolutions-ECS4', reason: 'The ECS Cluster has CloudWatch Container Insights disabled.' },
         ]);
       });
+
+
+      const appLoadbalancersDnsNames: string[] = [];
+      for (const stack of Object.values(stacks)){
+          appLoadbalancersDnsNames.push(stack.ecs?.loadbalancer.loadBalancerDnsName ?? '');
+      }
+
+      const cloudfrontEnv = {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: 'us-east-1',
+      };
+
+      const cloudfrontStackProps: TmCloudfrontStackProps = {
+        env: cloudfrontEnv,
+        crossRegionReferences: true,
+        retainLogBuckets: false,
+        retainErrorBucket: false,
+        applicationLoadbalancersDnsNames: appLoadbalancersDnsNames,
+        hostedZoneIdParameterName: '/cloudfrontStack/parameters/hostedZoneId',
+        customHttpHeaderParameterName: '/cloudfrontStack/parameters/customHttpHeader',
+        domainParameterName: '/cloudfrontStack/parameters/domanName',
+      }
+
+      const cloudfront = new TmCloudfrontStack(this, 'TmCloudfrontUsEast1Stack', cloudfrontStackProps);
+      stacks['us-east-1'] = { cloudfront };
 
     }
 

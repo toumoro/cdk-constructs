@@ -1,34 +1,38 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-//import { VpcBase, TmVpcProps } from './vpc/vpc-base';
 import { CfnOutput, Environment, RemovalPolicy } from 'aws-cdk-lib';
-//import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { AllowedMethods, CachePolicy, Distribution, OriginProtocolPolicy, OriginRequestPolicy, PriceClass, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { HttpOrigin, LoadBalancerV2Origin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-//import { BucketDeployment } from 'aws-cdk-lib/aws-s3-deployment';
-//import * as path from 'path';
-//import * as fs from 'fs';
-//import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { ILoadBalancerV2 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { TmCachePolicy, TmCachePolicyProps } from './cloudfront/cachePolicy';
+import { HttpOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { TmCachePolicy, TmCachePolicyProps } from '../../../src/cdn/cloudfront/cachePolicy';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as s3 from 'aws-cdk-lib/aws-s3'
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as s3Deployment from 'aws-cdk-lib/aws-s3-deployment';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface TmCloudfrontStackProps extends cdk.StackProps {
-    readonly originDnsName: string;
-    readonly domainName: string;
-    readonly hostedZoneId: string;
-    readonly env?: Environment;
-    readonly additionalCookies?: string[];
+    readonly hostedZoneIdParameterName: string;
+    readonly env: Environment;
     readonly retainLogBuckets?: boolean;
+    readonly retainErrorBucket?: boolean;
     readonly webAclId?: string;
     readonly errorCachingMinTtl?: number;
-    readonly applicationLoadbalancer: ILoadBalancerV2;
-    readonly loadBalancerOriginProtocol?: OriginProtocolPolicy;
-    readonly viewerProtocolPolicy?: ViewerProtocolPolicy;
-
+    readonly applicationLoadbalancersDnsNames: string[];
+    readonly loadBalancerOriginProtocol?: cloudfront.OriginProtocolPolicy;
+    readonly viewerProtocolPolicy?: cloudfront.ViewerProtocolPolicy;
+    readonly customHttpHeaderParameterName: string;
+    readonly domainParameterName: string;
+    readonly enableAcceptEncodingBrotli?: boolean,
+    readonly enableAcceptEncodingGzip?: boolean,
+    readonly cachePolicyDefaultTtl?: number,
+    readonly cachePolicyMaxTtl?: number,
+    readonly cachePolicyMinTtl?: number,
+    readonly additionalCookies?: string[];
+    readonly additionalHeaders?: string[];
+    readonly queryStrings?: string[];
 }
 
 export class TmCloudfrontStack extends cdk.Stack {
@@ -37,10 +41,8 @@ export class TmCloudfrontStack extends cdk.Stack {
     private logBucket: Bucket;
     private errorsBucket: Bucket;
     private errorsBucketOrigin: S3Origin;
-    //private assetsBucketOrigin: HttpOrigin;
-    private loadBalancerOrigin: HttpOrigin;
-    private distribution: Distribution;
-    //private s3Deployment?: BucketDeployment;
+    private loadBalancerOrigins: HttpOrigin[] = [];
+    private distribution: cloudfront.Distribution;
 
 
     constructor(scope: Construct, id: string, props: TmCloudfrontStackProps) {
@@ -48,127 +50,182 @@ export class TmCloudfrontStack extends cdk.Stack {
         super(scope, id, props);
 
         this.certificate = new Certificate(this, 'Certificate', {
-            domainName: props.domainName,
-            validation: CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', props.hostedZoneId)),
+            domainName: ssm.StringParameter.valueForStringParameter(this, props.domainParameterName),
+            validation: CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this,
+                'HostedZoneId',
+                ssm.StringParameter.valueForStringParameter(this, props.hostedZoneIdParameterName)
+            ),
+            )
         });
 
+        // BUCKETS
         const logBucketsRemovalPolicy = props.retainLogBuckets ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY;
 
-        this.logBucket = new Bucket(this, 'LogBucket', {
-            removalPolicy: logBucketsRemovalPolicy,
-            objectOwnership: ObjectOwnership.OBJECT_WRITER,
-            autoDeleteObjects: true,
-        });
+        if (logBucketsRemovalPolicy === RemovalPolicy.DESTROY) {
+            this.logBucket = new Bucket(this, 'LogBucket', {
+                removalPolicy: RemovalPolicy.DESTROY,
+                autoDeleteObjects: true,
+                objectOwnership: ObjectOwnership.OBJECT_WRITER,
+            });
+        }
+        else {
+            this.logBucket = new Bucket(this, 'LogBucket', {
+                removalPolicy: RemovalPolicy.RETAIN,
+                objectOwnership: ObjectOwnership.OBJECT_WRITER,
+            });
+        }
 
-        this.errorsBucket = new Bucket(this, 'ErrorsBucket');
+        const errorBucketsRemovalPolicy = props.retainErrorBucket ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY;
 
+        if (errorBucketsRemovalPolicy === RemovalPolicy.DESTROY) {
+            this.errorsBucket = new Bucket(this, 'ErrorsBucket', {
+                removalPolicy: RemovalPolicy.DESTROY,
+                autoDeleteObjects: true,
+                blockPublicAccess: new s3.BlockPublicAccess({
+                    blockPublicPolicy: false,
+                    restrictPublicBuckets: false,
+                })
+            });
+        }
+        else {
+            this.errorsBucket = new Bucket(this, 'ErrorsBucket', {
+                removalPolicy: RemovalPolicy.DESTROY,
+                blockPublicAccess: new s3.BlockPublicAccess({
+                    blockPublicPolicy: false,
+                    restrictPublicBuckets: false,
+                })
+            });
+        }
+
+        // Deploy error pages files
+        const errorsResponsePagesFilesPath = path.join(__dirname, 'cloudfront', 'error-pages');
+        if (fs.existsSync(errorsResponsePagesFilesPath)) {
+            new s3Deployment.BucketDeployment(this, 'DeployErrorPages', {
+                sources: [s3Deployment.Source.asset(path.join(__dirname, 'cloudfront', 'error-pages'))],
+                destinationBucket: this.errorsBucket,
+                destinationKeyPrefix: 'errors',
+            });
+        }
+
+        //  Origins
         this.errorsBucketOrigin = new S3Origin(this.errorsBucket);
 
-        // this.assetsBucketOrigin = new HttpOrigin(props.domainName, {
-        //     protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
-        // });
+        for (const loadBalancerDnsName of props.applicationLoadbalancersDnsNames) {
+            const httpOrigin = new HttpOrigin(loadBalancerDnsName, {
+                protocolPolicy: props.loadBalancerOriginProtocol || cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+                customHeaders: {
+                    'X-Custom-Header': ssm.StringParameter.valueForStringParameter(this, props.customHttpHeaderParameterName),
+                }
+            });
+            this.loadBalancerOrigins.push(httpOrigin);
+        }
 
-        this.loadBalancerOrigin = new LoadBalancerV2Origin(props.applicationLoadbalancer, {
-            protocolPolicy: props.loadBalancerOriginProtocol || OriginProtocolPolicy.HTTPS_ONLY,
-            customHeaders: {
-                'X-Custom-Header': 'sdsdsdsdsd',
-            }
-        });
-
-        // const responsePagesFilesPath = path.normalize(path.join(__dirname, '/../../../cf_errors/main/', props.env.environmentName, '/'));
-        // const responsePagePathsByStatusCode: { [key: string]: string } = {};
-
-        // if (fs.existsSync(responsePagesFilesPath)) {
-        //     this.s3Deployment = new BucketDeployment(this, 'DeployErrorFiles', {
-        //         sources: [Source.asset(responsePagesFilesPath)],
-        //         destinationBucket: this.errorsBucket,
-        //         destinationKeyPrefix: 'errors/',
-        //     });
-
-        //     const responsePageFilesPaths = fs.readdirSync(responsePagesFilesPath).filter(filename =>
-        //         fs.lstatSync(path.join(responsePagesFilesPath, filename)).isFile()
-        //     );
-
-        //     responsePageFilesPaths.forEach(responsePageFilePath => {
-        //         const responseCode = path.parse(responsePageFilePath).name;
-        //         responsePagePathsByStatusCode[responseCode] = `/errors/${responsePageFilePath}`;
-        //     });
-        // }
-
+        // Default Behavior Cache Policy
         const tmCachePolicyProps: TmCachePolicyProps = {
-            /** OPTIONAL CACHING PARAMETERS */
-            // cachePolicyName: 'typo3-cache-policy',
-            // cookieBehavior: CacheCookieBehavior,
-            // headerBehavior: CacheHeaderBehavior,
-            // queryStringBehavior: CacheQueryStringBehavior,
-            // enableAcceptEncodingBrotli: true,
-            // enableAcceptEncodingGzip: true,
-            // defaultTtl: Duration,
-            // maxTtl: Duration,
-            // minTtl: Duration,
-            // additionalCookies: string[],
-            // additionalHeaders: string[];
-            // additionalQueryStrings: string[];      
+            enableAcceptEncodingBrotli: props.enableAcceptEncodingBrotli,
+            enableAcceptEncodingGzip: props.enableAcceptEncodingGzip,
+            defaultTtl: cdk.Duration.seconds(props.cachePolicyDefaultTtl ?? 86400),
+            maxTtl: cdk.Duration.seconds(props.cachePolicyMaxTtl ?? 31536000),
+            minTtl: cdk.Duration.seconds(props.cachePolicyMinTtl ?? 0),
+            additionalCookies: props.additionalCookies,
+            additionalHeaders: props.additionalHeaders,
+            queryStrings: props.queryStrings,
 
         };
 
+        // Basic-Auth cloudfront function
+        const authFunctionCode = fs.readFileSync(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.js'), 'utf8');
+        const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
+            functionName: 'BasicAuthFunction',
+            code: cloudfront.FunctionCode.fromInline(authFunctionCode),
+        });
+
+        // Basic-Auth Lambda@Edge function
+        // const edgeFunction = new lambda.Function(this, 'BasicAuthFunction', {
+        //     runtime: lambda.Runtime.NODEJS_18_X, 
+        //     code: lambda.Code.fromAsset(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.zip')),
+        //     handler: 'basic-auth-function.handler',
+        // });
+        // // Add IAM policy to allow Lambda to read from SSM Parameter Store
+        // edgeFunction.addToRolePolicy(new iam.PolicyStatement({
+        //     actions: ['ssm:GetParameter'],
+        //     resources: [
+        //         `arn:aws:ssm:${this.region}:${this.account}:parameter/*`,
+        //     ],
+        // }));
+
+        // Default Behavior
         const defaultBehavior = {
-            origin: this.loadBalancerOrigin,
-            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            allowedMethods: AllowedMethods.ALLOW_ALL,
+            origin: this.loadBalancerOrigins[0], // the first LoadBalancer origin in the list
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
+            functionAssociations: [{
+                function: authFunction,
+                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            }],
+            // edgeLambdas: [
+            //     {
+            //         functionVersion: edgeFunction.currentVersion,
+            //         eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+            //     },
+            // ],
         }
 
-        this.distribution = new Distribution(this, 'CloudFrontDistribution', {
-            domainNames: [props.domainName],
+        // Error Responses
+        const errorCodes: number[] = [400, 403, 500, 501, 502, 503, 504];
+        const errorResponsesObjects: cloudfront.ErrorResponse[] = [];
+        for (const code of errorCodes) {
+            errorResponsesObjects.push(
+                {
+                    httpStatus: code,
+                    responseHttpStatus: code,
+                    responsePagePath: `/errors/${code}.html`,
+                    ttl: cdk.Duration.seconds(30),
+                }
+            )
+        }
+
+        // Distribution
+        this.distribution = new cloudfront.Distribution(this, 'CloudFrontDistribution', {
+            domainNames: [ssm.StringParameter.valueForStringParameter(this, props.domainParameterName)],
             certificate: this.certificate,
             logBucket: this.logBucket,
-            priceClass: PriceClass.PRICE_CLASS_100,
+            priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
             webAclId: props.webAclId,
-            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
-            defaultBehavior: defaultBehavior
-            // errorResponses: Object.entries(responsePagePathsByStatusCode).map(([statusCode, responsePagePath]) => ({
-            //     httpStatus: parseInt(statusCode),
-            //     responsePagePath,
-            //     ttl: Duration.seconds(props.errorCachingMinTtl || 30),
-            // })),
+            minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+            defaultBehavior: defaultBehavior,
+            errorResponses: errorResponsesObjects
         });
 
-        this.distribution.addBehavior('/typo3/*', this.loadBalancerOrigin, {
-            allowedMethods: AllowedMethods.ALLOW_ALL,
-            cachePolicy: CachePolicy.CACHING_DISABLED,
-            viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
+        this.distribution.addBehavior('/typo3/*', this.loadBalancerOrigins[0], {
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+            cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+            viewerProtocolPolicy: props.viewerProtocolPolicy || cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
+            functionAssociations: [{
+                function: authFunction,
+                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            }],
+            // edgeLambdas: [
+            //     {
+            //         functionVersion: edgeFunction.currentVersion,
+            //         eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
+            //     },
+            // ],
         });
 
+
+        // Error Behavior
         this.distribution.addBehavior('/errors/*', this.errorsBucketOrigin, {
-            viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         });
 
-        this.distribution.addBehavior('/assets/*', this.loadBalancerOrigin, {
-            viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
-        });
+
 
         new CfnOutput(this, 'DistributionID', {
             value: this.distribution.distributionId,
         });
-
     }
-
-    // addEdgeLambdaFunction(id: string, behaviorPathPattern: string, codePath: string, handler: string) {
-    //     const lambdaFunction = new Function(this, id, {
-    //         runtime: Runtime.PYTHON_3_8,
-    //         handler,
-    //         code: Code.fromAsset(codePath),
-    //     });
-
-    //     this.distribution.addBehavior(behaviorPathPattern, this.loadBalancerOrigin, {
-    //         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-    //         edgeLambdas: [{
-    //             eventType: LambdaEdgeEventType.VIEWER_REQUEST,
-    //             functionVersion: lambdaFunction.currentVersion,
-    //         }],
-    //     });
-    // }
 }
+
