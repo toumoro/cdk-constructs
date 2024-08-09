@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as rds from 'aws-cdk-lib/aws-rds';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 
 interface TmRdsNetworkSecondaryRegionPropos extends cdk.StackProps {
   readonly vpc: ec2.IVpc;
@@ -27,6 +28,19 @@ export class TmRdsNetworkSecondaryRegionStack extends cdk.Stack {
         },
     });
 
-    }
+    new ssm.StringParameter(this, 'clusterRdsArn', {
+      parameterName: '/RDS/Cluster/ARN',
+      stringValue: " ",
+    });
 
+    new ssm.StringParameter(this, 'clusterRdsWrite', {
+      parameterName: '/RDS/Endpoint/Write',
+      stringValue: " ",
+    });
+
+    new ssm.StringParameter(this, 'clusterRdsRead', {
+      parameterName: '/RDS/Endpoint/Read',
+      stringValue: " ",
+    });
+  }
 }
