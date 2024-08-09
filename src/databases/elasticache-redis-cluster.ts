@@ -2,7 +2,7 @@ import { aws_elasticache as elasticache, Tags } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { Construct } from 'constructs';
 
-interface RedisClusterProps {
+export interface IRedisClusterProps {
   envName: string;
   vpc: ec2.IVpc;
   cacheNodeType?: string;
@@ -22,7 +22,7 @@ export class TmElasticacheRedisCluster extends Construct {
   public readonly subnetGroup: elasticache.CfnSubnetGroup;
   public readonly cluster: elasticache.CfnReplicationGroup;
 
-  constructor(scope: Construct, id: string, props: RedisClusterProps) {
+  constructor(scope: Construct, id: string, props: IRedisClusterProps) {
     super(scope, id);
 
     const {
