@@ -234,6 +234,138 @@ The Fargate task definition in this construct.
 ---
 
 
+### TmElasticacheRedisCluster <a name="TmElasticacheRedisCluster" id="tm-cdk-constructs.TmElasticacheRedisCluster"></a>
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmElasticacheRedisCluster.Initializer"></a>
+
+```typescript
+import { TmElasticacheRedisCluster } from 'tm-cdk-constructs'
+
+new TmElasticacheRedisCluster(scope: Construct, id: string, props: IRedisClusterProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.IRedisClusterProps">IRedisClusterProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmElasticacheRedisCluster.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmElasticacheRedisCluster.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmElasticacheRedisCluster.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.IRedisClusterProps">IRedisClusterProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.toString">toString</a></code> | Returns a string representation of this construct. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmElasticacheRedisCluster.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmElasticacheRedisCluster.isConstruct"></a>
+
+```typescript
+import { TmElasticacheRedisCluster } from 'tm-cdk-constructs'
+
+TmElasticacheRedisCluster.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmElasticacheRedisCluster.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.cluster">cluster</a></code> | <code>aws-cdk-lib.aws_elasticache.CfnReplicationGroup</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.securityGroup">securityGroup</a></code> | <code>aws-cdk-lib.aws_ec2.SecurityGroup</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.subnetGroup">subnetGroup</a></code> | <code>aws-cdk-lib.aws_elasticache.CfnSubnetGroup</code> | *No description.* |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmElasticacheRedisCluster.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `cluster`<sup>Required</sup> <a name="cluster" id="tm-cdk-constructs.TmElasticacheRedisCluster.property.cluster"></a>
+
+```typescript
+public readonly cluster: CfnReplicationGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticache.CfnReplicationGroup
+
+---
+
+##### `securityGroup`<sup>Required</sup> <a name="securityGroup" id="tm-cdk-constructs.TmElasticacheRedisCluster.property.securityGroup"></a>
+
+```typescript
+public readonly securityGroup: SecurityGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.SecurityGroup
+
+---
+
+##### `subnetGroup`<sup>Required</sup> <a name="subnetGroup" id="tm-cdk-constructs.TmElasticacheRedisCluster.property.subnetGroup"></a>
+
+```typescript
+public readonly subnetGroup: CfnSubnetGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticache.CfnSubnetGroup
+
+---
+
+
 ### TmPipeline <a name="TmPipeline" id="tm-cdk-constructs.TmPipeline"></a>
 
 A CDK construct that creates a CodePipeline.
@@ -3823,4 +3955,149 @@ Indicates whether to enable the S3 endpoint for the VPC.
 ---
 
 
+## Protocols <a name="Protocols" id="Protocols"></a>
+
+### IRedisClusterProps <a name="IRedisClusterProps" id="tm-cdk-constructs.IRedisClusterProps"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.IRedisClusterProps">IRedisClusterProps</a>
+
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.envName">envName</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.allowFrom">allowFrom</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.allowFromConstructs">allowFromConstructs</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ec2.IConnectable}</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.automaticFailoverEnabled">automaticFailoverEnabled</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.autoMinorVersionUpgrade">autoMinorVersionUpgrade</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.cacheNodeType">cacheNodeType</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.clusterMode">clusterMode</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.engineVersion">engineVersion</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.globalReplicationGroupId">globalReplicationGroupId</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.multiAzEnabled">multiAzEnabled</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.replicasPerNodeGroup">replicasPerNodeGroup</a></code> | <code>number</code> | *No description.* |
+
+---
+
+##### `envName`<sup>Required</sup> <a name="envName" id="tm-cdk-constructs.IRedisClusterProps.property.envName"></a>
+
+```typescript
+public readonly envName: string;
+```
+
+- *Type:* string
+
+---
+
+##### `vpc`<sup>Required</sup> <a name="vpc" id="tm-cdk-constructs.IRedisClusterProps.property.vpc"></a>
+
+```typescript
+public readonly vpc: IVpc;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.IVpc
+
+---
+
+##### `allowFrom`<sup>Optional</sup> <a name="allowFrom" id="tm-cdk-constructs.IRedisClusterProps.property.allowFrom"></a>
+
+```typescript
+public readonly allowFrom: ISecurityGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup
+
+---
+
+##### `allowFromConstructs`<sup>Optional</sup> <a name="allowFromConstructs" id="tm-cdk-constructs.IRedisClusterProps.property.allowFromConstructs"></a>
+
+```typescript
+public readonly allowFromConstructs: {[ key: string ]: IConnectable};
+```
+
+- *Type:* {[ key: string ]: aws-cdk-lib.aws_ec2.IConnectable}
+
+---
+
+##### `automaticFailoverEnabled`<sup>Optional</sup> <a name="automaticFailoverEnabled" id="tm-cdk-constructs.IRedisClusterProps.property.automaticFailoverEnabled"></a>
+
+```typescript
+public readonly automaticFailoverEnabled: boolean;
+```
+
+- *Type:* boolean
+
+---
+
+##### `autoMinorVersionUpgrade`<sup>Optional</sup> <a name="autoMinorVersionUpgrade" id="tm-cdk-constructs.IRedisClusterProps.property.autoMinorVersionUpgrade"></a>
+
+```typescript
+public readonly autoMinorVersionUpgrade: boolean;
+```
+
+- *Type:* boolean
+
+---
+
+##### `cacheNodeType`<sup>Optional</sup> <a name="cacheNodeType" id="tm-cdk-constructs.IRedisClusterProps.property.cacheNodeType"></a>
+
+```typescript
+public readonly cacheNodeType: string;
+```
+
+- *Type:* string
+
+---
+
+##### `clusterMode`<sup>Optional</sup> <a name="clusterMode" id="tm-cdk-constructs.IRedisClusterProps.property.clusterMode"></a>
+
+```typescript
+public readonly clusterMode: string;
+```
+
+- *Type:* string
+
+---
+
+##### `engineVersion`<sup>Optional</sup> <a name="engineVersion" id="tm-cdk-constructs.IRedisClusterProps.property.engineVersion"></a>
+
+```typescript
+public readonly engineVersion: string;
+```
+
+- *Type:* string
+
+---
+
+##### `globalReplicationGroupId`<sup>Optional</sup> <a name="globalReplicationGroupId" id="tm-cdk-constructs.IRedisClusterProps.property.globalReplicationGroupId"></a>
+
+```typescript
+public readonly globalReplicationGroupId: string;
+```
+
+- *Type:* string
+
+---
+
+##### `multiAzEnabled`<sup>Optional</sup> <a name="multiAzEnabled" id="tm-cdk-constructs.IRedisClusterProps.property.multiAzEnabled"></a>
+
+```typescript
+public readonly multiAzEnabled: boolean;
+```
+
+- *Type:* boolean
+
+---
+
+##### `replicasPerNodeGroup`<sup>Optional</sup> <a name="replicasPerNodeGroup" id="tm-cdk-constructs.IRedisClusterProps.property.replicasPerNodeGroup"></a>
+
+```typescript
+public readonly replicasPerNodeGroup: number;
+```
+
+- *Type:* number
+
+---
 
