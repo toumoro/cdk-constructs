@@ -4,6 +4,9 @@ import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as events_targets from 'aws-cdk-lib/aws-events-targets';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
 
 
@@ -73,6 +76,15 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
 
   readonly secrets?: { [key: string]: ecs.Secret };
 
+  /*
+  * The scheduled task schedule expression
+  */
+  readonly scheduledTaskScheduleExpression?: events.Schedule;
+  /*
+  * The scheduled task command
+  */
+  readonly scheduledTasksCommand?: string;
+
 }
 
 
@@ -87,15 +99,16 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       file: props.buildDockerfile,
     });
 
-    const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
+    //const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
+    const defautProps: ecsPatterns.ApplicationLoadBalancedFargateServiceProps = {
       vpc: props.vpc,
       assignPublicIp: true,
       enableExecuteCommand: true,
       memoryLimitMiB: 2048,
       cpu: 1024,
       desiredCount: 2,
-      minTaskCount: 1,
-      maxTaskCount: 3,
+      //minTaskCount: 1,
+      //maxTaskCount: 3,
       listenerPort: 443,
       openListener: false,
       protocol: elbv2.ApplicationProtocol.HTTPS,
@@ -103,8 +116,8 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       taskSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
-      buildContextPath: props.buildContextPath,
-      buildDockerfile: props.buildDockerfile,
+      //buildContextPath: props.buildContextPath,
+      //buildDockerfile: props.buildDockerfile,
       taskImageOptions: {
         image: ecs.ContainerImage.fromDockerImageAsset(dockerImageAsset),
         containerPort: props.containerPort, // Optional: Specify the container port
@@ -156,6 +169,45 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     });
 
 
+
+    if (mergedProps.scheduledTasksCommand) {
+      /**
+       * Add the required permissions to the task role to allow the ECS task to be started by the scheduled task
+       */
+      const scheduledTaskRole = this.taskDefinition.taskRole as iam.Role;
+      const servicePrincipalScheduledTaskRole = new iam.ServicePrincipal('events.amazonaws.com');
+
+      scheduledTaskRole.assumeRolePolicy?.addStatements(new iam.PolicyStatement({
+        actions: ['sts:AssumeRole'],
+        principals: [servicePrincipalScheduledTaskRole],
+      }));
+
+
+      const schedulerTarget = new events_targets.EcsTask({
+        cluster: this.cluster,
+        taskDefinition: this.taskDefinition,
+        containerOverrides: [{
+          containerName: this.taskDefinition.defaultContainer!.containerName,
+          command: mergedProps.scheduledTasksCommand.split(' '),
+        }],
+        role: scheduledTaskRole,
+        taskCount: 1,
+        securityGroups: this.service.connections.securityGroups,
+        //subnetSelection: this.cluster.vpc.publicSubnets
+      });
+
+      const rule = new events.Rule(this, 'SchedulerRule', {
+        schedule: mergedProps.scheduledTaskScheduleExpression || events.Schedule.expression('rate(1 minute)'),
+        targets: [schedulerTarget],
+      });
+
+      const cfnRule = rule.node.defaultChild as events.CfnRule;
+      cfnRule.addPropertyOverride('Targets.0.EcsParameters.EnableExecuteCommand', 'true');
+      cfnRule.addPropertyOverride('Targets.0.EcsParameters.TagList', [
+        { Key: 'type', Value: 'ecs-scheduled' },
+        { Key: 'name', Value: id },
+      ]);
+    }
   };
 
 

@@ -1901,6 +1901,8 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.secrets">secrets</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ecs.Secret}</code> | *No description.* |
 
 ---
@@ -2576,6 +2578,26 @@ public readonly minTaskCount: number;
 - *Type:* number
 
 The minumun number od tasks.
+
+---
+
+##### `scheduledTaskScheduleExpression`<sup>Optional</sup> <a name="scheduledTaskScheduleExpression" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression"></a>
+
+```typescript
+public readonly scheduledTaskScheduleExpression: Schedule;
+```
+
+- *Type:* aws-cdk-lib.aws_events.Schedule
+
+---
+
+##### `scheduledTasksCommand`<sup>Optional</sup> <a name="scheduledTasksCommand" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand"></a>
+
+```typescript
+public readonly scheduledTasksCommand: string;
+```
+
+- *Type:* string
 
 ---
 

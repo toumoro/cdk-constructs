@@ -28,6 +28,8 @@ interface RegionParameters {
     domainParameterName: string;
     secretsFromSsmParameterStore?: string[];
     additionalSecretsFromParameterStore?: { [key: string]: string };
+    scheduledTaskScheduleExpression?: cdk.aws_events.Schedule;
+    scheduledTasksCommand?: string;
   }
   elasticache?: {
     isRedisGlobalReplication?: boolean;
@@ -58,7 +60,6 @@ export class TmPipelineAppStage extends cdk.Stage {
             .join('');
       }
       
-
       const commonEcsStackProps = {
         crossRegionReferences: true,
         buildContextPath: path.join(__dirname, '../build/'),
@@ -69,6 +70,8 @@ export class TmPipelineAppStage extends cdk.Stage {
         domainParameterName: 'domainName',
         secretsFromSsmParameterStore: ["TM_SECRET"],
         additionalSecretsFromParameterStore: {'TM_DATABASE_WRITER_HOSTNAME': '/RDS/Endpoint/Write'},
+        scheduledTaskScheduleExpression: cdk.aws_events.Schedule.rate(cdk.Duration.minutes(1)),
+        scheduledTasksCommand: 'echo "Hello, world!"',
       }
       
       const regions: { [region: string]: RegionParameters } = {
@@ -196,6 +199,8 @@ export class TmPipelineAppStage extends cdk.Stage {
           domainParameterName: regionProps.ecs.domainParameterName,
           secretsFromSsmParameterStore: regionProps.ecs.secretsFromSsmParameterStore,
           additionalSecretsFromParameterStore: regionProps.ecs.additionalSecretsFromParameterStore,
+          scheduledTaskScheduleExpression: regionProps.ecs.scheduledTaskScheduleExpression,
+          scheduledTasksCommand: regionProps.ecs.scheduledTasksCommand,
         }
     
         const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
