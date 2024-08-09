@@ -52,7 +52,7 @@ Before the first deploy, you need to create some parameters in Parameter Store:
 |-------------------------------------------|------------------------------------------------------|
 | branchNameParam                           | Name of the branch that will trigger the pipeline    |
 | customHttpHeaderValue                     | Secret header between CloudFront and Load-Balancer   |
-| domain                                    | Domain name for the application                      |
+| domainName                                | Domain name for the application                      |
 | hostedZoneId                              | Hosted Zone ID for the domain                        |
 
 
