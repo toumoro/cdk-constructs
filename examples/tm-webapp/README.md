@@ -34,17 +34,26 @@ cdk bootstrap
 
 When adding a new region, you must bootstrap it by running the bootstrap command again.
 
-## Create two CodeCommit repositories
+## CodeCommit repositories (soon to be deprecated)
 
+Create two CodeCommit repositories in your main region:
 * infrastructure
 * application
+
+Push the CDK app repository to infrastructure. 
+
+To the application repository, push a simple app to start with. Create a folder named docker. In that folder, create a Dockerfile that contains:
+```
+FROM httpd
+```
+Once the infrastructure is deployed with the your application's configuration, you will overwrite the application repository with your application.
 
 ## Configure mirroring if you wish to deploy from something else than CodeCommit
 
 [GitLab to CodeCommit](https://docs.gitlab.com/ee/user/project/repository/mirror/push.html)
 [Azure DevOps to CodeCommit](https://aws.amazon.com/blogs/devops/use-aws-codecommit-to-mirror-an-azure-devops-repository-using-an-azure-devops-pipeline/)
 
-## Deploy
+## Create parameters
 
 Before the first deploy, you need to create some parameters in Parameter Store:
 
@@ -55,10 +64,13 @@ Before the first deploy, you need to create some parameters in Parameter Store:
 | domainName                                | Domain name for the application                      |
 | hostedZoneId                              | Hosted Zone ID for the domain                        |
 
-
 ```
 aws ssm put-parameter --name "<Parameter>" --type "String" --value "<Description>"
 ```
+### First deploy
+
+Run the deploy command and let the
+
 ### Modifying removal policy to allow destuction of everything
 
 We're using an aspect to apply the RETAIN policy to every resource in the application. Before destroying, we must deploy change it to DESTROY.
