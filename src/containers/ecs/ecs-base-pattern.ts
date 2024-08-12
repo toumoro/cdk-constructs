@@ -169,7 +169,6 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     });
 
 
-
     if (mergedProps.scheduledTasksCommand) {
       /**
        * Add the required permissions to the task role to allow the ECS task to be started by the scheduled task
