@@ -28,6 +28,8 @@ interface RegionParameters {
     domainParameterName: string;
     secretsFromSsmParameterStore?: string[];
     additionalSecretsFromParameterStore?: { [key: string]: string };
+    scheduledTaskScheduleExpression?: cdk.aws_events.Schedule;
+    scheduledTasksCommand?: string;
   }
   elasticache?: {
     isRedisGlobalReplication?: boolean;
@@ -239,6 +241,8 @@ export class TmPipelineAppStage extends cdk.Stage {
       hostedZoneIdParameterName: '/cloudfrontStack/parameters/hostedZoneId',
       customHttpHeaderParameterName: '/cloudfrontStack/parameters/customHttpHeader',
       domainParameterName: '/cloudfrontStack/parameters/domanName',
+      basicAuthEnabled: true,
+      basicAuthBase64: '/cloudfrontStack/parameters/basicAuthBase64',
     }
 
     const cloudfront = new TmCloudfrontStack(this, 'TmCloudfrontUsEast1Stack', cloudfrontStackProps);

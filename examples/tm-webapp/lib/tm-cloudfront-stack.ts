@@ -33,6 +33,8 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
     readonly additionalCookies?: string[];
     readonly additionalHeaders?: string[];
     readonly queryStrings?: string[];
+    readonly basicAuthEnabled?: boolean;
+    readonly basicAuthBase64?: string;
 }
 
 export class TmCloudfrontStack extends cdk.Stack {
@@ -126,45 +128,60 @@ export class TmCloudfrontStack extends cdk.Stack {
             queryStrings: props.queryStrings,
 
         };
+        
+        const functionAssociation: cloudfront.FunctionAssociation[] = [];
 
-        // Basic-Auth cloudfront function
-        const authFunctionCode = fs.readFileSync(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.js'), 'utf8');
-        const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
-            functionName: 'BasicAuthFunction',
-            code: cloudfront.FunctionCode.fromInline(authFunctionCode),
-        });
+        if (props.basicAuthEnabled){
+            const basicAuthBase64 = ssm.StringParameter.valueForStringParameter(this, props.basicAuthBase64?.toString() ?? '');
+            console.log('Basic Auth is enabled');
+            const BasicAuthFunction: string = `
+            function handler(event) {
+                var authHeaders = event.request.headers.authorization;
+                // It is an encoding of \`Basic base64([username]:[password])\`
+                var expected = "Basic ${basicAuthBase64}";
+                if (authHeaders && authHeaders.value === expected) {
+                return event.request;
+                }
+                var response = {
+                statusCode: 401,
+                statusDescription: "Unauthorized",
+                headers: {
+                    "www-authenticate": {
+                    value: 'Basic realm="Authentification"',
+                    },
+                },
+                };
+            
+                return response;
+            }
+            `;
 
-        // Basic-Auth Lambda@Edge function
-        // const edgeFunction = new lambda.Function(this, 'BasicAuthFunction', {
-        //     runtime: lambda.Runtime.NODEJS_18_X, 
-        //     code: lambda.Code.fromAsset(path.join(__dirname, 'cloudfront', 'functions', 'basic-auth-function.zip')),
-        //     handler: 'basic-auth-function.handler',
-        // });
-        // // Add IAM policy to allow Lambda to read from SSM Parameter Store
-        // edgeFunction.addToRolePolicy(new iam.PolicyStatement({
-        //     actions: ['ssm:GetParameter'],
-        //     resources: [
-        //         `arn:aws:ssm:${this.region}:${this.account}:parameter/*`,
-        //     ],
-        // }));
+            const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
+                functionName: 'BasicAuthFunction',
+                code: cloudfront.FunctionCode.fromInline(BasicAuthFunction),
+            });
+
+            functionAssociation.push({
+                function: authFunction,
+                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            });
+        } else {
+            console.log('Basic Auth is not enabled');
+            functionAssociation.filter(assoc => assoc.function);
+
+        }
+        console.log(functionAssociation);
+
 
         // Default Behavior
-        const defaultBehavior = {
+        const defaultBehavior: cloudfront.BehaviorOptions = {
             origin: this.loadBalancerOrigins[0], // the first LoadBalancer origin in the list
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
             cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
-            functionAssociations: [{
-                function: authFunction,
-                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-            }],
-            // edgeLambdas: [
-            //     {
-            //         functionVersion: edgeFunction.currentVersion,
-            //         eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
-            //     },
-            // ],
+            functionAssociations: functionAssociation,
         }
+
 
         // Error Responses
         const errorCodes: number[] = [400, 403, 500, 501, 502, 503, 504];
@@ -197,25 +214,13 @@ export class TmCloudfrontStack extends cdk.Stack {
             cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
             viewerProtocolPolicy: props.viewerProtocolPolicy || cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
             originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
-            functionAssociations: [{
-                function: authFunction,
-                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
-            }],
-            // edgeLambdas: [
-            //     {
-            //         functionVersion: edgeFunction.currentVersion,
-            //         eventType: cloudfront.LambdaEdgeEventType.VIEWER_REQUEST,
-            //     },
-            // ],
+            functionAssociations: functionAssociation,
         });
-
 
         // Error Behavior
         this.distribution.addBehavior('/errors/*', this.errorsBucketOrigin, {
             viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         });
-
-
 
         new CfnOutput(this, 'DistributionID', {
             value: this.distribution.distributionId,
