@@ -133,7 +133,6 @@ export class TmCloudfrontStack extends cdk.Stack {
 
         if (props.basicAuthEnabled){
             const basicAuthBase64 = ssm.StringParameter.valueForStringParameter(this, props.basicAuthBase64?.toString() ?? '');
-            console.log('Basic Auth is enabled');
             const BasicAuthFunction: string = `
             function handler(event) {
                 var authHeaders = event.request.headers.authorization;
@@ -166,11 +165,9 @@ export class TmCloudfrontStack extends cdk.Stack {
                 eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
             });
         } else {
-            console.log('Basic Auth is not enabled');
             functionAssociation.filter(assoc => assoc.function);
 
         }
-        console.log(functionAssociation);
 
 
         // Default Behavior
