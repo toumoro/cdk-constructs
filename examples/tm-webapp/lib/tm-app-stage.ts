@@ -78,6 +78,7 @@ export class TmPipelineAppStage extends cdk.Stage {
       'ca-central-1': {
         vpc: {
           range: '10.3.0.0/16',
+
         },
         rds: {
           isRdsMainRegion: true,

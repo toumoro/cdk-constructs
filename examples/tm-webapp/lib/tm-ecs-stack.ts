@@ -29,6 +29,8 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly applicationName: string;
   readonly buildContextPath: string;
   readonly buildDockerfile: string;
+  readonly scheduledTaskScheduleExpression?: cdk.aws_events.Schedule;
+  readonly scheduledTasksCommand?: string;
 }
 
 export class TmEcsStack extends cdk.Stack {
@@ -107,6 +109,9 @@ export class TmEcsStack extends cdk.Stack {
       }),
       buildContextPath: props.buildContextPath,
       buildDockerfile: props.buildDockerfile,
+      scheduledTaskScheduleExpression: props.scheduledTaskScheduleExpression,
+      //schedule: cdk.aws_events.Schedule.rate(cdk.Duration.minutes(1)),
+      scheduledTasksCommand: props.scheduledTasksCommand,
     }
 
     /** Service Pattern */
@@ -148,7 +153,5 @@ export class TmEcsStack extends cdk.Stack {
       });
       environmentSecrets[`${key}`] = ecs.Secret.fromSsmParameter(secretParameter);
     })
-
-
   }
 }
