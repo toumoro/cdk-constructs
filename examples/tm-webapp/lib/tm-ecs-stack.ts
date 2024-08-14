@@ -112,6 +112,9 @@ export class TmEcsStack extends cdk.Stack {
       scheduledTaskScheduleExpression: props.scheduledTaskScheduleExpression,
       //schedule: cdk.aws_events.Schedule.rate(cdk.Duration.minutes(1)),
       scheduledTasksCommand: props.scheduledTasksCommand,
+      efsVolumes:  [
+        { name: 'example', path: '/tmp/example' },
+      ],
     }
 
     /** Service Pattern */

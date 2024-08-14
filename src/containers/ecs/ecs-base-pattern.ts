@@ -8,7 +8,12 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as events_targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
+import { TmEfsFileSystem } from '../../storage/efs-filesystem';
 
+export interface IIefsVolumes {
+  name: string;
+  path: string;
+}
 
 /**
  * Represents the configuration for an ecsPatterns.
@@ -85,6 +90,10 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   */
   readonly scheduledTasksCommand?: string;
 
+  /*
+  * EFS Volumes
+  */
+  readonly efsVolumes?: IIefsVolumes[];
 }
 
 
@@ -130,6 +139,32 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     const mergedProps = { ...defautProps, ...props };
 
     super(scope, id, mergedProps);
+
+    const taskDefinition = this.taskDefinition;
+
+    mergedProps.efsVolumes?.forEach((volume) => {
+      const efsVolume = new TmEfsFileSystem(this, `EfsVolume-${volume.name}`, {
+        vpc: mergedProps.vpc!,
+        uid: '33',
+        gid: '33',
+      });
+      taskDefinition.addVolume({
+        name: volume.name,
+        efsVolumeConfiguration: {
+          fileSystemId: efsVolume.efsFileSystem.fileSystemId,
+          authorizationConfig: {
+            accessPointId: efsVolume.efsAccessPoint.accessPointId,
+          },
+          transitEncryption: 'ENABLED',
+        },
+      });
+      taskDefinition.defaultContainer?.addMountPoints({
+        containerPath: volume.path,
+        sourceVolume: volume.name,
+        readOnly: false,
+      });
+      efsVolume.efsFileSystem.connections.allowDefaultPortFrom(this.service, 'Allow from ECS Service');
+    });
 
     // Remove the default action by setting a new default action with conditions
     this.listener.addTargetGroups('HeaderConditionForward', {

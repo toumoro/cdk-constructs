@@ -2031,6 +2031,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
@@ -2686,6 +2687,16 @@ public readonly customHttpHeaderValue: string;
 - *Type:* string
 
 Custom http header value.
+
+---
+
+##### `efsVolumes`<sup>Optional</sup> <a name="efsVolumes" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes"></a>
+
+```typescript
+public readonly efsVolumes: IIefsVolumes[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]
 
 ---
 
@@ -3978,6 +3989,40 @@ Indicates whether to enable the S3 endpoint for the VPC.
 
 
 ## Protocols <a name="Protocols" id="Protocols"></a>
+
+### IIefsVolumes <a name="IIefsVolumes" id="tm-cdk-constructs.IIefsVolumes"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>
+
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.IIefsVolumes.property.name">name</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IIefsVolumes.property.path">path</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="tm-cdk-constructs.IIefsVolumes.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+---
+
+##### `path`<sup>Required</sup> <a name="path" id="tm-cdk-constructs.IIefsVolumes.property.path"></a>
+
+```typescript
+public readonly path: string;
+```
+
+- *Type:* string
+
+---
 
 ### IRedisClusterProps <a name="IRedisClusterProps" id="tm-cdk-constructs.IRedisClusterProps"></a>
 
