@@ -10,6 +10,9 @@ import { TmRedisStack } from './tm-redis-stack';
 import { NagSuppressions, AwsSolutionsChecks } from 'cdk-nag';
 import * as path from 'path';
 import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
+import { TmCloudfrontCdnStack, TmCloudfrontCdnStackProps } from './tm-cloudfront-cdn-stack';
+import { TmS3Stack } from './tm-s3-stacks';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 
 interface RegionParameters {
   vpc: {
@@ -46,7 +49,9 @@ interface Stacks {
   ecs?: TmEcsStack;
   rds?: TmRdsAuroraMysqlServerlessStack | TmRdsNetworkSecondaryRegionStack;
   redis?: TmRedisGlobalStack | TmRedisStack;
+  s3?: TmS3Stack;
   cloudfront?: TmCloudfrontStack;
+  cloudfrontCdn?: TmCloudfrontCdnStack;
 }
 
 export class TmPipelineAppStage extends cdk.Stage {
@@ -117,13 +122,19 @@ export class TmPipelineAppStage extends cdk.Stage {
         env: env,
         range: regionProps.vpc.range,
       });
+      stacks[regionName] = { vpc } ;
 
       const bastion = new BastionStack(this, `TmBastion${regionName}Stack`, {
         vpc: vpc.vpc,
         env: env,
         crossRegionReferences: true,
       });
-      stacks[regionName] = { vpc, bastion };
+      stacks[regionName].bastion = bastion;
+
+      const s3 = new TmS3Stack(this, `TmS3${regionName}Stack`, {
+        env: env,
+      });
+      stacks[regionName].s3 = s3;
 
       if (regionProps.rds.isRdsMainRegion) {
         const rds = new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
@@ -203,7 +214,7 @@ export class TmPipelineAppStage extends cdk.Stage {
       }
 
       const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
-      stacks[regionName] = { ecs };
+      stacks[regionName].ecs = ecs;
 
       cdk.Aspects.of(vpc).add(new AwsSolutionsChecks());
       cdk.Aspects.of(bastion).add(new AwsSolutionsChecks());
@@ -227,6 +238,17 @@ export class TmPipelineAppStage extends cdk.Stage {
     .map(region => region.ecs?.loadbalancer.loadBalancerDnsName)
     .filter((dnsName): dnsName is string => dnsName !== undefined);
 
+    const errorBuckets: s3.Bucket[] = Object.values(stacks)
+    .map(region => region.s3?.errorBucket)
+    .filter((bucket): bucket is s3.Bucket => bucket !== undefined);
+
+    const contentBuckets: s3.Bucket[] = Object.values(stacks)
+    .map(region => region.s3?.contentBucket)
+    .filter((bucket): bucket is s3.Bucket => bucket !== undefined);
+
+    const logBuckets: s3.Bucket[] = Object.values(stacks)
+    .map(region => region.s3?.logBucket)
+    .filter((bucket): bucket is s3.Bucket => bucket !== undefined);
 
     const cloudfrontEnv = {
       account: process.env.CDK_DEFAULT_ACCOUNT,
@@ -237,7 +259,8 @@ export class TmPipelineAppStage extends cdk.Stage {
       env: cloudfrontEnv,
       crossRegionReferences: true,
       retainLogBuckets: false,
-      retainErrorBucket: false,
+      errorBuckets: errorBuckets,
+      logBuckets: logBuckets,
       applicationLoadbalancersDnsNames: appLoadbalancersDnsNames,
       hostedZoneIdParameterName: '/cloudfrontStack/parameters/hostedZoneId',
       customHttpHeaderParameterName: '/cloudfrontStack/parameters/customHttpHeader',
@@ -257,6 +280,29 @@ export class TmPipelineAppStage extends cdk.Stage {
       { id: 'AwsSolutions-IAM5', reason: ' The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.'},
       { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
     ]);
+
+    const cloudfrontCdnStackProps: TmCloudfrontCdnStackProps = {
+      env: cloudfrontEnv,
+      crossRegionReferences: true,
+      hostedZoneIdParameterName: '/cloudfrontStack/parameters/hostedZoneId',
+      domainParameterName: '/cloudfrontCdnStack/parameters/domanName',
+      contentBuckets: contentBuckets,
+      errorBuckets: errorBuckets,
+    }
+
+    const cloudfrontCdn = new TmCloudfrontCdnStack(this, 'TmCloudfrontCdnUsEast1Stack', cloudfrontCdnStackProps);
+    stacks['us-east-1'] = { cloudfrontCdn };
+
+    cdk.Aspects.of(cloudfrontCdn).add(new AwsSolutionsChecks());
+    NagSuppressions.addStackSuppressions(cloudfrontCdn, [
+      { id: 'AwsSolutions-S1', reason: 'The S3 Bucket has server access logs disabled.' },
+      { id: 'AwsSolutions-S10', reason: 'The S3 Bucket or bucket policy does not require requests to use SSL.'},
+      { id: 'AwsSolutions-CFR3', reason: 'The CloudFront distribution does not have access logs enabled.'},
+      { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.'},
+      { id: 'AwsSolutions-IAM5', reason: ' The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.'},
+      { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
+    ]);
+
   }
 
 }
