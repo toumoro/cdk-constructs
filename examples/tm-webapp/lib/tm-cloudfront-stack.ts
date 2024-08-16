@@ -40,7 +40,7 @@ export class TmCloudfrontStack extends cdk.Stack {
     private certificate: Certificate;
     private errorsBucketOrigins: S3Origin[] = [];
     private loadBalancerOrigins: HttpOrigin[] = [];
-    private distribution: cloudfront.Distribution;
+    public readonly distribution: cloudfront.Distribution;
 
 
     constructor(scope: Construct, id: string, props: TmCloudfrontStackProps) {

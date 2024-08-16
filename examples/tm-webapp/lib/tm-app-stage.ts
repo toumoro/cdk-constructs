@@ -12,6 +12,7 @@ import * as path from 'path';
 import { TmCloudfrontStack, TmCloudfrontStackProps } from './tm-cloudfront-stack';
 import { TmCloudfrontCdnStack, TmCloudfrontCdnStackProps } from './tm-cloudfront-cdn-stack';
 import { TmS3Stack } from './tm-s3-stacks';
+import { TmServiceIamUsersStack, TmServiceIamUsersStackProps } from './tm-iam-user-services-stack';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 
 interface RegionParameters {
@@ -52,6 +53,7 @@ interface Stacks {
   s3?: TmS3Stack;
   cloudfront?: TmCloudfrontStack;
   cloudfrontCdn?: TmCloudfrontCdnStack;
+  iam?: TmServiceIamUsersStack;
 }
 
 export class TmPipelineAppStage extends cdk.Stage {
@@ -83,7 +85,6 @@ export class TmPipelineAppStage extends cdk.Stage {
       'ca-central-1': {
         vpc: {
           range: '10.3.0.0/16',
-
         },
         rds: {
           isRdsMainRegion: true,
@@ -135,9 +136,10 @@ export class TmPipelineAppStage extends cdk.Stage {
         env: env,
       });
       stacks[regionName].s3 = s3;
-
+      
+      let rds: TmRdsAuroraMysqlServerlessStack | TmRdsNetworkSecondaryRegionStack;
       if (regionProps.rds.isRdsMainRegion) {
-        const rds = new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
+        rds = new TmRdsAuroraMysqlServerlessStack(this, `TmRdsAurora${regionName}`, {
           env: env,
           vpc: vpc.vpc,
           bastionHost: bastion.securityGroupBastion,
@@ -154,7 +156,7 @@ export class TmPipelineAppStage extends cdk.Stage {
         ]);
         stacks[regionName].rds = rds;
       } else {
-        const rds = new TmRdsNetworkSecondaryRegionStack(this, `TmRdsNetwork${regionName}Stack`, {
+        rds = new TmRdsNetworkSecondaryRegionStack(this, `TmRdsNetwork${regionName}Stack`, {
           env: env,
           vpc: vpc.vpc,
           bastionHost: bastion.securityGroupBastion,
@@ -162,23 +164,24 @@ export class TmPipelineAppStage extends cdk.Stage {
         stacks[regionName].rds = rds;
         cdk.Aspects.of(rds).add(new AwsSolutionsChecks());
       }
+
       if (regionProps.elasticache!.isRedisGlobalReplication) {
-        const redisGlobal = new TmRedisGlobalStack(this, `TmRedisGlobal${regionName}Stack`, {
+        const redis = new TmRedisGlobalStack(this, `TmRedisGlobal${regionName}Stack`, {
           env: env,
           vpc: vpc.vpc,
           crossRegionReferences: true,
           allowFromConstructs: { bastion: bastion.securityGroupBastion },
         });
-        stacks[regionName].redis = redisGlobal;
+        stacks[regionName].redis = redis;
         //console.log(redisGlobal.globalReplicationGroupId);
-        cdk.Aspects.of(redisGlobal).add(new AwsSolutionsChecks());
-        NagSuppressions.addStackSuppressions(redisGlobal, [
+        cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
+        NagSuppressions.addStackSuppressions(redis, [
           { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
           { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
           { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
           { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
         ]);
-        mainRegionRedisProps.globalReplicationGroupId = redisGlobal.globalReplicationGroupId;
+        mainRegionRedisProps.globalReplicationGroupId = redis.globalReplicationGroupId;
       } else {
         if (mainRegionRedisProps.globalReplicationGroupId) {
           const redis = new TmRedisStack(this, `TmRedis${regionName}Stack`, {
@@ -214,6 +217,7 @@ export class TmPipelineAppStage extends cdk.Stage {
       }
 
       const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
+      ecs.addDependency(rds);
       stacks[regionName].ecs = ecs;
 
       cdk.Aspects.of(vpc).add(new AwsSolutionsChecks());
@@ -302,6 +306,32 @@ export class TmPipelineAppStage extends cdk.Stage {
       { id: 'AwsSolutions-IAM5', reason: ' The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.'},
       { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
     ]);
+
+
+    
+    Object.entries(regions).forEach(([region]) => {
+      
+      const env = {
+        account: process.env.CDK_DEFAULT_ACCOUNT,
+        region: region,
+      };
+      
+      const regionName = toPascalCase(region);
+      const contentBuckets = stacks[regionName].s3!.contentBucket.bucketArn;
+      
+      const iamUsersProps: TmServiceIamUsersStackProps = { 
+        env: env,
+        crossRegionReferences: true,
+        contentBucketArn: contentBuckets,
+        cloudfrontDistributionId: cloudfront.distribution.distributionId,
+      }
+  
+      const iamUsers = new TmServiceIamUsersStack(this, `TmServiceIamUser${regionName}Stack`, iamUsersProps);
+      stacks[regionName].iam = iamUsers;
+  
+      cdk.Aspects.of(iamUsers).add(new AwsSolutionsChecks());
+      
+    });
 
   }
 
