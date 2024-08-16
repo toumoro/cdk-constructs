@@ -1,46 +1,46 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-//import { VpcBase, TmVpcProps } from './vpc/vpc-base';
-import { CfnOutput, Environment, RemovalPolicy } from 'aws-cdk-lib';
-//import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { AllowedMethods, CachePolicy, Distribution, OriginProtocolPolicy, OriginRequestPolicy, PriceClass, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { CfnOutput, Environment } from 'aws-cdk-lib';
 import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
-import { Bucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
-import { HttpOrigin, LoadBalancerV2Origin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
-//import { BucketDeployment } from 'aws-cdk-lib/aws-s3-deployment';
-//import * as path from 'path';
-//import * as fs from 'fs';
-//import { Code, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { ILoadBalancerV2 } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
-import { TmCachePolicy, TmCachePolicyProps } from './cloudfront/cachePolicy';
+import { HttpOrigin, S3Origin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { TmCachePolicy, TmCachePolicyProps } from '../../../src/cdn/cloudfront/cachePolicy';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
+import * as s3 from 'aws-cdk-lib/aws-s3'
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 
 export interface TmCloudfrontStackProps extends cdk.StackProps {
-    readonly originDnsName: string;
-    readonly domainName: string;
-    readonly hostedZoneId: string;
-    readonly env?: Environment;
-    readonly additionalCookies?: string[];
+    readonly hostedZoneIdParameterName: string;
+    readonly env: Environment;
     readonly retainLogBuckets?: boolean;
+    readonly retainErrorBucket?: boolean;
     readonly webAclId?: string;
     readonly errorCachingMinTtl?: number;
-    readonly applicationLoadbalancer: ILoadBalancerV2;
-    readonly loadBalancerOriginProtocol?: OriginProtocolPolicy;
-    readonly viewerProtocolPolicy?: ViewerProtocolPolicy;
-
+    readonly applicationLoadbalancersDnsNames: string[];
+    readonly loadBalancerOriginProtocol?: cloudfront.OriginProtocolPolicy;
+    readonly viewerProtocolPolicy?: cloudfront.ViewerProtocolPolicy;
+    readonly customHttpHeaderParameterName: string;
+    readonly domainParameterName: string;
+    readonly enableAcceptEncodingBrotli?: boolean,
+    readonly enableAcceptEncodingGzip?: boolean,
+    readonly cachePolicyDefaultTtl?: number,
+    readonly cachePolicyMaxTtl?: number,
+    readonly cachePolicyMinTtl?: number,
+    readonly additionalCookies?: string[];
+    readonly additionalHeaders?: string[];
+    readonly queryStrings?: string[];
+    readonly basicAuthEnabled?: boolean;
+    readonly basicAuthBase64?: string;
+    readonly errorBuckets: s3.Bucket[];
+    readonly logBuckets: s3.Bucket[];
 }
 
 export class TmCloudfrontStack extends cdk.Stack {
 
     private certificate: Certificate;
-    private logBucket: Bucket;
-    private errorsBucket: Bucket;
-    private errorsBucketOrigin: S3Origin;
-    //private assetsBucketOrigin: HttpOrigin;
-    private loadBalancerOrigin: HttpOrigin;
-    private distribution: Distribution;
-    //private s3Deployment?: BucketDeployment;
+    private errorsBucketOrigins: S3Origin[] = [];
+    private loadBalancerOrigins: HttpOrigin[] = [];
+    public readonly distribution: cloudfront.Distribution;
 
 
     constructor(scope: Construct, id: string, props: TmCloudfrontStackProps) {
@@ -48,106 +48,152 @@ export class TmCloudfrontStack extends cdk.Stack {
         super(scope, id, props);
 
         this.certificate = new Certificate(this, 'Certificate', {
-            domainName: props.domainName,
-            validation: CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this, 'HostedZone', props.hostedZoneId)),
+            domainName: ssm.StringParameter.valueForStringParameter(this, props.domainParameterName),
+            validation: CertificateValidation.fromDns(HostedZone.fromHostedZoneId(this,
+                'HostedZoneId',
+                ssm.StringParameter.valueForStringParameter(this, props.hostedZoneIdParameterName)
+            ),
+            )
         });
 
-        const logBucketsRemovalPolicy = props.retainLogBuckets ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY;
+        // Log Bucket
+        const logBucket = props.logBuckets[0];
 
-        this.logBucket = new Bucket(this, 'LogBucket', {
-            removalPolicy: logBucketsRemovalPolicy,
-            objectOwnership: ObjectOwnership.OBJECT_WRITER,
-            autoDeleteObjects: true,
-        });
-
-        this.errorsBucket = new Bucket(this, 'ErrorsBucket');
-
-        this.errorsBucketOrigin = new S3Origin(this.errorsBucket);
-
-        // this.assetsBucketOrigin = new HttpOrigin(props.domainName, {
-        //     protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
-        // });
-
-        this.loadBalancerOrigin = new LoadBalancerV2Origin(props.applicationLoadbalancer, {
-            protocolPolicy: props.loadBalancerOriginProtocol || OriginProtocolPolicy.HTTPS_ONLY,
-            customHeaders: {
-                'X-Custom-Header': 'sdsdsdsdsd',
-            }
-        });
-
-        // const responsePagesFilesPath = path.normalize(path.join(__dirname, '/../../../cf_errors/main/', props.env.environmentName, '/'));
-        // const responsePagePathsByStatusCode: { [key: string]: string } = {};
-
-        // if (fs.existsSync(responsePagesFilesPath)) {
-        //     this.s3Deployment = new BucketDeployment(this, 'DeployErrorFiles', {
-        //         sources: [Source.asset(responsePagesFilesPath)],
-        //         destinationBucket: this.errorsBucket,
-        //         destinationKeyPrefix: 'errors/',
-        //     });
-
-        //     const responsePageFilesPaths = fs.readdirSync(responsePagesFilesPath).filter(filename =>
-        //         fs.lstatSync(path.join(responsePagesFilesPath, filename)).isFile()
-        //     );
-
-        //     responsePageFilesPaths.forEach(responsePageFilePath => {
-        //         const responseCode = path.parse(responsePageFilePath).name;
-        //         responsePagePathsByStatusCode[responseCode] = `/errors/${responsePageFilePath}`;
-        //     });
-        // }
-
-        const tmCachePolicyProps: TmCachePolicyProps = {
-            /** OPTIONAL CACHING PARAMETERS */
-            // cachePolicyName: 'typo3-cache-policy',
-            // cookieBehavior: CacheCookieBehavior,
-            // headerBehavior: CacheHeaderBehavior,
-            // queryStringBehavior: CacheQueryStringBehavior,
-            // enableAcceptEncodingBrotli: true,
-            // enableAcceptEncodingGzip: true,
-            // defaultTtl: Duration,
-            // maxTtl: Duration,
-            // minTtl: Duration,
-            // additionalCookies: string[],
-            // additionalHeaders: string[];
-            // additionalQueryStrings: string[];      
-
-        };
-
-        const defaultBehavior = {
-            origin: this.loadBalancerOrigin,
-            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            allowedMethods: AllowedMethods.ALLOW_ALL,
-            cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
+        //  Origins
+        for (const errorBucket of props.errorBuckets) {
+            const errorBucketOrgin = new S3Origin(errorBucket);
+            this.errorsBucketOrigins.push(errorBucketOrgin);
         }
 
-        this.distribution = new Distribution(this, 'CloudFrontDistribution', {
-            domainNames: [props.domainName],
+        for (const loadBalancerDnsName of props.applicationLoadbalancersDnsNames) {
+            const httpOrigin = new HttpOrigin(loadBalancerDnsName, {
+                protocolPolicy: props.loadBalancerOriginProtocol || cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+                customHeaders: {
+                    'X-Custom-Header': ssm.StringParameter.valueForStringParameter(this, props.customHttpHeaderParameterName),
+                }
+            });
+            this.loadBalancerOrigins.push(httpOrigin);
+        }
+
+        // Default Behavior Cache Policy
+        const tmCachePolicyProps: TmCachePolicyProps = {
+            enableAcceptEncodingBrotli: props.enableAcceptEncodingBrotli,
+            enableAcceptEncodingGzip: props.enableAcceptEncodingGzip,
+            defaultTtl: cdk.Duration.seconds(props.cachePolicyDefaultTtl ?? 86400),
+            maxTtl: cdk.Duration.seconds(props.cachePolicyMaxTtl ?? 31536000),
+            minTtl: cdk.Duration.seconds(props.cachePolicyMinTtl ?? 0),
+            additionalCookies: props.additionalCookies,
+            additionalHeaders: props.additionalHeaders,
+            queryStrings: props.queryStrings,
+
+        };
+        
+        const functionAssociation: cloudfront.FunctionAssociation[] = [];
+
+        if (props.basicAuthEnabled){
+            const basicAuthBase64 = ssm.StringParameter.valueForStringParameter(this, props.basicAuthBase64?.toString() ?? '');
+            const BasicAuthFunction: string = `
+            function handler(event) {
+                var authHeaders = event.request.headers.authorization;
+                // It is an encoding of \`Basic base64([username]:[password])\`
+                var expected = "Basic ${basicAuthBase64}";
+                if (authHeaders && authHeaders.value === expected) {
+                return event.request;
+                }
+                var response = {
+                statusCode: 401,
+                statusDescription: "Unauthorized",
+                headers: {
+                    "www-authenticate": {
+                    value: 'Basic realm="Authentification"',
+                    },
+                },
+                };
+            
+                return response;
+            }
+            `;
+
+            const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
+                functionName: 'BasicAuthFunction',
+                code: cloudfront.FunctionCode.fromInline(BasicAuthFunction),
+            });
+
+            functionAssociation.push({
+                function: authFunction,
+                eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            });
+        } else {
+            functionAssociation.filter(assoc => assoc.function);
+        }
+
+
+        // Default Behavior
+        const defaultBehavior: cloudfront.BehaviorOptions = {
+            origin: this.loadBalancerOrigins[0], // the first LoadBalancer origin in the list
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+            cachePolicy: new TmCachePolicy(this, 'DefaultCachePolicy', tmCachePolicyProps),
+            functionAssociations: functionAssociation,
+        }
+
+
+        // Error Responses
+        const errorCodes: number[] = [400, 403, 500, 501, 502, 503, 504];
+        const errorResponsesObjects: cloudfront.ErrorResponse[] = [];
+        for (const code of errorCodes) {
+            errorResponsesObjects.push(
+                {
+                    httpStatus: code,
+                    responseHttpStatus: code,
+                    responsePagePath: `/errors/${code}.html`,
+                    ttl: cdk.Duration.seconds(30),
+                }
+            )
+        }
+
+        // Distribution
+        this.distribution = new cloudfront.Distribution(this, 'CloudFrontDistribution', {
+            domainNames: [ssm.StringParameter.valueForStringParameter(this, props.domainParameterName)],
             certificate: this.certificate,
-            logBucket: this.logBucket,
-            priceClass: PriceClass.PRICE_CLASS_100,
+            logBucket: logBucket,
+            priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
             webAclId: props.webAclId,
-            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
-            defaultBehavior: defaultBehavior
-            // errorResponses: Object.entries(responsePagePathsByStatusCode).map(([statusCode, responsePagePath]) => ({
-            //     httpStatus: parseInt(statusCode),
-            //     responsePagePath,
-            //     ttl: Duration.seconds(props.errorCachingMinTtl || 30),
-            // })),
+            minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+            defaultBehavior: defaultBehavior,
+            errorResponses: errorResponsesObjects
         });
 
-        this.distribution.addBehavior('/typo3/*', this.loadBalancerOrigin, {
-            allowedMethods: AllowedMethods.ALLOW_ALL,
-            cachePolicy: CachePolicy.CACHING_DISABLED,
-            viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
+        // Default TYPO3 Behavior
+        this.distribution.addBehavior('/typo3/*', this.loadBalancerOrigins[0], {
+            allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+            cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+            viewerProtocolPolicy: props.viewerProtocolPolicy || cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
+            functionAssociations: functionAssociation,
         });
 
-        this.distribution.addBehavior('/errors/*', this.errorsBucketOrigin, {
-            viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        // Add additional behaviors for backup regions
+        this.loadBalancerOrigins.slice(1).forEach((origin, index) => {
+            this.distribution.addBehavior(`/typo3-backup-region-${ index + 1 }/*`, origin, {
+                allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
+                cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+                viewerProtocolPolicy: props.viewerProtocolPolicy || cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+                originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
+                functionAssociations: functionAssociation,
+            });
         });
 
-        this.distribution.addBehavior('/assets/*', this.loadBalancerOrigin, {
-            viewerProtocolPolicy: props.viewerProtocolPolicy || ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
+        // Default Error Behavior
+        this.distribution.addBehavior('/errors/*', this.errorsBucketOrigins[0], {
+            viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        });
+
+        // Add additional behaviors for backup regions
+        this.errorsBucketOrigins.slice(1).forEach((origin, index) => {
+            this.distribution.addBehavior(`/errors-backup-region-${index + 1}/*`, origin, {
+                viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            });
         });
 
         new CfnOutput(this, 'DistributionID', {
@@ -155,20 +201,5 @@ export class TmCloudfrontStack extends cdk.Stack {
         });
 
     }
-
-    // addEdgeLambdaFunction(id: string, behaviorPathPattern: string, codePath: string, handler: string) {
-    //     const lambdaFunction = new Function(this, id, {
-    //         runtime: Runtime.PYTHON_3_8,
-    //         handler,
-    //         code: Code.fromAsset(codePath),
-    //     });
-
-    //     this.distribution.addBehavior(behaviorPathPattern, this.loadBalancerOrigin, {
-    //         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-    //         edgeLambdas: [{
-    //             eventType: LambdaEdgeEventType.VIEWER_REQUEST,
-    //             functionVersion: lambdaFunction.currentVersion,
-    //         }],
-    //     });
-    // }
 }
+

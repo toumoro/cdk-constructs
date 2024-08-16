@@ -18,7 +18,7 @@ export interface TmCachePolicyProps extends CachePolicyProps {
   minTtl?: Duration;
   additionalCookies?: string[];
   additionalHeaders?: string[];
-  additionalQueryStrings?: string[];
+  queryStrings?: string[];
 }
 
 
@@ -49,7 +49,7 @@ export class TmCachePolicy extends CachePolicy {
     ];
 
     const allowedQueryStrings = [
-      ...(props.additionalQueryStrings || []),
+      ...(props.queryStrings || []),
     ];
 
     const defaultProps: TmCachePolicyProps = {
@@ -60,9 +60,17 @@ export class TmCachePolicy extends CachePolicy {
       queryStringBehavior: allowedQueryStrings.length > 0
         ? CacheQueryStringBehavior.allowList(...allowedQueryStrings)
         : CacheQueryStringBehavior.all(),
+      defaultTtl: Duration.seconds(86400),
+      maxTtl: Duration.seconds(31536000),
+      minTtl: Duration.seconds(0),
     };
 
-    const mergedProps = { ...defaultProps, ...props };
+    const mergedProps = {
+      ...defaultProps,
+      ...props,
+      enableAcceptEncodingBrotli: props.enableAcceptEncodingBrotli ?? defaultProps.enableAcceptEncodingBrotli,
+      enableAcceptEncodingGzip: props.enableAcceptEncodingGzip ?? defaultProps.enableAcceptEncodingGzip,
+    };
 
     super(scope, id, mergedProps);
   };
