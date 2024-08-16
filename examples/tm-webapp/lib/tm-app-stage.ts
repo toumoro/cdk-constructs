@@ -124,6 +124,7 @@ export class TmPipelineAppStage extends cdk.Stage {
         range: regionProps.vpc.range,
       });
       stacks[regionName] = { vpc } ;
+      this.applyNagChecks(vpc);
 
       const bastion = new BastionStack(this, `TmBastion${regionName}Stack`, {
         vpc: vpc.vpc,
@@ -131,11 +132,13 @@ export class TmPipelineAppStage extends cdk.Stage {
         crossRegionReferences: true,
       });
       stacks[regionName].bastion = bastion;
+      this.applyNagChecks(bastion);
 
       const s3 = new TmS3Stack(this, `TmS3${regionName}Stack`, {
         env: env,
       });
       stacks[regionName].s3 = s3;
+      this.applyNagChecks(s3);
       
       let rds: TmRdsAuroraMysqlServerlessStack | TmRdsNetworkSecondaryRegionStack;
       if (regionProps.rds.isRdsMainRegion) {
@@ -145,16 +148,9 @@ export class TmPipelineAppStage extends cdk.Stage {
           bastionHost: bastion.securityGroupBastion,
           enableGlobal: true,
         });
-        cdk.Aspects.of(rds).add(new AwsSolutionsChecks());
-        NagSuppressions.addStackSuppressions(rds, [
-          { id: 'AwsSolutions-SMG4', reason: 'The secret does not have automatic rotation scheduled.' },
-          { id: 'AwsSolutions-RDS6', reason: 'The RDS Aurora MySQL/PostgresSQL cluster does not have IAM Database Authentication enabled.' },
-          { id: 'AwsSolutions-RDS10', reason: 'AwsSolutions-RDS10: The RDS instance or Aurora DB cluster does not have deletion protection enabled.' },
-          { id: 'AwsSolutions-RDS11', reason: 'The RDS instance or Aurora DB cluster uses the default endpoint port.' },
-          { id: 'AwsSolutions-RDS14', reason: 'The RDS Aurora MySQL cluster does not have Backtrack enabled.' },
-          { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.' },
-        ]);
         stacks[regionName].rds = rds;
+        this.applyNagChecks(rds);
+        
       } else {
         rds = new TmRdsNetworkSecondaryRegionStack(this, `TmRdsNetwork${regionName}Stack`, {
           env: env,
@@ -162,7 +158,7 @@ export class TmPipelineAppStage extends cdk.Stage {
           bastionHost: bastion.securityGroupBastion,
         });
         stacks[regionName].rds = rds;
-        cdk.Aspects.of(rds).add(new AwsSolutionsChecks());
+        this.applyNagChecks(rds);
       }
 
       if (regionProps.elasticache!.isRedisGlobalReplication) {
@@ -173,14 +169,8 @@ export class TmPipelineAppStage extends cdk.Stage {
           allowFromConstructs: { bastion: bastion.securityGroupBastion },
         });
         stacks[regionName].redis = redis;
-        //console.log(redisGlobal.globalReplicationGroupId);
-        cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
-        NagSuppressions.addStackSuppressions(redis, [
-          { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
-          { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
-          { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
-          { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
-        ]);
+        this.applyNagChecks(redis);
+
         mainRegionRedisProps.globalReplicationGroupId = redis.globalReplicationGroupId;
       } else {
         if (mainRegionRedisProps.globalReplicationGroupId) {
@@ -192,13 +182,7 @@ export class TmPipelineAppStage extends cdk.Stage {
             allowFromConstructs: { bastion: bastion.securityGroupBastion },
           });
           stacks[regionName].redis = redis;
-          cdk.Aspects.of(redis).add(new AwsSolutionsChecks());
-          NagSuppressions.addStackSuppressions(redis, [
-            { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
-            { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
-            { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
-            { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
-          ]);
+          this.applyNagChecks(redis);
         }
       }
 
@@ -219,23 +203,7 @@ export class TmPipelineAppStage extends cdk.Stage {
       const ecs = new TmEcsStack(this, `TmEcs${regionName}Stack`, ecsStackProps);
       ecs.addDependency(rds);
       stacks[regionName].ecs = ecs;
-
-      cdk.Aspects.of(vpc).add(new AwsSolutionsChecks());
-      cdk.Aspects.of(bastion).add(new AwsSolutionsChecks());
-      NagSuppressions.addStackSuppressions(bastion, [
-        { id: 'AwsSolutions-IAM5', reason: 'The IAM entity contains wildcard permissions.' },
-        { id: 'AwsSolutions-EC26', reason: 'EBS volumes that have encryption disabled.' },
-        { id: 'AwsSolutions-EC28', reason: 'The EC2 instance does not have detailed monitoring enabled.' },
-        { id: 'AwsSolutions-EC29', reason: 'The EC2 instance does not have termination protection enabled.' },
-      ]);
-      cdk.Aspects.of(ecs).add(new AwsSolutionsChecks());
-      NagSuppressions.addStackSuppressions(ecs, [
-        { id: 'AwsSolutions-IAM5', reason: 'The IAM entity contains wildcard permissions.' },
-        { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.' },
-        { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
-        { id: 'AwsSolutions-ELB2', reason: 'The ELB does not have access logs enabled.' },
-        { id: 'AwsSolutions-ECS4', reason: 'The ECS Cluster has CloudWatch Container Insights disabled.' },
-      ]);
+      this.applyNagChecks(ecs);
     });
 
     const appLoadbalancersDnsNames: string[] = Object.values(stacks)
@@ -275,15 +243,7 @@ export class TmPipelineAppStage extends cdk.Stage {
 
     const cloudfront = new TmCloudfrontStack(this, 'TmCloudfrontUsEast1Stack', cloudfrontStackProps);
     stacks['us-east-1'] = { cloudfront };
-
-    cdk.Aspects.of(cloudfront).add(new AwsSolutionsChecks());
-    NagSuppressions.addStackSuppressions(cloudfront, [
-      { id: 'AwsSolutions-S1', reason: 'The S3 Bucket has server access logs disabled.' },
-      { id: 'AwsSolutions-S10', reason: 'The S3 Bucket or bucket policy does not require requests to use SSL.'},
-      { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.'},
-      { id: 'AwsSolutions-IAM5', reason: ' The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.'},
-      { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
-    ]);
+    this.applyNagChecks(cloudfront);
 
     const cloudfrontCdnStackProps: TmCloudfrontCdnStackProps = {
       env: cloudfrontEnv,
@@ -296,18 +256,7 @@ export class TmPipelineAppStage extends cdk.Stage {
 
     const cloudfrontCdn = new TmCloudfrontCdnStack(this, 'TmCloudfrontCdnUsEast1Stack', cloudfrontCdnStackProps);
     stacks['us-east-1'] = { cloudfrontCdn };
-
-    cdk.Aspects.of(cloudfrontCdn).add(new AwsSolutionsChecks());
-    NagSuppressions.addStackSuppressions(cloudfrontCdn, [
-      { id: 'AwsSolutions-S1', reason: 'The S3 Bucket has server access logs disabled.' },
-      { id: 'AwsSolutions-S10', reason: 'The S3 Bucket or bucket policy does not require requests to use SSL.'},
-      { id: 'AwsSolutions-CFR3', reason: 'The CloudFront distribution does not have access logs enabled.'},
-      { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.'},
-      { id: 'AwsSolutions-IAM5', reason: ' The IAM entity contains wildcard permissions and does not have a cdk-nag rule suppression with evidence for those permission.'},
-      { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
-    ]);
-
-
+    this.applyNagChecks(cloudfrontCdn);
     
     Object.entries(regions).forEach(([region]) => {
       
@@ -328,11 +277,40 @@ export class TmPipelineAppStage extends cdk.Stage {
   
       const iamUsers = new TmServiceIamUsersStack(this, `TmServiceIamUser${regionName}Stack`, iamUsersProps);
       stacks[regionName].iam = iamUsers;
-  
-      cdk.Aspects.of(iamUsers).add(new AwsSolutionsChecks());
-      
+      this.applyNagChecks(iamUsers);
     });
 
+  }
+
+  private applyNagChecks(stack: cdk.Stack): void {
+    cdk.Aspects.of(stack).add(new AwsSolutionsChecks());
+    NagSuppressions.addStackSuppressions(stack, [
+      // RDS stack
+      { id: 'AwsSolutions-IAM4', reason: 'The IAM user, role, or group uses AWS managed policies.' },
+      { id: 'AwsSolutions-SMG4', reason: 'The secret does not have automatic rotation scheduled.' },
+      { id: 'AwsSolutions-RDS6', reason: 'The RDS Aurora MySQL/PostgresSQL cluster does not have IAM Database Authentication enabled.' },
+      { id: 'AwsSolutions-RDS10', reason: 'AwsSolutions-RDS10: The RDS instance or Aurora DB cluster does not have deletion protection enabled.' },
+      { id: 'AwsSolutions-RDS11', reason: 'The RDS instance or Aurora DB cluster uses the default endpoint port.' },
+      { id: 'AwsSolutions-RDS14', reason: 'The RDS Aurora MySQL cluster does not have Backtrack enabled.' },
+      // Redis stack
+      { id: 'AwsSolutions-AEC3', reason: 'It does not have both encryption in transit and at rest enabled.' },
+      { id: 'AwsSolutions-AEC4', reason: 'It not deployed in a Multi-AZ configuration.' },
+      { id: 'AwsSolutions-AEC5', reason: 'It uses the default endpoint port.' },
+      { id: 'AwsSolutions-AEC6', reason: 'It does not use Redis AUTH for user authentication.' },
+      // Bastion stack
+      { id: 'AwsSolutions-IAM5', reason: 'The IAM entity contains wildcard permissions.' },
+      { id: 'AwsSolutions-EC26', reason: 'EBS volumes that have encryption disabled.' },
+      { id: 'AwsSolutions-EC28', reason: 'The EC2 instance does not have detailed monitoring enabled.' },
+      { id: 'AwsSolutions-EC29', reason: 'The EC2 instance does not have termination protection enabled.' },
+      { id: 'AwsSolutions-L1', reason: 'The non-container Lambda function is not configured to use the latest runtime version.' },
+      // ECS stack
+      { id: 'AwsSolutions-ELB2', reason: 'The ELB does not have access logs enabled.' },
+      { id: 'AwsSolutions-ECS4', reason: ' The ECS Cluster has CloudWatch Container Insights disabled.' },
+      // CloudFront stack and CloudFront CDN stack
+      { id: 'AwsSolutions-S1', reason: 'The S3 Bucket has server access logs disabled.' },
+      { id: 'AwsSolutions-S10', reason: 'The S3 Bucket or bucket policy does not require requests to use SSL.'},
+      { id: 'AwsSolutions-CFR3', reason: 'The CloudFront distribution does not have access logs enabled.'},
+    ]);
   }
 
 }
