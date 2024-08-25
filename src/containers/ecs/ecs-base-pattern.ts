@@ -106,6 +106,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       //file: 'docker/Dockerfile',
       directory: props.buildContextPath,
       file: props.buildDockerfile,
+      followSymlinks: cdk.SymlinkFollowMode.ALWAYS,
     });
 
     //const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
