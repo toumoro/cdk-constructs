@@ -15,13 +15,70 @@ The `cdk.json` file tells the CDK Toolkit how to execute your app.
 
 # Bootstrap projet
 
-## Create a mirroring before begging the deploy
+## Install packages
+
+At the root of the project:
+```
+npm install
+npx projen
+```
+
+[!WARNING]
+Do not run npm install in the examples folder. There shall be only one node_modules folder at the root of the project.
+
+## Deploy cdk bootstrap
+
+```
+cdk bootstrap
+```
+
+When adding a new region, you must bootstrap it by running the bootstrap command again.
+
+## CodeCommit repositories (soon to be deprecated)
+
+Create two CodeCommit repositories in your main region:
+* infrastructure
+* application
+
+Push the CDK app repository to infrastructure. 
+
+To the application repository, push a simple app to start with. Create a folder named docker. In that folder, create a Dockerfile that contains:
+```
+FROM httpd
+```
+Once the infrastructure is deployed with the your application's configuration, you will overwrite the application repository with your application.
+
+## Configure mirroring if you wish to deploy from something else than CodeCommit
 
 [GitLab to CodeCommit](https://docs.gitlab.com/ee/user/project/repository/mirror/push.html)
 [Azure DevOps to CodeCommit](https://aws.amazon.com/blogs/devops/use-aws-codecommit-to-mirror-an-azure-devops-repository-using-an-azure-devops-pipeline/)
 
-## Create SSM entries for each account that is going to be used
+## Create parameters
 
-* Default repository branch  main `aws ssm put-parameter --name "repositoryBranch" --type "String" --value "main"`
-* Default domain `aws ssm put-parameter --name "domain" --type "String" --value "main"`
-* Create a vakye Secure `aws ssm put-parameter --name "secure-parameter-name" --type "SecureString" --value "secure-parameter-value"`
+Before the first deploy, you need to create some parameters in Parameter Store:
+
+| Parameter                                 | Description                                          |
+|-------------------------------------------|------------------------------------------------------|
+| branchNameParam                           | Name of the branch that will trigger the pipeline    |
+| customHttpHeaderValue                     | Secret header between CloudFront and Load-Balancer   |
+| domainName                                | Domain name for the application                      |
+| hostedZoneId                              | Hosted Zone ID for the domain                        |
+
+```
+aws ssm put-parameter --name "<Parameter>" --type "String" --value "<Description>"
+```
+### First deploy
+
+Run the deploy command and let the
+
+### Modifying removal policy to allow destuction of everything
+
+We're using an aspect to apply the RETAIN policy to every resource in the application. Before destroying, we must deploy change it to DESTROY.
+
+```
+cdk deploy "**" --context removalPolicy=DESTROY --concurrency 10
+```
+Then we can destroy everything
+```
+cdk destroy "**" --concurrency 10
+```
