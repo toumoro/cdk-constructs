@@ -78,6 +78,10 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * The build dockerfile.
   */
   readonly buildDockerfile: string;
+  /*
+  * Build Args.
+  */
+  readonly buildArgs?: { [key: string]: string };
 
   readonly secrets?: { [key: string]: ecs.Secret };
 
@@ -107,6 +111,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       directory: props.buildContextPath,
       file: props.buildDockerfile,
       followSymlinks: cdk.SymlinkFollowMode.ALWAYS,
+      buildArgs: props.buildArgs,
     });
 
     //const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
