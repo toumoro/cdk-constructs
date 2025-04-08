@@ -1070,8 +1070,13 @@ Import an existing DatabaseCluster from properties.
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.secret">secret</a></code> | <code>aws-cdk-lib.aws_secretsmanager.ISecret</code> | The secret attached to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.cloudwatchLogGroups">cloudwatchLogGroups</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_logs.ILogGroup}</code> | The log group is created when `cloudwatchLogsExports` is set. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.multiUserRotationApplication">multiUserRotationApplication</a></code> | <code>aws-cdk-lib.aws_secretsmanager.SecretRotationApplication</code> | Application for multi user rotation to this cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.performanceInsightsEnabled">performanceInsightsEnabled</a></code> | <code>boolean</code> | Whether Performance Insights is enabled at cluster level. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.singleUserRotationApplication">singleUserRotationApplication</a></code> | <code>aws-cdk-lib.aws_secretsmanager.SecretRotationApplication</code> | Application for single user rotation of the master password to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | The VPC network to place the cluster in. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.databaseInsightsMode">databaseInsightsMode</a></code> | <code>aws-cdk-lib.aws_rds.DatabaseInsightsMode</code> | The database insights mode. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.monitoringRole">monitoringRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role for the enhanced monitoring. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.performanceInsightEncryptionKey">performanceInsightEncryptionKey</a></code> | <code>aws-cdk-lib.aws_kms.IKey</code> | The AWS KMS key for encryption of Performance Insights data. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.performanceInsightRetention">performanceInsightRetention</a></code> | <code>aws-cdk-lib.aws_rds.PerformanceInsightRetention</code> | The amount of time, in days, to retain Performance Insights data. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.vpcSubnets">vpcSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | The cluster's subnets. |
 
 ---
@@ -1269,6 +1274,18 @@ Application for multi user rotation to this cluster.
 
 ---
 
+##### `performanceInsightsEnabled`<sup>Required</sup> <a name="performanceInsightsEnabled" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.performanceInsightsEnabled"></a>
+
+```typescript
+public readonly performanceInsightsEnabled: boolean;
+```
+
+- *Type:* boolean
+
+Whether Performance Insights is enabled at cluster level.
+
+---
+
 ##### `singleUserRotationApplication`<sup>Required</sup> <a name="singleUserRotationApplication" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.singleUserRotationApplication"></a>
 
 ```typescript
@@ -1290,6 +1307,54 @@ public readonly vpc: IVpc;
 - *Type:* aws-cdk-lib.aws_ec2.IVpc
 
 The VPC network to place the cluster in.
+
+---
+
+##### `databaseInsightsMode`<sup>Optional</sup> <a name="databaseInsightsMode" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.databaseInsightsMode"></a>
+
+```typescript
+public readonly databaseInsightsMode: DatabaseInsightsMode;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.DatabaseInsightsMode
+
+The database insights mode.
+
+---
+
+##### `monitoringRole`<sup>Optional</sup> <a name="monitoringRole" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.monitoringRole"></a>
+
+```typescript
+public readonly monitoringRole: IRole;
+```
+
+- *Type:* aws-cdk-lib.aws_iam.IRole
+
+The IAM role for the enhanced monitoring.
+
+---
+
+##### `performanceInsightEncryptionKey`<sup>Optional</sup> <a name="performanceInsightEncryptionKey" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.performanceInsightEncryptionKey"></a>
+
+```typescript
+public readonly performanceInsightEncryptionKey: IKey;
+```
+
+- *Type:* aws-cdk-lib.aws_kms.IKey
+
+The AWS KMS key for encryption of Performance Insights data.
+
+---
+
+##### `performanceInsightRetention`<sup>Optional</sup> <a name="performanceInsightRetention" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.performanceInsightRetention"></a>
+
+```typescript
+public readonly performanceInsightRetention: PerformanceInsightRetention;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.PerformanceInsightRetention
+
+The amount of time, in days, to retain Performance Insights data.
 
 ---
 
@@ -2000,6 +2065,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.enableExecuteCommand">enableExecuteCommand</a></code> | <code>boolean</code> | Whether ECS Exec should be enabled. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.healthCheckGracePeriod">healthCheckGracePeriod</a></code> | <code>aws-cdk-lib.Duration</code> | The period of time, in seconds, that the Amazon ECS service scheduler ignores unhealthy Elastic Load Balancing target health checks after a task has first started. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.idleTimeout">idleTimeout</a></code> | <code>aws-cdk-lib.Duration</code> | The load balancer idle timeout, in seconds. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ipAddressType">ipAddressType</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.IpAddressType</code> | The type of IP address to use. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.listenerPort">listenerPort</a></code> | <code>number</code> | Listener port of the application load balancer that will serve traffic to the service. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancer">loadBalancer</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.IApplicationLoadBalancer</code> | The application load balancer that will serve traffic to the service. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancerName">loadBalancerName</a></code> | <code>string</code> | Name of the load balancer. |
@@ -2024,11 +2090,14 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.runtimePlatform">runtimePlatform</a></code> | <code>aws-cdk-lib.aws_ecs.RuntimePlatform</code> | The runtime platform of the task definition. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.taskDefinition">taskDefinition</a></code> | <code>aws-cdk-lib.aws_ecs.FargateTaskDefinition</code> | The task definition to use for tasks in the service. TaskDefinition or TaskImageOptions must be specified, but not both. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.assignPublicIp">assignPublicIp</a></code> | <code>boolean</code> | Determines whether the service will be assigned a public IP address. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerCpu">containerCpu</a></code> | <code>number</code> | The minimum number of CPU units to reserve for the container. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerMemoryLimitMiB">containerMemoryLimitMiB</a></code> | <code>number</code> | The amount (in MiB) of memory to present to the container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.healthCheck">healthCheck</a></code> | <code>aws-cdk-lib.aws_ecs.HealthCheck</code> | The health check command and associated configuration parameters for the container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.securityGroups">securityGroups</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup[]</code> | The security groups to associate with the service. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.taskSubnets">taskSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | The subnets to associate with the service. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
@@ -2223,6 +2292,19 @@ public readonly idleTimeout: Duration;
 The load balancer idle timeout, in seconds.
 
 Can be between 1 and 4000 seconds
+
+---
+
+##### `ipAddressType`<sup>Optional</sup> <a name="ipAddressType" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ipAddressType"></a>
+
+```typescript
+public readonly ipAddressType: IpAddressType;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticloadbalancingv2.IpAddressType
+- *Default:* IpAddressType.IPV4
+
+The type of IP address to use.
 
 ---
 
@@ -2605,6 +2687,35 @@ Determines whether the service will be assigned a public IP address.
 
 ---
 
+##### `containerCpu`<sup>Optional</sup> <a name="containerCpu" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerCpu"></a>
+
+```typescript
+public readonly containerCpu: number;
+```
+
+- *Type:* number
+- *Default:* No minimum CPU units reserved.
+
+The minimum number of CPU units to reserve for the container.
+
+---
+
+##### `containerMemoryLimitMiB`<sup>Optional</sup> <a name="containerMemoryLimitMiB" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerMemoryLimitMiB"></a>
+
+```typescript
+public readonly containerMemoryLimitMiB: number;
+```
+
+- *Type:* number
+- *Default:* No memory limit.
+
+The amount (in MiB) of memory to present to the container.
+
+If your container attempts to exceed the allocated memory, the container
+is terminated.
+
+---
+
 ##### `healthCheck`<sup>Optional</sup> <a name="healthCheck" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.healthCheck"></a>
 
 ```typescript
@@ -2663,6 +2774,16 @@ public readonly buildDockerfile: string;
 ```
 
 - *Type:* string
+
+---
+
+##### `buildContainerArgs`<sup>Optional</sup> <a name="buildContainerArgs" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContainerArgs"></a>
+
+```typescript
+public readonly buildContainerArgs: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
 
 ---
 
@@ -2851,33 +2972,44 @@ const tmRdsAuroraMysqlServerlessProps: TmRdsAuroraMysqlServerlessProps = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.engine">engine</a></code> | <code>aws-cdk-lib.aws_rds.IClusterEngine</code> | What kind of database to start. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.autoMinorVersionUpgrade">autoMinorVersionUpgrade</a></code> | <code>boolean</code> | Specifies whether minor engine upgrades are applied automatically to the DB cluster during the maintenance window. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.backtrackWindow">backtrackWindow</a></code> | <code>aws-cdk-lib.Duration</code> | The number of seconds to set a cluster's target backtrack window to. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.backup">backup</a></code> | <code>aws-cdk-lib.aws_rds.BackupProps</code> | Backup settings. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.cloudwatchLogsExports">cloudwatchLogsExports</a></code> | <code>string[]</code> | The list of log types that need to be enabled for exporting to CloudWatch Logs. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.cloudwatchLogsRetention">cloudwatchLogsRetention</a></code> | <code>aws-cdk-lib.aws_logs.RetentionDays</code> | The number of days log events are kept in CloudWatch Logs. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.cloudwatchLogsRetentionRole">cloudwatchLogsRetentionRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role for the Lambda function associated with the custom resource that sets the retention policy. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.clusterIdentifier">clusterIdentifier</a></code> | <code>string</code> | An optional identifier for the cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.clusterScailabilityType">clusterScailabilityType</a></code> | <code>aws-cdk-lib.aws_rds.ClusterScailabilityType</code> | [Misspelled] Specifies the scalability mode of the Aurora DB cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.clusterScalabilityType">clusterScalabilityType</a></code> | <code>aws-cdk-lib.aws_rds.ClusterScalabilityType</code> | Specifies the scalability mode of the Aurora DB cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.copyTagsToSnapshot">copyTagsToSnapshot</a></code> | <code>boolean</code> | Whether to copy tags to the snapshot when a snapshot is created. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.credentials">credentials</a></code> | <code>aws-cdk-lib.aws_rds.Credentials</code> | Credentials for the administrative user. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.databaseInsightsMode">databaseInsightsMode</a></code> | <code>aws-cdk-lib.aws_rds.DatabaseInsightsMode</code> | The database insights mode. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.defaultDatabaseName">defaultDatabaseName</a></code> | <code>string</code> | Name of a database which is automatically created inside the cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.deletionProtection">deletionProtection</a></code> | <code>boolean</code> | Indicates whether the DB cluster should have deletion protection enabled. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.domain">domain</a></code> | <code>string</code> | Directory ID for associating the DB cluster with a specific Active Directory. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.domainRole">domainRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role to be used when making API calls to the Directory Service. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableClusterLevelEnhancedMonitoring">enableClusterLevelEnhancedMonitoring</a></code> | <code>boolean</code> | Whether to enable enhanced monitoring at the cluster level. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableDataApi">enableDataApi</a></code> | <code>boolean</code> | Whether to enable the Data API for the cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableLocalWriteForwarding">enableLocalWriteForwarding</a></code> | <code>boolean</code> | Whether read replicas can forward write operations to the writer DB instance in the DB cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enablePerformanceInsights">enablePerformanceInsights</a></code> | <code>boolean</code> | Whether to enable Performance Insights for the DB cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.engineLifecycleSupport">engineLifecycleSupport</a></code> | <code>aws-cdk-lib.aws_rds.EngineLifecycleSupport</code> | The life cycle type for this DB cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.iamAuthentication">iamAuthentication</a></code> | <code>boolean</code> | Whether to enable mapping of AWS Identity and Access Management (IAM) accounts to database accounts. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instanceIdentifierBase">instanceIdentifierBase</a></code> | <code>string</code> | Base identifier for instances. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instanceProps">instanceProps</a></code> | <code>aws-cdk-lib.aws_rds.InstanceProps</code> | Settings for the individual instances that are launched. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instances">instances</a></code> | <code>number</code> | How many replicas/instances to create. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instanceUpdateBehaviour">instanceUpdateBehaviour</a></code> | <code>aws-cdk-lib.aws_rds.InstanceUpdateBehaviour</code> | The ordering of updates for instances. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.monitoringInterval">monitoringInterval</a></code> | <code>aws-cdk-lib.Duration</code> | The interval, in seconds, between points when Amazon RDS collects enhanced monitoring metrics for the DB instances. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.monitoringRole">monitoringRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | Role that will be used to manage DB instances monitoring. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.monitoringInterval">monitoringInterval</a></code> | <code>aws-cdk-lib.Duration</code> | The interval between points when Amazon RDS collects enhanced monitoring metrics. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.monitoringRole">monitoringRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | Role that will be used to manage DB monitoring. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.networkType">networkType</a></code> | <code>aws-cdk-lib.aws_rds.NetworkType</code> | The network type of the DB instance. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.parameterGroup">parameterGroup</a></code> | <code>aws-cdk-lib.aws_rds.IParameterGroup</code> | Additional parameters to pass to the database engine. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.parameters">parameters</a></code> | <code>{[ key: string ]: string}</code> | The parameters in the DBClusterParameterGroup to create automatically. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.performanceInsightEncryptionKey">performanceInsightEncryptionKey</a></code> | <code>aws-cdk-lib.aws_kms.IKey</code> | The AWS KMS key for encryption of Performance Insights data. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.performanceInsightRetention">performanceInsightRetention</a></code> | <code>aws-cdk-lib.aws_rds.PerformanceInsightRetention</code> | The amount of time, in days, to retain Performance Insights data. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.port">port</a></code> | <code>number</code> | What port to listen on. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.preferredMaintenanceWindow">preferredMaintenanceWindow</a></code> | <code>string</code> | A preferred maintenance window day/time range. Should be specified as a range ddd:hh24:mi-ddd:hh24:mi (24H Clock UTC). |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.readers">readers</a></code> | <code>aws-cdk-lib.aws_rds.IClusterInstance[]</code> | A list of instances to create as cluster reader instances. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.removalPolicy">removalPolicy</a></code> | <code>aws-cdk-lib.RemovalPolicy</code> | The removal policy to apply when the cluster and its instances are removed from the stack or replaced during an update. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.replicationSourceIdentifier">replicationSourceIdentifier</a></code> | <code>string</code> | The Amazon Resource Name (ARN) of the source DB instance or DB cluster if this DB cluster is created as a read replica. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.s3ExportBuckets">s3ExportBuckets</a></code> | <code>aws-cdk-lib.aws_s3.IBucket[]</code> | S3 buckets that you want to load data into. This feature is only supported by the Aurora database engine. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.s3ExportRole">s3ExportRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | Role that will be associated with this DB cluster to enable S3 export. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.s3ImportBuckets">s3ImportBuckets</a></code> | <code>aws-cdk-lib.aws_s3.IBucket[]</code> | S3 buckets that you want to load data from. This feature is only supported by the Aurora database engine. |
@@ -2905,6 +3037,19 @@ public readonly engine: IClusterEngine;
 - *Type:* aws-cdk-lib.aws_rds.IClusterEngine
 
 What kind of database to start.
+
+---
+
+##### `autoMinorVersionUpgrade`<sup>Optional</sup> <a name="autoMinorVersionUpgrade" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.autoMinorVersionUpgrade"></a>
+
+```typescript
+public readonly autoMinorVersionUpgrade: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Specifies whether minor engine upgrades are applied automatically to the DB cluster during the maintenance window.
 
 ---
 
@@ -2997,6 +3142,38 @@ An optional identifier for the cluster.
 
 ---
 
+##### ~~`clusterScailabilityType`~~<sup>Optional</sup> <a name="clusterScailabilityType" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.clusterScailabilityType"></a>
+
+- *Deprecated:* Use clusterScalabilityType instead. This will be removed in the next major version.
+
+```typescript
+public readonly clusterScailabilityType: ClusterScailabilityType;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.ClusterScailabilityType
+- *Default:* ClusterScailabilityType.STANDARD
+
+[Misspelled] Specifies the scalability mode of the Aurora DB cluster.
+
+Set LIMITLESS if you want to use a limitless database; otherwise, set it to STANDARD.
+
+---
+
+##### `clusterScalabilityType`<sup>Optional</sup> <a name="clusterScalabilityType" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.clusterScalabilityType"></a>
+
+```typescript
+public readonly clusterScalabilityType: ClusterScalabilityType;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.ClusterScalabilityType
+- *Default:* ClusterScalabilityType.STANDARD
+
+Specifies the scalability mode of the Aurora DB cluster.
+
+Set LIMITLESS if you want to use a limitless database; otherwise, set it to STANDARD.
+
+---
+
 ##### `copyTagsToSnapshot`<sup>Optional</sup> <a name="copyTagsToSnapshot" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.copyTagsToSnapshot"></a>
 
 ```typescript
@@ -3020,6 +3197,19 @@ public readonly credentials: Credentials;
 - *Default:* A username of 'admin' (or 'postgres' for PostgreSQL) and SecretsManager-generated password
 
 Credentials for the administrative user.
+
+---
+
+##### `databaseInsightsMode`<sup>Optional</sup> <a name="databaseInsightsMode" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.databaseInsightsMode"></a>
+
+```typescript
+public readonly databaseInsightsMode: DatabaseInsightsMode;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.DatabaseInsightsMode
+- *Default:* DatabaseInsightsMode.STANDARD when performance insights are enabled and Amazon Aurora engine is used, otherwise not set.
+
+The database insights mode.
 
 ---
 
@@ -3081,6 +3271,22 @@ The role needs the AWS-managed policy
 
 ---
 
+##### `enableClusterLevelEnhancedMonitoring`<sup>Optional</sup> <a name="enableClusterLevelEnhancedMonitoring" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableClusterLevelEnhancedMonitoring"></a>
+
+```typescript
+public readonly enableClusterLevelEnhancedMonitoring: boolean;
+```
+
+- *Type:* boolean
+- *Default:* When the `monitoringInterval` is set, enhanced monitoring is enabled for each instance.
+
+Whether to enable enhanced monitoring at the cluster level.
+
+If set to true, `monitoringInterval` and `monitoringRole` are applied to not the instances, but the cluster.
+`monitoringInterval` is required to be set if `enableClusterLevelEnhancedMonitoring` is set to true.
+
+---
+
 ##### `enableDataApi`<sup>Optional</sup> <a name="enableDataApi" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableDataApi"></a>
 
 ```typescript
@@ -3091,6 +3297,52 @@ public readonly enableDataApi: boolean;
 - *Default:* false
 
 Whether to enable the Data API for the cluster.
+
+---
+
+##### `enableLocalWriteForwarding`<sup>Optional</sup> <a name="enableLocalWriteForwarding" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableLocalWriteForwarding"></a>
+
+```typescript
+public readonly enableLocalWriteForwarding: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether read replicas can forward write operations to the writer DB instance in the DB cluster.
+
+This setting can only be enabled for Aurora MySQL 3.04 or higher, and for Aurora PostgreSQL 16.4
+or higher (for version 16), 15.8 or higher (for version 15), and 14.13 or higher (for version 14).
+
+> [https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-postgresql-write-forwarding.html](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-postgresql-write-forwarding.html)
+
+---
+
+##### `enablePerformanceInsights`<sup>Optional</sup> <a name="enablePerformanceInsights" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enablePerformanceInsights"></a>
+
+```typescript
+public readonly enablePerformanceInsights: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false, unless `performanceInsightRetention` or `performanceInsightEncryptionKey` is set, or `databaseInsightsMode` is set to `DatabaseInsightsMode.ADVANCED`.
+
+Whether to enable Performance Insights for the DB cluster.
+
+---
+
+##### `engineLifecycleSupport`<sup>Optional</sup> <a name="engineLifecycleSupport" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.engineLifecycleSupport"></a>
+
+```typescript
+public readonly engineLifecycleSupport: EngineLifecycleSupport;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.EngineLifecycleSupport
+- *Default:* undefined - AWS RDS default setting is `EngineLifecycleSupport.OPEN_SOURCE_RDS_EXTENDED_SUPPORT`
+
+The life cycle type for this DB cluster.
+
+> [https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/extended-support.html](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/extended-support.html)
 
 ---
 
@@ -3175,7 +3427,10 @@ public readonly monitoringInterval: Duration;
 - *Type:* aws-cdk-lib.Duration
 - *Default:* no enhanced monitoring
 
-The interval, in seconds, between points when Amazon RDS collects enhanced monitoring metrics for the DB instances.
+The interval between points when Amazon RDS collects enhanced monitoring metrics.
+
+If you enable `enableClusterLevelEnhancedMonitoring`, this property is applied to the cluster,
+otherwise it is applied to the instances.
 
 ---
 
@@ -3188,7 +3443,10 @@ public readonly monitoringRole: IRole;
 - *Type:* aws-cdk-lib.aws_iam.IRole
 - *Default:* A role is automatically created for you
 
-Role that will be used to manage DB instances monitoring.
+Role that will be used to manage DB monitoring.
+
+If you enable `enableClusterLevelEnhancedMonitoring`, this property is applied to the cluster,
+otherwise it is applied to the instances.
 
 ---
 
@@ -3231,6 +3489,34 @@ The parameters in the DBClusterParameterGroup to create automatically.
 
 You can only specify parameterGroup or parameters but not both.
 You need to use a versioned engine to auto-generate a DBClusterParameterGroup.
+
+---
+
+##### `performanceInsightEncryptionKey`<sup>Optional</sup> <a name="performanceInsightEncryptionKey" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.performanceInsightEncryptionKey"></a>
+
+```typescript
+public readonly performanceInsightEncryptionKey: IKey;
+```
+
+- *Type:* aws-cdk-lib.aws_kms.IKey
+- *Default:* default master key
+
+The AWS KMS key for encryption of Performance Insights data.
+
+---
+
+##### `performanceInsightRetention`<sup>Optional</sup> <a name="performanceInsightRetention" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.performanceInsightRetention"></a>
+
+```typescript
+public readonly performanceInsightRetention: PerformanceInsightRetention;
+```
+
+- *Type:* aws-cdk-lib.aws_rds.PerformanceInsightRetention
+- *Default:* 7
+
+The amount of time, in days, to retain Performance Insights data.
+
+If you set `databaseInsightsMode` to `DatabaseInsightsMode.ADVANCED`, you must set this property to `PerformanceInsightRetention.MONTHS_15`.
 
 ---
 
@@ -3290,6 +3576,21 @@ The removal policy to apply when the cluster and its instances are removed from 
 
 ---
 
+##### `replicationSourceIdentifier`<sup>Optional</sup> <a name="replicationSourceIdentifier" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.replicationSourceIdentifier"></a>
+
+```typescript
+public readonly replicationSourceIdentifier: string;
+```
+
+- *Type:* string
+- *Default:* This DB Cluster is not a read replica
+
+The Amazon Resource Name (ARN) of the source DB instance or DB cluster if this DB cluster is created as a read replica.
+
+Cannot be used with credentials.
+
+---
+
 ##### `s3ExportBuckets`<sup>Optional</sup> <a name="s3ExportBuckets" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.s3ExportBuckets"></a>
 
 ```typescript
@@ -3323,7 +3624,7 @@ Role that will be associated with this DB cluster to enable S3 export.
 This feature is only supported by the Aurora database engine.
 
 This property must not be used if `s3ExportBuckets` is used.
-
+To use this property with Aurora PostgreSQL, it must be configured with the S3 export feature enabled when creating the DatabaseClusterEngine
 For MySQL:
 
 > [https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/postgresql-s3-export.html](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/postgresql-s3-export.html)
@@ -3363,7 +3664,7 @@ Role that will be associated with this DB cluster to enable S3 import.
 This feature is only supported by the Aurora database engine.
 
 This property must not be used if `s3ImportBuckets` is used.
-
+To use this property with Aurora PostgreSQL, it must be configured with the S3 import feature enabled when creating the DatabaseClusterEngine
 For MySQL:
 
 > [https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Migrating.html](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Migrating.html)
@@ -3395,7 +3696,7 @@ public readonly serverlessV2MaxCapacity: number;
 The maximum number of Aurora capacity units (ACUs) for a DB instance in an Aurora Serverless v2 cluster.
 
 You can specify ACU values in half-step increments, such as 40, 40.5, 41, and so on.
-The largest value that you can use is 128 (256GB).
+The largest value that you can use is 256.
 
 The maximum capacity must be higher than 0.5 ACUs.
 
@@ -3415,9 +3716,12 @@ public readonly serverlessV2MinCapacity: number;
 The minimum number of Aurora capacity units (ACUs) for a DB instance in an Aurora Serverless v2 cluster.
 
 You can specify ACU values in half-step increments, such as 8, 8.5, 9, and so on.
-The smallest value that you can use is 0.5.
+The smallest value that you can use is 0.
 
-> [https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html#aurora-serverless-v2.max_capacity_considerations](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html#aurora-serverless-v2.max_capacity_considerations)
+For Aurora versions that support the Aurora Serverless v2 auto-pause feature, the smallest value that you can use is 0.
+For versions that don't support Aurora Serverless v2 auto-pause, the smallest value that you can use is 0.5.
+
+> [https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html#aurora-serverless-v2.min_capacity_considerations](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.setting-capacity.html#aurora-serverless-v2.min_capacity_considerations)
 
 ---
 
