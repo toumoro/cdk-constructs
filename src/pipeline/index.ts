@@ -1,4 +1,3 @@
-import * as codecommit from 'aws-cdk-lib/aws-codecommit';
 import * as pipelines from 'aws-cdk-lib/pipelines';
 import { Construct } from 'constructs';
 
@@ -47,13 +46,12 @@ export class TmPipeline extends Construct {
   constructor(scope: Construct, id: string, props: TmPipelineProps) {
     super(scope, id);
 
-    // Define a CodeCommit repository
-    const repository = codecommit.Repository.fromRepositoryName(this, props.repoName, props.repoName);
+
 
     // Create a pipeline
     this.pipeline = new pipelines.CodePipeline(this, props.pipelineName, {
       synth: new pipelines.ShellStep('Synth', {
-        input: pipelines.CodePipelineSource.codeCommit(repository, props.repoBranch),
+        input: pipelines.CodePipelineSource.gitHub(props.repoName, props.repoBranch),
         // Commands to run in the synth step
         installCommands: ['npm install', 'npm ci', 'npm install -g aws-cdk'],
         commands: props.synthCommand ?? ['npm install', 'npm ci', 'npm install -g aws-cdk', 'cdk synth'],

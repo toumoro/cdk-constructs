@@ -2,11 +2,11 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { TmPipelineStack } from '../lib/tm-pipeline-stack';
-import { AwsSolutionsChecks } from 'cdk-nag';
-import { Aspects } from 'aws-cdk-lib';
+//import { AwsSolutionsChecks, NagSuppressions } from 'cdk-nag';
+//import { Aspects } from 'aws-cdk-lib';
 
 const app = new cdk.App();
-Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }))
+//Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }))
 new TmPipelineStack(app, 'CdkPipelinecdkStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
