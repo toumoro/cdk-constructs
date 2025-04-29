@@ -2889,11 +2889,12 @@ const tmPipelineProps: TmPipelineProps = { ... }
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
-| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.pipelineName">pipelineName</a></code> | <code>string</code> | The name of the pipeline. |
-| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.repoBranch">repoBranch</a></code> | <code>string</code> | The branch of the repository to use. |
-| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.repoName">repoName</a></code> | <code>string</code> | The name of the repository. |
-| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.primaryOutputDirectory">primaryOutputDirectory</a></code> | <code>string</code> | The primary output directory. |
-| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.synthCommand">synthCommand</a></code> | <code>string[]</code> | The command to run in the synth step. |
+| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.pipelineName">pipelineName</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.primaryOutputDirectory">primaryOutputDirectory</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.repoBranch">repoBranch</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.repoName">repoName</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.source">source</a></code> | <code>aws-cdk-lib.pipelines.CodePipelineSource</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineProps.property.synthCommand">synthCommand</a></code> | <code>string[]</code> | *No description.* |
 
 ---
 
@@ -2905,32 +2906,6 @@ public readonly pipelineName: string;
 
 - *Type:* string
 
-The name of the pipeline.
-
----
-
-##### `repoBranch`<sup>Required</sup> <a name="repoBranch" id="tm-cdk-constructs.TmPipelineProps.property.repoBranch"></a>
-
-```typescript
-public readonly repoBranch: string;
-```
-
-- *Type:* string
-
-The branch of the repository to use.
-
----
-
-##### `repoName`<sup>Required</sup> <a name="repoName" id="tm-cdk-constructs.TmPipelineProps.property.repoName"></a>
-
-```typescript
-public readonly repoName: string;
-```
-
-- *Type:* string
-
-The name of the repository.
-
 ---
 
 ##### `primaryOutputDirectory`<sup>Optional</sup> <a name="primaryOutputDirectory" id="tm-cdk-constructs.TmPipelineProps.property.primaryOutputDirectory"></a>
@@ -2941,7 +2916,35 @@ public readonly primaryOutputDirectory: string;
 
 - *Type:* string
 
-The primary output directory.
+---
+
+##### `repoBranch`<sup>Optional</sup> <a name="repoBranch" id="tm-cdk-constructs.TmPipelineProps.property.repoBranch"></a>
+
+```typescript
+public readonly repoBranch: string;
+```
+
+- *Type:* string
+
+---
+
+##### `repoName`<sup>Optional</sup> <a name="repoName" id="tm-cdk-constructs.TmPipelineProps.property.repoName"></a>
+
+```typescript
+public readonly repoName: string;
+```
+
+- *Type:* string
+
+---
+
+##### `source`<sup>Optional</sup> <a name="source" id="tm-cdk-constructs.TmPipelineProps.property.source"></a>
+
+```typescript
+public readonly source: CodePipelineSource;
+```
+
+- *Type:* aws-cdk-lib.pipelines.CodePipelineSource
 
 ---
 
@@ -2952,8 +2955,6 @@ public readonly synthCommand: string[];
 ```
 
 - *Type:* string[]
-
-The command to run in the synth step.
 
 ---
 
