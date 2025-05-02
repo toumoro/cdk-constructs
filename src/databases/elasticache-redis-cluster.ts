@@ -63,15 +63,6 @@ export class TmElasticacheRedisCluster extends Construct {
       cacheSubnetGroupName: `${envName}-redis`,
     });
 
-    // Optional: Create a parameter group for Valkey 8 if needed
-    if (engine === 'valkey' && engineVersion.startsWith('8')) {
-      this.parameterGroup = new elasticache.CfnParameterGroup(this, 'ValkeyParameterGroup', {
-        cacheParameterGroupFamily: 'valkey8',
-        description: `Valkey 8.0 Parameter Group for ${envName}`,
-        properties: {},
-      });
-    }
-
     const replicationGroupProps: any = {
       replicationGroupDescription: `${envName}-Redis`,
       cacheSubnetGroupName: this.subnetGroup.cacheSubnetGroupName,
@@ -91,8 +82,14 @@ export class TmElasticacheRedisCluster extends Construct {
       replicationGroupProps.cacheNodeType = cacheNodeType;
     }
 
-    if (this.parameterGroup) {
-      replicationGroupProps.cacheParameterGroupName = this.parameterGroup.ref;
+    // Optional: Create a parameter group for Valkey 8 if needed
+    if (engine === 'valkey' && engineVersion.startsWith('8')) {
+      const parameterGroup = new elasticache.CfnParameterGroup(this, 'ValkeyParameterGroup', {
+        cacheParameterGroupFamily: 'valkey8',
+        description: `Valkey 8.0 Parameter Group for ${envName}`,
+        properties: {},
+      });
+      replicationGroupProps.cacheParameterGroupName = parameterGroup.ref;
     }
 
     //console.log(replicationGroupProps);
