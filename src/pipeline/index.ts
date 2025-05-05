@@ -12,7 +12,7 @@ export interface TmPipelineProps {
    * The name of the pipeline.
    */
   readonly pipelineName: string;
-    /**
+  /**
    * The command to run in the synth step.
    */
   readonly synthCommand?: string[];
