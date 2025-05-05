@@ -6,6 +6,7 @@ export interface IRedisClusterProps {
   envName: string;
   vpc: ec2.IVpc;
   cacheNodeType?: string;
+  engine?: string;
   engineVersion?: string;
   replicasPerNodeGroup?: number;
   autoMinorVersionUpgrade?: boolean;
@@ -21,6 +22,7 @@ export class TmElasticacheRedisCluster extends Construct {
   public readonly securityGroup: ec2.SecurityGroup;
   public readonly subnetGroup: elasticache.CfnSubnetGroup;
   public readonly cluster: elasticache.CfnReplicationGroup;
+  public readonly parameterGroup?: elasticache.CfnParameterGroup;
 
   constructor(scope: Construct, id: string, props: IRedisClusterProps) {
     super(scope, id);
@@ -29,6 +31,7 @@ export class TmElasticacheRedisCluster extends Construct {
       envName,
       vpc,
       cacheNodeType = 'cache.t3.micro',
+      engine = 'redis',
       engineVersion = '7.1',
       replicasPerNodeGroup = 1,
       autoMinorVersionUpgrade = true,
@@ -65,6 +68,8 @@ export class TmElasticacheRedisCluster extends Construct {
       cacheSubnetGroupName: this.subnetGroup.cacheSubnetGroupName,
       securityGroupIds: [this.securityGroup.securityGroupId],
       replicasPerNodeGroup: replicasPerNodeGroup,
+      engine: engine,
+      engineVersion: engineVersion,
     };
 
     if (globalReplicationGroupId) {
@@ -75,8 +80,16 @@ export class TmElasticacheRedisCluster extends Construct {
       replicationGroupProps.automaticFailoverEnabled = automaticFailoverEnabled;
       replicationGroupProps.clusterMode = clusterMode;
       replicationGroupProps.cacheNodeType = cacheNodeType;
-      replicationGroupProps.engine = 'redis';
-      replicationGroupProps.engineVersion = engineVersion;
+    }
+
+    // Optional: Create a parameter group for Valkey 8 if needed
+    if (engine === 'valkey' && engineVersion.startsWith('8')) {
+      const parameterGroup = new elasticache.CfnParameterGroup(this, 'ValkeyParameterGroup', {
+        cacheParameterGroupFamily: 'valkey8',
+        description: `Valkey 8.0 Parameter Group for ${envName}`,
+        properties: {},
+      });
+      replicationGroupProps.cacheParameterGroupName = parameterGroup.ref;
     }
 
     //console.log(replicationGroupProps);

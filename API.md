@@ -320,6 +320,7 @@ Any object.
 | <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.cluster">cluster</a></code> | <code>aws-cdk-lib.aws_elasticache.CfnReplicationGroup</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.securityGroup">securityGroup</a></code> | <code>aws-cdk-lib.aws_ec2.SecurityGroup</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.subnetGroup">subnetGroup</a></code> | <code>aws-cdk-lib.aws_elasticache.CfnSubnetGroup</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.property.parameterGroup">parameterGroup</a></code> | <code>aws-cdk-lib.aws_elasticache.CfnParameterGroup</code> | *No description.* |
 
 ---
 
@@ -362,6 +363,16 @@ public readonly subnetGroup: CfnSubnetGroup;
 ```
 
 - *Type:* aws-cdk-lib.aws_elasticache.CfnSubnetGroup
+
+---
+
+##### `parameterGroup`<sup>Optional</sup> <a name="parameterGroup" id="tm-cdk-constructs.TmElasticacheRedisCluster.property.parameterGroup"></a>
+
+```typescript
+public readonly parameterGroup: CfnParameterGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticache.CfnParameterGroup
 
 ---
 
@@ -4345,6 +4356,7 @@ public readonly path: string;
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.autoMinorVersionUpgrade">autoMinorVersionUpgrade</a></code> | <code>boolean</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.cacheNodeType">cacheNodeType</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.clusterMode">clusterMode</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.engine">engine</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.engineVersion">engineVersion</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.globalReplicationGroupId">globalReplicationGroupId</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.multiAzEnabled">multiAzEnabled</a></code> | <code>boolean</code> | *No description.* |
@@ -4426,6 +4438,16 @@ public readonly cacheNodeType: string;
 
 ```typescript
 public readonly clusterMode: string;
+```
+
+- *Type:* string
+
+---
+
+##### `engine`<sup>Optional</sup> <a name="engine" id="tm-cdk-constructs.IRedisClusterProps.property.engine"></a>
+
+```typescript
+public readonly engine: string;
 ```
 
 - *Type:* string
