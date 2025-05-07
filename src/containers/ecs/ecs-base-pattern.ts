@@ -174,6 +174,9 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       efsVolume.efsFileSystem.connections.allowDefaultPortFrom(this.service, 'Allow from ECS Service');
     });
 
+    // Keep task definitions active to allow manual rollback from ECS console
+    taskDefinition.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+
     // Remove the default action by setting a new default action with conditions
     this.listener.addTargetGroups('HeaderConditionForward', {
       priority: 1,
