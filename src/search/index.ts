@@ -1,0 +1,1 @@
+export * from './solr/solr-ec2-base-pattern';
