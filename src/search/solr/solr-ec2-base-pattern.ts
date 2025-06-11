@@ -187,7 +187,7 @@ export class TmSolrEc2 extends ec2.Instance {
     Tags.of(volumeData).add('solrdata', 'true');
 
     if (props.hostedZone) {
-      new route53.ARecord(scope, 'SolrAliasRecord', {
+      const route53Record = new route53.ARecord(scope, 'SolrAliasRecord', {
         zone: props.hostedZone,
         recordName: props.recordName || 'solr', // Will create solr.example.internal
         target: route53.RecordTarget.fromIpAddresses(this.instancePrivateIp),
@@ -195,7 +195,7 @@ export class TmSolrEc2 extends ec2.Instance {
 
       new ssm.StringParameter(scope, 'VarSolrDnsName', {
         parameterName: `${ssmPathPrefix}/Endpoint/Writer`,
-        stringValue: props.recordName || 'solr',
+        stringValue: route53Record.domainName,
       });
     }
   }
