@@ -115,6 +115,10 @@ export class TmEcsStack extends cdk.Stack {
       efsVolumes:  [
         { name: 'example', path: '/tmp/example' },
       ],
+      ecsDeploymentHookProps: {
+        containerName: 'web',
+        command: ['/usr/local/bin/deployment-hook.sh'],
+      },
     }
 
     /** Service Pattern */
