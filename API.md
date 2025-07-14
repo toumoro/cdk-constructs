@@ -2536,6 +2536,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps">ecsDeploymentHookProps</a></code> | <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a></code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
@@ -3244,6 +3245,16 @@ public readonly customHttpHeaderValue: string;
 - *Type:* string
 
 Custom http header value.
+
+---
+
+##### `ecsDeploymentHookProps`<sup>Optional</sup> <a name="ecsDeploymentHookProps" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps"></a>
+
+```typescript
+public readonly ecsDeploymentHookProps: IIEcsDeploymentHookProps;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a>
 
 ---
 
@@ -5425,6 +5436,40 @@ Indicates whether to enable the S3 endpoint for the VPC.
 
 
 ## Protocols <a name="Protocols" id="Protocols"></a>
+
+### IIEcsDeploymentHookProps <a name="IIEcsDeploymentHookProps" id="tm-cdk-constructs.IIEcsDeploymentHookProps"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a>
+
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps.property.command">command</a></code> | <code>string[]</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps.property.containerName">containerName</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `command`<sup>Required</sup> <a name="command" id="tm-cdk-constructs.IIEcsDeploymentHookProps.property.command"></a>
+
+```typescript
+public readonly command: string[];
+```
+
+- *Type:* string[]
+
+---
+
+##### `containerName`<sup>Required</sup> <a name="containerName" id="tm-cdk-constructs.IIEcsDeploymentHookProps.property.containerName"></a>
+
+```typescript
+public readonly containerName: string;
+```
+
+- *Type:* string
+
+---
 
 ### IIefsVolumes <a name="IIefsVolumes" id="tm-cdk-constructs.IIefsVolumes"></a>
 
