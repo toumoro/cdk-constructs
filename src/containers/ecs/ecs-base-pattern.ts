@@ -267,7 +267,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
 
     // Add deployment hook if provided
     if (mergedProps.ecsDeploymentHookProps) {
-      new TmEcsDeploymentHook(scope, 'EcsDeploymentHook', {
+      new TmEcsDeploymentHook(this, 'EcsDeploymentHook', {
         taskDefinition: this.taskDefinition,
         cluster: this.cluster,
         subnets: mergedProps.vpc!.publicSubnets,

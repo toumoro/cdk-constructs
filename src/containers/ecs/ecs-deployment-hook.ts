@@ -120,12 +120,15 @@ export class TmEcsDeploymentHook extends Construct {
       resources: [props.taskDefinition.taskDefinitionArn],
     }));
 
+    const resources = [props.taskDefinition.taskRole.roleArn];
+
+    if (props.taskDefinition.executionRole) {
+      resources.push(props.taskDefinition.executionRole.roleArn);
+    }
+
     lambdaFunction.addToRolePolicy(new iam.PolicyStatement({
       actions: ['iam:PassRole'],
-      resources: [
-        props.taskDefinition.taskRole.roleArn,
-        props.taskDefinition.executionRole?.roleArn || '*',
-      ],
+      resources: resources,
     }));
 
     new triggers.Trigger(this, 'Trigger', {
