@@ -8,11 +8,17 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as events_targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
+import { TmEcsDeploymentHook } from './ecs-deployment-hook';
 import { TmEfsFileSystem } from '../../storage/efs-filesystem';
 
 export interface IIefsVolumes {
   name: string;
   path: string;
+}
+
+export interface IIEcsDeploymentHookProps {
+  containerName: string;
+  command: string[];
 }
 
 /**
@@ -100,6 +106,11 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * EFS Volumes
   */
   readonly efsVolumes?: IIefsVolumes[];
+
+  /*
+  * Deployment Hook Props
+  */
+  readonly ecsDeploymentHookProps?: IIEcsDeploymentHookProps;
 }
 
 
@@ -253,8 +264,19 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         { Key: 'name', Value: id },
       ]);
     }
-  };
 
+    // Add deployment hook if provided
+    if (mergedProps.ecsDeploymentHookProps) {
+      new TmEcsDeploymentHook(this, 'EcsDeploymentHook', {
+        taskDefinition: this.taskDefinition,
+        cluster: this.cluster,
+        subnets: mergedProps.vpc!.publicSubnets,
+        securityGroups: this.service.connections.securityGroups,
+        containerName: mergedProps.ecsDeploymentHookProps.containerName,
+        command: mergedProps.ecsDeploymentHookProps.command,
+      });
+    }
+  };
 
 }
 
