@@ -11,7 +11,7 @@ import { Construct } from 'constructs';
 /**
  * Props for `TmEcsDeploymentHook`.
  */
-export interface TmEcsDeploymentHookProps extends cdk.StackProps {
+export interface ITmEcsDeploymentHookProps {
   /**
    * The ECS task definition to run.
    */
@@ -40,7 +40,7 @@ export interface TmEcsDeploymentHookProps extends cdk.StackProps {
 }
 
 export class TmEcsDeploymentHook extends Construct {
-  constructor(scope: Construct, id: string, props: TmEcsDeploymentHookProps) {
+  constructor(scope: Construct, id: string, props: ITmEcsDeploymentHookProps) {
     super(scope, id);
 
 
