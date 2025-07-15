@@ -234,6 +234,105 @@ The Fargate task definition in this construct.
 ---
 
 
+### TmEcsDeploymentHook <a name="TmEcsDeploymentHook" id="tm-cdk-constructs.TmEcsDeploymentHook"></a>
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmEcsDeploymentHook.Initializer"></a>
+
+```typescript
+import { TmEcsDeploymentHook } from 'tm-cdk-constructs'
+
+new TmEcsDeploymentHook(scope: Construct, id: string, props: ITmEcsDeploymentHookProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps">ITmEcsDeploymentHookProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmEcsDeploymentHook.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmEcsDeploymentHook.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmEcsDeploymentHook.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps">ITmEcsDeploymentHookProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.toString">toString</a></code> | Returns a string representation of this construct. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmEcsDeploymentHook.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmEcsDeploymentHook.isConstruct"></a>
+
+```typescript
+import { TmEcsDeploymentHook } from 'tm-cdk-constructs'
+
+TmEcsDeploymentHook.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmEcsDeploymentHook.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmEcsDeploymentHook.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+
 ### TmElasticacheRedisCluster <a name="TmElasticacheRedisCluster" id="tm-cdk-constructs.TmElasticacheRedisCluster"></a>
 
 #### Initializers <a name="Initializers" id="tm-cdk-constructs.TmElasticacheRedisCluster.Initializer"></a>
@@ -5657,6 +5756,100 @@ public readonly replicasPerNodeGroup: number;
 ```
 
 - *Type:* number
+
+---
+
+### ITmEcsDeploymentHookProps <a name="ITmEcsDeploymentHookProps" id="tm-cdk-constructs.ITmEcsDeploymentHookProps"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps">ITmEcsDeploymentHookProps</a>
+
+Props for `TmEcsDeploymentHook`.
+
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.cluster">cluster</a></code> | <code>aws-cdk-lib.aws_ecs.ICluster</code> | The ECS cluster where the task will be run. |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.command">command</a></code> | <code>string[]</code> | The command to run in the container. |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.containerName">containerName</a></code> | <code>string</code> | The name of the container in the task definition. |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.securityGroups">securityGroups</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup[]</code> | The security groups to associate with the task. |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.subnets">subnets</a></code> | <code>aws-cdk-lib.aws_ec2.ISubnet[]</code> | The subnets where the task will be launched. |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.taskDefinition">taskDefinition</a></code> | <code>aws-cdk-lib.aws_ecs.FargateTaskDefinition</code> | The ECS task definition to run. |
+
+---
+
+##### `cluster`<sup>Required</sup> <a name="cluster" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.cluster"></a>
+
+```typescript
+public readonly cluster: ICluster;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.ICluster
+
+The ECS cluster where the task will be run.
+
+---
+
+##### `command`<sup>Required</sup> <a name="command" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.command"></a>
+
+```typescript
+public readonly command: string[];
+```
+
+- *Type:* string[]
+
+The command to run in the container.
+
+This should be an array of strings, where the first element is the command and the subsequent elements are its arguments.
+
+---
+
+##### `containerName`<sup>Required</sup> <a name="containerName" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.containerName"></a>
+
+```typescript
+public readonly containerName: string;
+```
+
+- *Type:* string
+
+The name of the container in the task definition.
+
+---
+
+##### `securityGroups`<sup>Required</sup> <a name="securityGroups" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.securityGroups"></a>
+
+```typescript
+public readonly securityGroups: ISecurityGroup[];
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup[]
+
+The security groups to associate with the task.
+
+---
+
+##### `subnets`<sup>Required</sup> <a name="subnets" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.subnets"></a>
+
+```typescript
+public readonly subnets: ISubnet[];
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISubnet[]
+
+The subnets where the task will be launched.
+
+---
+
+##### `taskDefinition`<sup>Required</sup> <a name="taskDefinition" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.taskDefinition"></a>
+
+```typescript
+public readonly taskDefinition: FargateTaskDefinition;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.FargateTaskDefinition
+
+The ECS task definition to run.
 
 ---
 
