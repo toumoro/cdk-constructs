@@ -37,51 +37,5 @@ export class TmPipelineStack extends cdk.Stack {
                       'pwd']
     });
 
-    // ** Pipeline with S3 source **
-    const sourceBucket = new s3.Bucket(this, 'Infrastructure Source Bucket',
-    {
-        versioned: true,
-        removalPolicy: cdk.RemovalPolicy.DESTROY,
-        autoDeleteObjects: true,
-        lifecycleRules: [
-          {
-            noncurrentVersionExpiration: cdk.Duration.days(30),
-            noncurrentVersionsToRetain: 10,
-          },
-        ],
-      }
-      );
-
-    // Deny HTTP (unencrypted) requests
-    sourceBucket.addToResourcePolicy(new iam.PolicyStatement({
-      sid: 'AllowSSLRequestsOnly',
-      effect: iam.Effect.DENY,
-      principals: [new iam.AnyPrincipal()],
-      actions: ['s3:*'],
-      resources: [
-        sourceBucket.bucketArn,
-        `${sourceBucket.bucketArn}/*`,
-      ],
-      conditions: {
-        Bool: {
-          'aws:SecureTransport': 'false',
-        },
-      },
-    }));
-
-    // Should be triggered by S3 put, but the event bridge rule doesn't seem to trigger.
-    const s3Source = pipelines.CodePipelineSource.s3(sourceBucket, 'source.zip', { trigger: codepipeline_actions.S3Trigger.EVENTS });
-
-    new TmPipeline(this, 'PipelineCdkS3', {
-      pipelineName: 'PipelineCdkS3',
-      source: s3Source,
-      primaryOutputDirectory: 'examples/tm-pipeline/cdk.out',
-      synthCommand: [ 'cd examples/tm-pipeline',
-                      'npm install',
-                      'cdk synth',
-                      'find . -iname cdk.out',
-                      'pwd']
-    });
-
   }
 }
