@@ -44,6 +44,12 @@ export interface TmSorlEc2Props extends ec2.InstanceProps {
     */
   readonly solrJavaMem?: string;
   /*
+    * Cores to be enabled in the Solr instance.
+    * Must be a list of core names separated by spaces.
+    * By default: 'french english'
+    */
+  readonly solrTypo3SolrEnabledCores?: string;
+  /*
     * The security group to allow access to the Solr instance.
     */
   readonly allowFrom?: ec2.ISecurityGroup;
@@ -103,6 +109,10 @@ export class TmSolrEc2 extends ec2.Instance {
     new ssm.StringParameter(scope, 'VarSolrAwsCompte', {
       parameterName: `${ssmPathPrefix}/AWS_ACCOUNT`,
       stringValue: cdk.Stack.of(scope).account,
+    });
+    new ssm.StringParameter(scope, 'VarSolrTypo3SolrEnabledCores', {
+      parameterName: `${ssmPathPrefix}/TYPO3_SOLR_ENABLED_CORES`,
+      stringValue: props.solrTypo3SolrEnabledCores || 'french english',
     });
     /*
         * Default properties for the EC2 instance.
