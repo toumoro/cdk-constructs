@@ -4434,6 +4434,7 @@ const tmSorlEc2Props: TmSorlEc2Props = { ... }
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.recordName">recordName</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.solrJavaMem">solrJavaMem</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.solrOpts">solrOpts</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.solrTypo3SolrEnabledCores">solrTypo3SolrEnabledCores</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.ssmPathPrefix">ssmPathPrefix</a></code> | <code>string</code> | *No description.* |
 
 ---
@@ -5057,6 +5058,16 @@ public readonly solrJavaMem: string;
 
 ```typescript
 public readonly solrOpts: string;
+```
+
+- *Type:* string
+
+---
+
+##### `solrTypo3SolrEnabledCores`<sup>Optional</sup> <a name="solrTypo3SolrEnabledCores" id="tm-cdk-constructs.TmSorlEc2Props.property.solrTypo3SolrEnabledCores"></a>
+
+```typescript
+public readonly solrTypo3SolrEnabledCores: string;
 ```
 
 - *Type:* string
