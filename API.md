@@ -2,6 +2,105 @@
 
 ## Constructs <a name="Constructs" id="Constructs"></a>
 
+### TmAnsiblePlaybookEc2 <a name="TmAnsiblePlaybookEc2" id="tm-cdk-constructs.TmAnsiblePlaybookEc2"></a>
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer"></a>
+
+```typescript
+import { TmAnsiblePlaybookEc2 } from 'tm-cdk-constructs'
+
+new TmAnsiblePlaybookEc2(scope: Construct, id: string, props: IAnsiblePlaybookEc2Props)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props">IAnsiblePlaybookEc2Props</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props">IAnsiblePlaybookEc2Props</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.toString">toString</a></code> | Returns a string representation of this construct. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.isConstruct"></a>
+
+```typescript
+import { TmAnsiblePlaybookEc2 } from 'tm-cdk-constructs'
+
+TmAnsiblePlaybookEc2.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+
 ### TmApplicationLoadBalancedFargateService <a name="TmApplicationLoadBalancedFargateService" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService"></a>
 
 #### Initializers <a name="Initializers" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.Initializer"></a>
@@ -472,6 +571,105 @@ public readonly parameterGroup: CfnParameterGroup;
 ```
 
 - *Type:* aws-cdk-lib.aws_elasticache.CfnParameterGroup
+
+---
+
+
+### TmPatchManager <a name="TmPatchManager" id="tm-cdk-constructs.TmPatchManager"></a>
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmPatchManager.Initializer"></a>
+
+```typescript
+import { TmPatchManager } from 'tm-cdk-constructs'
+
+new TmPatchManager(scope: Construct, id: string, props: IPatchManagerProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.IPatchManagerProps">IPatchManagerProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmPatchManager.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmPatchManager.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmPatchManager.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.IPatchManagerProps">IPatchManagerProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.toString">toString</a></code> | Returns a string representation of this construct. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmPatchManager.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmPatchManager.isConstruct"></a>
+
+```typescript
+import { TmPatchManager } from 'tm-cdk-constructs'
+
+TmPatchManager.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmPatchManager.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmPatchManager.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
 
 ---
 
@@ -5547,6 +5745,95 @@ Indicates whether to enable the S3 endpoint for the VPC.
 
 ## Protocols <a name="Protocols" id="Protocols"></a>
 
+### IAnsiblePlaybookEc2Props <a name="IAnsiblePlaybookEc2Props" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props">IAnsiblePlaybookEc2Props</a>
+
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubBranch">gitHubBranch</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubOwner">gitHubOwner</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubPath">gitHubPath</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubRepository">gitHubRepository</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.playbookFile">playbookFile</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetKey">tagTargetKey</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetValue">tagTargetValue</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `gitHubBranch`<sup>Optional</sup> <a name="gitHubBranch" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubBranch"></a>
+
+```typescript
+public readonly gitHubBranch: string;
+```
+
+- *Type:* string
+
+---
+
+##### `gitHubOwner`<sup>Optional</sup> <a name="gitHubOwner" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubOwner"></a>
+
+```typescript
+public readonly gitHubOwner: string;
+```
+
+- *Type:* string
+
+---
+
+##### `gitHubPath`<sup>Optional</sup> <a name="gitHubPath" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubPath"></a>
+
+```typescript
+public readonly gitHubPath: string;
+```
+
+- *Type:* string
+
+---
+
+##### `gitHubRepository`<sup>Optional</sup> <a name="gitHubRepository" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubRepository"></a>
+
+```typescript
+public readonly gitHubRepository: string;
+```
+
+- *Type:* string
+
+---
+
+##### `playbookFile`<sup>Optional</sup> <a name="playbookFile" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.playbookFile"></a>
+
+```typescript
+public readonly playbookFile: string;
+```
+
+- *Type:* string
+
+---
+
+##### `tagTargetKey`<sup>Optional</sup> <a name="tagTargetKey" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetKey"></a>
+
+```typescript
+public readonly tagTargetKey: string;
+```
+
+- *Type:* string
+
+---
+
+##### `tagTargetValue`<sup>Optional</sup> <a name="tagTargetValue" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetValue"></a>
+
+```typescript
+public readonly tagTargetValue: string;
+```
+
+- *Type:* string
+
+---
+
 ### IIEcsDeploymentHookProps <a name="IIEcsDeploymentHookProps" id="tm-cdk-constructs.IIEcsDeploymentHookProps"></a>
 
 - *Implemented By:* <a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a>
@@ -5609,6 +5896,73 @@ public readonly name: string;
 
 ```typescript
 public readonly path: string;
+```
+
+- *Type:* string
+
+---
+
+### IPatchManagerProps <a name="IPatchManagerProps" id="tm-cdk-constructs.IPatchManagerProps"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.IPatchManagerProps">IPatchManagerProps</a>
+
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.IPatchManagerProps.property.commandUpdate">commandUpdate</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IPatchManagerProps.property.cronScheduleFullUpdates">cronScheduleFullUpdates</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IPatchManagerProps.property.cronScheduleUpdates">cronScheduleUpdates</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IPatchManagerProps.property.operatingSystem">operatingSystem</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IPatchManagerProps.property.tagPatchGroup">tagPatchGroup</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `commandUpdate`<sup>Optional</sup> <a name="commandUpdate" id="tm-cdk-constructs.IPatchManagerProps.property.commandUpdate"></a>
+
+```typescript
+public readonly commandUpdate: string;
+```
+
+- *Type:* string
+
+---
+
+##### `cronScheduleFullUpdates`<sup>Optional</sup> <a name="cronScheduleFullUpdates" id="tm-cdk-constructs.IPatchManagerProps.property.cronScheduleFullUpdates"></a>
+
+```typescript
+public readonly cronScheduleFullUpdates: string;
+```
+
+- *Type:* string
+
+---
+
+##### `cronScheduleUpdates`<sup>Optional</sup> <a name="cronScheduleUpdates" id="tm-cdk-constructs.IPatchManagerProps.property.cronScheduleUpdates"></a>
+
+```typescript
+public readonly cronScheduleUpdates: string;
+```
+
+- *Type:* string
+
+---
+
+##### `operatingSystem`<sup>Optional</sup> <a name="operatingSystem" id="tm-cdk-constructs.IPatchManagerProps.property.operatingSystem"></a>
+
+```typescript
+public readonly operatingSystem: string;
+```
+
+- *Type:* string
+
+---
+
+##### `tagPatchGroup`<sup>Optional</sup> <a name="tagPatchGroup" id="tm-cdk-constructs.IPatchManagerProps.property.tagPatchGroup"></a>
+
+```typescript
+public readonly tagPatchGroup: string;
 ```
 
 - *Type:* string
