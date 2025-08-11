@@ -4426,9 +4426,9 @@ const tmSorlEc2Props: TmSorlEc2Props = { ... }
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.userDataCausesReplacement">userDataCausesReplacement</a></code> | <code>boolean</code> | Changes to the UserData force replacement. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.vpcSubnets">vpcSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | Where to place the instance within the VPC. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | *No description.* |
-| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.allowFrom">allowFrom</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.ebsVolumeSize">ebsVolumeSize</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.hostedZone">hostedZone</a></code> | <code>aws-cdk-lib.aws_route53.IHostedZone</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.recordName">recordName</a></code> | <code>string</code> | *No description.* |
@@ -4984,16 +4984,6 @@ public readonly buildContextPath: string;
 
 ---
 
-##### `buildDockerfile`<sup>Required</sup> <a name="buildDockerfile" id="tm-cdk-constructs.TmSorlEc2Props.property.buildDockerfile"></a>
-
-```typescript
-public readonly buildDockerfile: string;
-```
-
-- *Type:* string
-
----
-
 ##### `allowFrom`<sup>Optional</sup> <a name="allowFrom" id="tm-cdk-constructs.TmSorlEc2Props.property.allowFrom"></a>
 
 ```typescript
@@ -5011,6 +5001,16 @@ public readonly buildContainerArgs: {[ key: string ]: string};
 ```
 
 - *Type:* {[ key: string ]: string}
+
+---
+
+##### `buildDockerfile`<sup>Optional</sup> <a name="buildDockerfile" id="tm-cdk-constructs.TmSorlEc2Props.property.buildDockerfile"></a>
+
+```typescript
+public readonly buildDockerfile: string;
+```
+
+- *Type:* string
 
 ---
 
