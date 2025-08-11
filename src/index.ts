@@ -3,6 +3,6 @@ export * from './pipeline';
 export * from './databases';
 export * from './containers';
 export * from './search';
-export * from './mgmt';
+export * from './management';
 //export * from './stacks/network/vpcBaseStack';
 //export * from '../examples/rdsauroramysqlserverless/lib/rdsNetworkSecondaryRegion';

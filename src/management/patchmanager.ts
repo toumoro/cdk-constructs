@@ -18,11 +18,11 @@ export class TmPatchManager extends Construct {
     super(scope, id);
 
     const {
-      tagPatchGroup = 'tmPatchGroup',
-      cronScheduleUpdates = 'cron(* */2 * * ? *)',
-      cronScheduleFullUpdates = 'cron(* 2 ? * 3 *)',
-      operatingSystem = 'AMAZON_LINUX_2023',
-      commandUpdate = 'sudo dnf upgrade -y "*"',
+      tagPatchGroup = 'tmPatchGroup', // Patch Group tag (must match the one in your baseline)
+      cronScheduleUpdates = 'cron(* */2 * * ? *)', // Every 2 hours
+      cronScheduleFullUpdates = 'cron(* 2 ? * 3 *)', // Weekly on tuesday at 2 AM
+      operatingSystem = 'AMAZON_LINUX_2023', // Operating system for the patch baseline
+      commandUpdate = 'sudo dnf upgrade -y "*"', // Command to run for full updates
     } = props;
 
     new ssm.CfnPatchBaseline(this, 'TmPatchBaseLine', {
@@ -48,7 +48,7 @@ export class TmPatchManager extends Construct {
 
     const maintenanceWindowUpdates = new ssm.CfnMaintenanceWindow(this, 'TmPatchMaintenaceWindows', {
       name: 'TmMaintenanceWindowUpdates',
-      schedule: cronScheduleUpdates, // every 2 hours
+      schedule: cronScheduleUpdates,
       duration: 2,
       cutoff: 1,
       allowUnassociatedTargets: false,
@@ -56,7 +56,7 @@ export class TmPatchManager extends Construct {
 
     const maintenanceWindowFullUpdates = new ssm.CfnMaintenanceWindow(this, 'TmPatchMaintenaceWindowsFull', {
       name: 'TmMaintenanceWindowFullUpdates',
-      schedule: cronScheduleFullUpdates, // every 2 hours
+      schedule: cronScheduleFullUpdates,
       duration: 2,
       cutoff: 1,
       allowUnassociatedTargets: false,
@@ -66,7 +66,7 @@ export class TmPatchManager extends Construct {
       resourceType: 'INSTANCE',
       targets: [{
         key: 'tag:PatchGroup',
-        values: [tagPatchGroup], // Patch Group tag (must match the one in your baseline)
+        values: [tagPatchGroup],
       }],
       windowId: maintenanceWindowUpdates.ref,
     });
@@ -75,7 +75,7 @@ export class TmPatchManager extends Construct {
       resourceType: 'INSTANCE',
       targets: [{
         key: 'tag:PatchGroup',
-        values: [tagPatchGroup], // Patch Group tag (must match the one in your baseline)
+        values: [tagPatchGroup],
       }],
       windowId: maintenanceWindowFullUpdates.ref,
     });
@@ -92,12 +92,11 @@ export class TmPatchManager extends Construct {
         },
       ],
       maxConcurrency: '50',
-      maxErrors: '50', // Allow one error before failing the task
+      maxErrors: '50',
       taskInvocationParameters: {
         maintenanceWindowRunCommandParameters: {
           parameters: {
             Operation: ['Install'],
-            //RebootOption: ['NoReboot'],
           },
         },
       },
@@ -115,7 +114,7 @@ export class TmPatchManager extends Construct {
         },
       ],
       maxConcurrency: '50',
-      maxErrors: '50', // Allow one error before failing the task
+      maxErrors: '50',
       taskInvocationParameters: {
         maintenanceWindowRunCommandParameters: {
           parameters: {
