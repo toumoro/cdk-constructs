@@ -30,7 +30,7 @@ export interface TmSorlEc2Props extends ec2.InstanceProps {
   /*
     * The build dockerfile.
     */
-  readonly buildDockerfile: string;
+  readonly buildDockerfile?: string;
   /*
     * The build container args.
     */
