@@ -61,7 +61,7 @@ export class TmAnsiblePlaybookEc2 extends Construct {
       ],
     };
 
-    new ssm.CfnAssociation(this, `AnsiblePlaybookAssociation${tagTargetValue}`, {
+    new ssm.CfnAssociation(this, `AnsiblePlaybookAssociation${tagTargetKey}`, {
       name: 'AWS-ApplyAnsiblePlaybooks', // Required document name
       parameters: parametersAnsible,
       targets: [
@@ -70,7 +70,7 @@ export class TmAnsiblePlaybookEc2 extends Construct {
           values: [`${tagTargetValue}`],
         },
       ],
-      associationName: `Deployment-${tagTargetValue}-${String(Date.now())}`,
+      associationName: `Deployment-${tagTargetValue}`,
       applyOnlyAtCronInterval: false,
       waitForSuccessTimeoutSeconds: 600,
       maxConcurrency: '1', // Only one instance at a time
