@@ -19,8 +19,8 @@ export class TmPatchManager extends Construct {
 
     const {
       tagPatchGroup = 'tmPatchGroup', // Patch Group tag (must match the one in your baseline)
-      cronScheduleUpdates = 'rate(3 hours)', // Every 3 hours
-      cronScheduleFullUpdates = 'cron(0 2 ? * 3 *)', // Weekly on tuesday at 2 AM
+      cronScheduleUpdates = 'cron(0 10 ? * * *)', // Daily at 10 AM UTC / 6 AM EST
+      cronScheduleFullUpdates = 'cron(0 2 ? * 3 *)', // Weekly on tuesday at 2 AM UTC / 10 PM EST on Monday
       operatingSystem = 'AMAZON_LINUX_2023', // Operating system for the patch baseline
       commandUpdate = 'sudo dnf upgrade -y "*"', // Command to run for full updates
     } = props;
