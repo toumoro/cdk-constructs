@@ -5758,6 +5758,7 @@ Indicates whether to enable the S3 endpoint for the VPC.
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubOwner">gitHubOwner</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubPath">gitHubPath</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubRepository">gitHubRepository</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubTokenSsmSecure">gitHubTokenSsmSecure</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.playbookFile">playbookFile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetKey">tagTargetKey</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetValue">tagTargetValue</a></code> | <code>string</code> | *No description.* |
@@ -5798,6 +5799,16 @@ public readonly gitHubPath: string;
 
 ```typescript
 public readonly gitHubRepository: string;
+```
+
+- *Type:* string
+
+---
+
+##### `gitHubTokenSsmSecure`<sup>Optional</sup> <a name="gitHubTokenSsmSecure" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubTokenSsmSecure"></a>
+
+```typescript
+public readonly gitHubTokenSsmSecure: string;
 ```
 
 - *Type:* string
