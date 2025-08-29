@@ -17,6 +17,7 @@ export interface IAnsiblePlaybookEc2Props {
   gitHubBranch?: string;
   gitHubPath?: string;
   playbookFile?: string;
+  gitHubTokenSsmSecure?: string;
 }
 
 export class TmAnsiblePlaybookEc2 extends Construct {
@@ -33,6 +34,7 @@ export class TmAnsiblePlaybookEc2 extends Construct {
       gitHubBranch = 'main',
       gitHubPath = 'playbooks',
       playbookFile = 'docker-deploy.yml',
+      gitHubTokenSsmSecure = '/ansible/tm/github/token',
     } = props;
 
     const parametersAnsible = {
@@ -45,6 +47,7 @@ export class TmAnsiblePlaybookEc2 extends Construct {
           repository: `${gitHubRepository}`,
           path: `${gitHubPath}`,
           getOptions: `branch:${gitHubBranch}`,
+          tokenInfo: `{{ssm-secure:${gitHubTokenSsmSecure}}}`,
         }),
       ],
       InstallDependencies: [
