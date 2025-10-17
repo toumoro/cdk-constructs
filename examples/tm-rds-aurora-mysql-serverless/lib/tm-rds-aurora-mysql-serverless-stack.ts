@@ -17,15 +17,15 @@ export class TmRdsAuroraMysqlServerlessStack extends cdk.Stack {
     super(scope, id, props);
 
     const cluster = new TmRdsAuroraMysqlServerless(this, 'Database', {
-      engine: rds.DatabaseClusterEngine.auroraMysql({ 
-        version: rds.AuroraMysqlEngineVersion.VER_3_05_2,
+      engine: rds.DatabaseClusterEngine.auroraMysql({
+        version: rds.AuroraMysqlEngineVersion.VER_3_08_1,
       }),
       vpc: props.vpc,
       enableGlobal: props.enableGlobal,
     });
 
     cluster.connections.allowFrom(props.bastionHost, ec2.Port.tcp(3306));
-    
+
     cluster.metricServerlessDatabaseCapacity({
       period: cdk.Duration.minutes(10),
     }).createAlarm(this, 'capacity', {
