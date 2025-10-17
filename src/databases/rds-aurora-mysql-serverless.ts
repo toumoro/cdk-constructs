@@ -9,6 +9,13 @@ export interface TmRdsAuroraMysqlServerlessProps extends rds.DatabaseClusterProp
    * Enable the creation of a Global Cluster for the RDS cluster.
    */
   readonly enableGlobal?: boolean ;
+
+  /**
+   * The instance type for a provisioned writer.
+   * If provided, a provisioned writer will be created instead of a serverless one.
+   * @default - An Aurora Serverless v2 writer is created.
+   */
+  readonly provisionedInstanceType?: ec2.InstanceType;
 }
 
 export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
@@ -25,6 +32,17 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
     props?: TmRdsAuroraMysqlServerlessProps,
   ) {
 
+    const performanceInsightRetention = rds.PerformanceInsightRetention.DEFAULT;
+    // Conditionally create the writer instance props
+    const writerProps = props?.provisionedInstanceType
+      ? rds.ClusterInstance.provisioned('writer', {
+          instanceType: props.provisionedInstanceType,
+          performanceInsightRetention: performanceInsightRetention,
+        })
+      : rds.ClusterInstance.serverlessV2('writer', {
+          performanceInsightRetention: performanceInsightRetention,
+        });
+
     /**
      * The default properties for the RDS Aurora MySQL Serverless database cluster.
      */
@@ -32,9 +50,7 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
       engine: rds.DatabaseClusterEngine.auroraMysql({
         version: rds.AuroraMysqlEngineVersion.VER_3_05_2,
       }),
-      writer: rds.ClusterInstance.serverlessV2('writer', {
-        performanceInsightRetention: rds.PerformanceInsightRetention.DEFAULT,
-      }),
+      writer: writerProps,
       credentials: rds.Credentials.fromUsername('admin'), // The master credentials for the database
       // to true in production
       deletionProtection: false,
