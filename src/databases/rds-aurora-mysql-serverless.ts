@@ -36,12 +36,12 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
     // Conditionally create the writer instance props
     const writerProps = props?.provisionedInstanceType
       ? rds.ClusterInstance.provisioned('writer', {
-          instanceType: props.provisionedInstanceType,
-          performanceInsightRetention: performanceInsightRetention,
-        })
+        instanceType: props.provisionedInstanceType,
+        performanceInsightRetention: performanceInsightRetention,
+      })
       : rds.ClusterInstance.serverlessV2('writer', {
-          performanceInsightRetention: performanceInsightRetention,
-        });
+        performanceInsightRetention: performanceInsightRetention,
+      });
 
     /**
      * The default properties for the RDS Aurora MySQL Serverless database cluster.

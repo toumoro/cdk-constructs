@@ -3769,6 +3769,7 @@ const tmRdsAuroraMysqlServerlessProps: TmRdsAuroraMysqlServerlessProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.vpcSubnets">vpcSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | Where to place the instances within the VPC. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.writer">writer</a></code> | <code>aws-cdk-lib.aws_rds.IClusterInstance</code> | The instance to use for the cluster writer. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.enableGlobal">enableGlobal</a></code> | <code>boolean</code> | Enable the creation of a Global Cluster for the RDS cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.provisionedInstanceType">provisionedInstanceType</a></code> | <code>aws-cdk-lib.aws_ec2.InstanceType</code> | The instance type for a provisioned writer. |
 
 ---
 
@@ -4572,6 +4573,21 @@ public readonly enableGlobal: boolean;
 - *Type:* boolean
 
 Enable the creation of a Global Cluster for the RDS cluster.
+
+---
+
+##### `provisionedInstanceType`<sup>Optional</sup> <a name="provisionedInstanceType" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.provisionedInstanceType"></a>
+
+```typescript
+public readonly provisionedInstanceType: InstanceType;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.InstanceType
+- *Default:* An Aurora Serverless v2 writer is created.
+
+The instance type for a provisioned writer.
+
+If provided, a provisioned writer will be created instead of a serverless one.
 
 ---
 
