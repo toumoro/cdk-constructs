@@ -111,6 +111,14 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * Deployment Hook Props
   */
   readonly ecsDeploymentHookProps?: IIEcsDeploymentHookProps;
+  /*
+  * targetCpuUtilizationPercent
+  */
+  readonly targetCpuUtilizationPercent?: number;
+  /*
+  * targetMemoryUtilizationPercent
+  */
+  readonly targetMemoryUtilizationPercent?: number;
 }
 
 
@@ -208,19 +216,19 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     // Configure auto-scaling
     const scaling = this.service.autoScaleTaskCount({
       minCapacity: mergedProps.minTaskCount,
-      maxCapacity: mergedProps.maxTaskCount || 3,
+      maxCapacity: mergedProps.maxTaskCount || 30,
     });
 
     // Scale based on CPU utilization
     scaling.scaleOnCpuUtilization('CpuScaling', {
-      targetUtilizationPercent: 50,
+      targetUtilizationPercent: mergedProps.targetCpuUtilizationPercent || 30,
       scaleInCooldown: cdk.Duration.seconds(60),
       scaleOutCooldown: cdk.Duration.seconds(60),
     });
 
     // Scale based on Memory utilization
     scaling.scaleOnMemoryUtilization('MemoryScaling', {
-      targetUtilizationPercent: 50,
+      targetUtilizationPercent: mergedProps.targetMemoryUtilizationPercent || 30,
       scaleInCooldown: cdk.Duration.seconds(60),
       scaleOutCooldown: cdk.Duration.seconds(60),
     });

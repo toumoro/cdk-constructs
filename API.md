@@ -2840,6 +2840,8 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.secrets">secrets</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ecs.Secret}</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | *No description.* |
 
 ---
 
@@ -3616,6 +3618,26 @@ public readonly secrets: {[ key: string ]: Secret};
 ```
 
 - *Type:* {[ key: string ]: aws-cdk-lib.aws_ecs.Secret}
+
+---
+
+##### `targetCpuUtilizationPercent`<sup>Optional</sup> <a name="targetCpuUtilizationPercent" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetCpuUtilizationPercent"></a>
+
+```typescript
+public readonly targetCpuUtilizationPercent: number;
+```
+
+- *Type:* number
+
+---
+
+##### `targetMemoryUtilizationPercent`<sup>Optional</sup> <a name="targetMemoryUtilizationPercent" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetMemoryUtilizationPercent"></a>
+
+```typescript
+public readonly targetMemoryUtilizationPercent: number;
+```
+
+- *Type:* number
 
 ---
 
