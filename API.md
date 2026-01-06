@@ -332,6 +332,25 @@ The Fargate task definition in this construct.
 
 ---
 
+#### Constants <a name="Constants" id="Constants"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.PROPERTY_INJECTION_ID">PROPERTY_INJECTION_ID</a></code> | <code>string</code> | Uniquely identifies this class. |
+
+---
+
+##### `PROPERTY_INJECTION_ID`<sup>Required</sup> <a name="PROPERTY_INJECTION_ID" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.PROPERTY_INJECTION_ID"></a>
+
+```typescript
+public readonly PROPERTY_INJECTION_ID: string;
+```
+
+- *Type:* string
+
+Uniquely identifies this class.
+
+---
 
 ### TmEcsDeploymentHook <a name="TmEcsDeploymentHook" id="tm-cdk-constructs.TmEcsDeploymentHook"></a>
 
@@ -1278,6 +1297,7 @@ As a cluster-level metric, it represents the average of the ServerlessDatabaseCa
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.isOwnedResource">isOwnedResource</a></code> | Returns true if the construct was created by CDK, and false otherwise. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.isResource">isResource</a></code> | Check whether the given construct is a Resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.fromDatabaseClusterAttributes">fromDatabaseClusterAttributes</a></code> | Import an existing DatabaseCluster from properties. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.fromLookup">fromLookup</a></code> | Lookup an existing DatabaseCluster using clusterIdentifier. |
 
 ---
 
@@ -1359,12 +1379,40 @@ Import an existing DatabaseCluster from properties.
 
 ---
 
+##### `fromLookup` <a name="fromLookup" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.fromLookup"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerless } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlServerless.fromLookup(scope: Construct, id: string, options: DatabaseClusterLookupOptions)
+```
+
+Lookup an existing DatabaseCluster using clusterIdentifier.
+
+###### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.fromLookup.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+###### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.fromLookup.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+###### `options`<sup>Required</sup> <a name="options" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.fromLookup.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.aws_rds.DatabaseClusterLookupOptions
+
+---
+
 #### Properties <a name="Properties" id="Properties"></a>
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.env">env</a></code> | <code>aws-cdk-lib.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.clusterArn">clusterArn</a></code> | <code>string</code> | The ARN of the cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.clusterEndpoint">clusterEndpoint</a></code> | <code>aws-cdk-lib.aws_rds.Endpoint</code> | The endpoint to use for read/write operations. |
@@ -1407,16 +1455,17 @@ The tree node.
 public readonly env: ResourceEnvironment;
 ```
 
-- *Type:* aws-cdk-lib.ResourceEnvironment
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
 
 The environment this resource belongs to.
 
-For resources that are created and managed by the CDK
-(generally, those created by creating new class instances like Role, Bucket, etc.),
-this is always the same as the environment of the stack they belong to;
-however, for imported resources
-(those obtained from static methods like fromRoleArn, fromBucketName, etc.),
-that might be different than the stack they were imported into.
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
 
 ---
 
@@ -1678,6 +1727,25 @@ The cluster's subnets.
 
 ---
 
+#### Constants <a name="Constants" id="Constants"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.PROPERTY_INJECTION_ID">PROPERTY_INJECTION_ID</a></code> | <code>string</code> | Uniquely identifies this class. |
+
+---
+
+##### `PROPERTY_INJECTION_ID`<sup>Required</sup> <a name="PROPERTY_INJECTION_ID" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.PROPERTY_INJECTION_ID"></a>
+
+```typescript
+public readonly PROPERTY_INJECTION_ID: string;
+```
+
+- *Type:* string
+
+Uniquely identifies this class.
+
+---
 
 ### TmSolrEc2 <a name="TmSolrEc2" id="tm-cdk-constructs.TmSolrEc2"></a>
 
@@ -1895,7 +1963,7 @@ Check whether the given construct is a Resource.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#tm-cdk-constructs.TmSolrEc2.property.env">env</a></code> | <code>aws-cdk-lib.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#tm-cdk-constructs.TmSolrEc2.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.connections">connections</a></code> | <code>aws-cdk-lib.aws_ec2.Connections</code> | Allows specify security group connections for the instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.grantPrincipal">grantPrincipal</a></code> | <code>aws-cdk-lib.aws_iam.IPrincipal</code> | The principal to grant permissions to. |
@@ -1906,6 +1974,7 @@ Check whether the given construct is a Resource.
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.instancePrivateIp">instancePrivateIp</a></code> | <code>string</code> | Private IP for this instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.instancePublicDnsName">instancePublicDnsName</a></code> | <code>string</code> | Publicly-routable DNS name for this instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.instancePublicIp">instancePublicIp</a></code> | <code>string</code> | Publicly-routable IP  address for this instance. |
+| <code><a href="#tm-cdk-constructs.TmSolrEc2.property.instanceRef">instanceRef</a></code> | <code>aws-cdk-lib.interfaces.aws_ec2.InstanceReference</code> | A reference to a Instance resource. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.osType">osType</a></code> | <code>aws-cdk-lib.aws_ec2.OperatingSystemType</code> | The type of OS the instance is running. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.role">role</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role assumed by the instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.userData">userData</a></code> | <code>aws-cdk-lib.aws_ec2.UserData</code> | UserData for the instance. |
@@ -1930,16 +1999,17 @@ The tree node.
 public readonly env: ResourceEnvironment;
 ```
 
-- *Type:* aws-cdk-lib.ResourceEnvironment
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
 
 The environment this resource belongs to.
 
-For resources that are created and managed by the CDK
-(generally, those created by creating new class instances like Role, Bucket, etc.),
-this is always the same as the environment of the stack they belong to;
-however, for imported resources
-(those obtained from static methods like fromRoleArn, fromBucketName, etc.),
-that might be different than the stack they were imported into.
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
 
 ---
 
@@ -2067,6 +2137,18 @@ Publicly-routable IP  address for this instance.
 
 ---
 
+##### `instanceRef`<sup>Required</sup> <a name="instanceRef" id="tm-cdk-constructs.TmSolrEc2.property.instanceRef"></a>
+
+```typescript
+public readonly instanceRef: InstanceReference;
+```
+
+- *Type:* aws-cdk-lib.interfaces.aws_ec2.InstanceReference
+
+A reference to a Instance resource.
+
+---
+
 ##### `osType`<sup>Required</sup> <a name="osType" id="tm-cdk-constructs.TmSolrEc2.property.osType"></a>
 
 ```typescript
@@ -2103,6 +2185,25 @@ UserData for the instance.
 
 ---
 
+#### Constants <a name="Constants" id="Constants"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmSolrEc2.property.PROPERTY_INJECTION_ID">PROPERTY_INJECTION_ID</a></code> | <code>string</code> | Uniquely identifies this class. |
+
+---
+
+##### `PROPERTY_INJECTION_ID`<sup>Required</sup> <a name="PROPERTY_INJECTION_ID" id="tm-cdk-constructs.TmSolrEc2.property.PROPERTY_INJECTION_ID"></a>
+
+```typescript
+public readonly PROPERTY_INJECTION_ID: string;
+```
+
+- *Type:* string
+
+Uniquely identifies this class.
+
+---
 
 ### TmVpcBase <a name="TmVpcBase" id="tm-cdk-constructs.TmVpcBase"></a>
 
@@ -2461,7 +2562,7 @@ Prefer to use `Vpc.fromLookup()` instead.
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
-| <code><a href="#tm-cdk-constructs.TmVpcBase.property.env">env</a></code> | <code>aws-cdk-lib.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#tm-cdk-constructs.TmVpcBase.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | AZs for this VPC. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.dnsHostnamesEnabled">dnsHostnamesEnabled</a></code> | <code>boolean</code> | Indicates if instances launched in this VPC will have public DNS hostnames. |
@@ -2477,6 +2578,7 @@ Prefer to use `Vpc.fromLookup()` instead.
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.vpcDefaultSecurityGroup">vpcDefaultSecurityGroup</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.vpcId">vpcId</a></code> | <code>string</code> | Identifier for this VPC. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.vpcIpv6CidrBlocks">vpcIpv6CidrBlocks</a></code> | <code>string[]</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmVpcBase.property.vpcRef">vpcRef</a></code> | <code>aws-cdk-lib.interfaces.aws_ec2.VPCReference</code> | A reference to a VPC resource. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.internetGatewayId">internetGatewayId</a></code> | <code>string</code> | Internet Gateway for the VPC. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.vpnGatewayId">vpnGatewayId</a></code> | <code>string</code> | Returns the id of the VPN Gateway (if enabled). |
 
@@ -2500,16 +2602,17 @@ The tree node.
 public readonly env: ResourceEnvironment;
 ```
 
-- *Type:* aws-cdk-lib.ResourceEnvironment
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
 
 The environment this resource belongs to.
 
-For resources that are created and managed by the CDK
-(generally, those created by creating new class instances like Role, Bucket, etc.),
-this is always the same as the environment of the stack they belong to;
-however, for imported resources
-(those obtained from static methods like fromRoleArn, fromBucketName, etc.),
-that might be different than the stack they were imported into.
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
 
 ---
 
@@ -2685,6 +2788,18 @@ public readonly vpcIpv6CidrBlocks: string[];
 
 ---
 
+##### `vpcRef`<sup>Required</sup> <a name="vpcRef" id="tm-cdk-constructs.TmVpcBase.property.vpcRef"></a>
+
+```typescript
+public readonly vpcRef: VPCReference;
+```
+
+- *Type:* aws-cdk-lib.interfaces.aws_ec2.VPCReference
+
+A reference to a VPC resource.
+
+---
+
 ##### `internetGatewayId`<sup>Optional</sup> <a name="internetGatewayId" id="tm-cdk-constructs.TmVpcBase.property.internetGatewayId"></a>
 
 ```typescript
@@ -2719,6 +2834,7 @@ Returns the id of the VPN Gateway (if enabled).
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.DEFAULT_CIDR_RANGE">DEFAULT_CIDR_RANGE</a></code> | <code>string</code> | The default CIDR range used when creating VPCs. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.DEFAULT_SUBNETS">DEFAULT_SUBNETS</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetConfiguration[]</code> | The default subnet configuration. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.property.DEFAULT_SUBNETS_NO_NAT">DEFAULT_SUBNETS_NO_NAT</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetConfiguration[]</code> | The default subnet configuration if natGateways specified to be 0. |
+| <code><a href="#tm-cdk-constructs.TmVpcBase.property.PROPERTY_INJECTION_ID">PROPERTY_INJECTION_ID</a></code> | <code>string</code> | Uniquely identifies this class. |
 
 ---
 
@@ -2767,6 +2883,18 @@ The default subnet configuration if natGateways specified to be 0.
 
 ---
 
+##### `PROPERTY_INJECTION_ID`<sup>Required</sup> <a name="PROPERTY_INJECTION_ID" id="tm-cdk-constructs.TmVpcBase.property.PROPERTY_INJECTION_ID"></a>
+
+```typescript
+public readonly PROPERTY_INJECTION_ID: string;
+```
+
+- *Type:* string
+
+Uniquely identifies this class.
+
+---
+
 ## Structs <a name="Structs" id="Structs"></a>
 
 ### TmApplicationLoadBalancedFargateServiceProps <a name="TmApplicationLoadBalancedFargateServiceProps" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps"></a>
@@ -2810,7 +2938,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.protocolVersion">protocolVersion</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.ApplicationProtocolVersion</code> | The protocol version to use. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.publicLoadBalancer">publicLoadBalancer</a></code> | <code>boolean</code> | Determines whether the Load Balancer will be internet-facing. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.recordType">recordType</a></code> | <code>aws-cdk-lib.aws_ecs_patterns.ApplicationLoadBalancedServiceRecordType</code> | Specifies whether the Route53 record should be a CNAME, an A record using the Alias feature or no record at all. |
-| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.redirectHTTP">redirectHTTP</a></code> | <code>boolean</code> | Specifies whether the load balancer should redirect traffic on port 80 to port 443 to support HTTP->HTTPS redirects This is only valid if the protocol of the ALB is HTTPS. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.redirectHTTP">redirectHTTP</a></code> | <code>boolean</code> | Specifies whether the load balancer should redirect traffic on port 80 to the {@link listenerPort} to support HTTP->HTTPS redirects. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.serviceName">serviceName</a></code> | <code>string</code> | The name of the service. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.sslPolicy">sslPolicy</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.SslPolicy</code> | The security policy that defines which ciphers and protocols are supported by the ALB Listener. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetProtocol">targetProtocol</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.ApplicationProtocol</code> | The protocol for connections from the load balancer to the ECS tasks. |
@@ -3209,7 +3337,9 @@ public readonly redirectHTTP: boolean;
 - *Type:* boolean
 - *Default:* false
 
-Specifies whether the load balancer should redirect traffic on port 80 to port 443 to support HTTP->HTTPS redirects This is only valid if the protocol of the ALB is HTTPS.
+Specifies whether the load balancer should redirect traffic on port 80 to the {@link listenerPort} to support HTTP->HTTPS redirects.
+
+This is only valid if the protocol of the ALB is HTTPS.
 
 ---
 
@@ -3751,6 +3881,7 @@ const tmRdsAuroraMysqlServerlessProps: TmRdsAuroraMysqlServerlessProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.credentials">credentials</a></code> | <code>aws-cdk-lib.aws_rds.Credentials</code> | Credentials for the administrative user. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.databaseInsightsMode">databaseInsightsMode</a></code> | <code>aws-cdk-lib.aws_rds.DatabaseInsightsMode</code> | The database insights mode. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.defaultDatabaseName">defaultDatabaseName</a></code> | <code>string</code> | Name of a database which is automatically created inside the cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.deleteAutomatedBackups">deleteAutomatedBackups</a></code> | <code>boolean</code> | Specifies whether to remove automated backups immediately after the DB cluster is deleted. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.deletionProtection">deletionProtection</a></code> | <code>boolean</code> | Indicates whether the DB cluster should have deletion protection enabled. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.domain">domain</a></code> | <code>string</code> | Directory ID for associating the DB cluster with a specific Active Directory. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.domainRole">domainRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role to be used when making API calls to the Directory Service. |
@@ -3781,10 +3912,11 @@ const tmRdsAuroraMysqlServerlessProps: TmRdsAuroraMysqlServerlessProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.s3ImportBuckets">s3ImportBuckets</a></code> | <code>aws-cdk-lib.aws_s3.IBucket[]</code> | S3 buckets that you want to load data from. This feature is only supported by the Aurora database engine. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.s3ImportRole">s3ImportRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | Role that will be associated with this DB cluster to enable S3 import. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.securityGroups">securityGroups</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup[]</code> | Security group. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.serverlessV2AutoPauseDuration">serverlessV2AutoPauseDuration</a></code> | <code>aws-cdk-lib.Duration</code> | Specifies the duration an Aurora Serverless v2 DB instance must be idle before Aurora attempts to automatically pause it. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.serverlessV2MaxCapacity">serverlessV2MaxCapacity</a></code> | <code>number</code> | The maximum number of Aurora capacity units (ACUs) for a DB instance in an Aurora Serverless v2 cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.serverlessV2MinCapacity">serverlessV2MinCapacity</a></code> | <code>number</code> | The minimum number of Aurora capacity units (ACUs) for a DB instance in an Aurora Serverless v2 cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageEncrypted">storageEncrypted</a></code> | <code>boolean</code> | Whether to enable storage encryption. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageEncryptionKey">storageEncryptionKey</a></code> | <code>aws-cdk-lib.aws_kms.IKey</code> | The KMS key for storage encryption. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageEncryptionKey">storageEncryptionKey</a></code> | <code>aws-cdk-lib.interfaces.aws_kms.IKeyRef</code> | The KMS key for storage encryption. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageType">storageType</a></code> | <code>aws-cdk-lib.aws_rds.DBClusterStorageType</code> | The storage type to be associated with the DB cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.subnetGroup">subnetGroup</a></code> | <code>aws-cdk-lib.aws_rds.ISubnetGroup</code> | Existing subnet group for the cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | What subnets to run the RDS instances in. |
@@ -3990,6 +4122,19 @@ public readonly defaultDatabaseName: string;
 - *Default:* Database is not created in cluster.
 
 Name of a database which is automatically created inside the cluster.
+
+---
+
+##### `deleteAutomatedBackups`<sup>Optional</sup> <a name="deleteAutomatedBackups" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.deleteAutomatedBackups"></a>
+
+```typescript
+public readonly deleteAutomatedBackups: boolean;
+```
+
+- *Type:* boolean
+- *Default:* undefined - AWS RDS default is to remove automated backups immediately after the DB cluster is deleted, unless the AWS Backup policy specifies a point-in-time restore rule.
+
+Specifies whether to remove automated backups immediately after the DB cluster is deleted.
 
 ---
 
@@ -4451,6 +4596,23 @@ Security group.
 
 ---
 
+##### `serverlessV2AutoPauseDuration`<sup>Optional</sup> <a name="serverlessV2AutoPauseDuration" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.serverlessV2AutoPauseDuration"></a>
+
+```typescript
+public readonly serverlessV2AutoPauseDuration: Duration;
+```
+
+- *Type:* aws-cdk-lib.Duration
+- *Default:* The default is 300 seconds (5 minutes).
+
+Specifies the duration an Aurora Serverless v2 DB instance must be idle before Aurora attempts to automatically pause it.
+
+The duration must be between 300 seconds (5 minutes) and 86,400 seconds (24 hours).
+
+> [https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2-auto-pause.html](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2-auto-pause.html)
+
+---
+
 ##### `serverlessV2MaxCapacity`<sup>Optional</sup> <a name="serverlessV2MaxCapacity" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.serverlessV2MaxCapacity"></a>
 
 ```typescript
@@ -4508,10 +4670,10 @@ Whether to enable storage encryption.
 ##### `storageEncryptionKey`<sup>Optional</sup> <a name="storageEncryptionKey" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageEncryptionKey"></a>
 
 ```typescript
-public readonly storageEncryptionKey: IKey;
+public readonly storageEncryptionKey: IKeyRef;
 ```
 
-- *Type:* aws-cdk-lib.aws_kms.IKey
+- *Type:* aws-cdk-lib.interfaces.aws_kms.IKeyRef
 - *Default:* if storageEncrypted is true then the default master key, no key otherwise
 
 The KMS key for storage encryption.
@@ -4527,7 +4689,7 @@ public readonly storageType: DBClusterStorageType;
 ```
 
 - *Type:* aws-cdk-lib.aws_rds.DBClusterStorageType
-- *Default:* DBClusterStorageType.AURORA_IOPT1
+- *Default:* DBClusterStorageType.AURORA
 
 The storage type to be associated with the DB cluster.
 
@@ -4641,15 +4803,20 @@ const tmSorlEc2Props: TmSorlEc2Props = { ... }
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.ebsOptimized">ebsOptimized</a></code> | <code>boolean</code> | Indicates whether the instance is optimized for Amazon EBS I/O. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.enclaveEnabled">enclaveEnabled</a></code> | <code>boolean</code> | Whether the instance is enabled for AWS Nitro Enclaves. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.hibernationEnabled">hibernationEnabled</a></code> | <code>boolean</code> | Whether the instance is enabled for hibernation. |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.httpEndpoint">httpEndpoint</a></code> | <code>boolean</code> | Enables or disables the HTTP metadata endpoint on your instances. |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.httpProtocolIpv6">httpProtocolIpv6</a></code> | <code>boolean</code> | Enables or disables the IPv6 endpoint for the instance metadata service. |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.httpPutResponseHopLimit">httpPutResponseHopLimit</a></code> | <code>number</code> | The desired HTTP PUT response hop limit for instance metadata requests. |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.httpTokens">httpTokens</a></code> | <code>aws-cdk-lib.aws_ec2.HttpTokens</code> | The state of token usage for your instance metadata requests. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.init">init</a></code> | <code>aws-cdk-lib.aws_ec2.CloudFormationInit</code> | Apply the given CloudFormation Init configuration to the instance at startup. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.initOptions">initOptions</a></code> | <code>aws-cdk-lib.aws_ec2.ApplyCloudFormationInitOptions</code> | Use the given options for applying CloudFormation Init. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.instanceInitiatedShutdownBehavior">instanceInitiatedShutdownBehavior</a></code> | <code>aws-cdk-lib.aws_ec2.InstanceInitiatedShutdownBehavior</code> | Indicates whether an instance stops or terminates when you initiate shutdown from the instance (using the operating system command for system shutdown). |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.instanceMetadataTags">instanceMetadataTags</a></code> | <code>boolean</code> | Set to enabled to allow access to instance tags from the instance metadata. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.instanceName">instanceName</a></code> | <code>string</code> | The name of the instance. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.instanceProfile">instanceProfile</a></code> | <code>aws-cdk-lib.aws_iam.IInstanceProfile</code> | The instance profile used to pass role information to EC2 instances. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.ipv6AddressCount">ipv6AddressCount</a></code> | <code>number</code> | The number of IPv6 addresses to associate with the primary network interface. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.keyName">keyName</a></code> | <code>string</code> | Name of SSH keypair to grant access to instance. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.keyPair">keyPair</a></code> | <code>aws-cdk-lib.aws_ec2.IKeyPair</code> | The SSH keypair to grant access to the instance. |
-| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.placementGroup">placementGroup</a></code> | <code>aws-cdk-lib.aws_ec2.IPlacementGroup</code> | The placement group that you want to launch the instance into. |
+| <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.placementGroup">placementGroup</a></code> | <code>aws-cdk-lib.interfaces.aws_ec2.IPlacementGroupRef</code> | The placement group that you want to launch the instance into. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.privateIpAddress">privateIpAddress</a></code> | <code>string</code> | Defines a private IP address to associate with an instance. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.propagateTagsToVolumeOnCreation">propagateTagsToVolumeOnCreation</a></code> | <code>boolean</code> | Propagate the EC2 instance tags to the EBS volumes. |
 | <code><a href="#tm-cdk-constructs.TmSorlEc2Props.property.requireImdsv2">requireImdsv2</a></code> | <code>boolean</code> | Whether IMDSv2 should be required on this instance. |
@@ -4893,6 +5060,73 @@ You can't set both `enclaveEnabled` and `hibernationEnabled` to true on the same
 
 ---
 
+##### `httpEndpoint`<sup>Optional</sup> <a name="httpEndpoint" id="tm-cdk-constructs.TmSorlEc2Props.property.httpEndpoint"></a>
+
+```typescript
+public readonly httpEndpoint: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Enables or disables the HTTP metadata endpoint on your instances.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httpendpoint](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httpendpoint)
+
+---
+
+##### `httpProtocolIpv6`<sup>Optional</sup> <a name="httpProtocolIpv6" id="tm-cdk-constructs.TmSorlEc2Props.property.httpProtocolIpv6"></a>
+
+```typescript
+public readonly httpProtocolIpv6: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enables or disables the IPv6 endpoint for the instance metadata service.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httpprotocolipv6](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httpprotocolipv6)
+
+---
+
+##### `httpPutResponseHopLimit`<sup>Optional</sup> <a name="httpPutResponseHopLimit" id="tm-cdk-constructs.TmSorlEc2Props.property.httpPutResponseHopLimit"></a>
+
+```typescript
+public readonly httpPutResponseHopLimit: number;
+```
+
+- *Type:* number
+- *Default:* No default value specified by CloudFormation
+
+The desired HTTP PUT response hop limit for instance metadata requests.
+
+The larger the number, the further instance metadata requests can travel.
+
+Possible values: Integers from 1 to 64
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httpputresponsehoplimit](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httpputresponsehoplimit)
+
+---
+
+##### `httpTokens`<sup>Optional</sup> <a name="httpTokens" id="tm-cdk-constructs.TmSorlEc2Props.property.httpTokens"></a>
+
+```typescript
+public readonly httpTokens: HttpTokens;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.HttpTokens
+- *Default:* The default is conditional based on the AMI and account-level settings: - If the AMI's `ImdsSupport` is `v2.0` and the account level default is `no-preference`, the default is `HttpTokens.REQUIRED` - If the AMI's `ImdsSupport` is `v2.0` and the account level default is `V1 or V2`, the default is `HttpTokens.OPTIONAL` - See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-options.html#instance-metadata-options-order-of-precedence
+
+The state of token usage for your instance metadata requests.
+
+Set to 'required' to enforce IMDSv2. This is equivalent to using `requireImdsv2: true`,
+but allows you to configure other metadata options alongside IMDSv2 enforcement.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httptokens](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-httptokens)
+
+---
+
 ##### `init`<sup>Optional</sup> <a name="init" id="tm-cdk-constructs.TmSorlEc2Props.property.init"></a>
 
 ```typescript
@@ -4933,6 +5167,23 @@ public readonly instanceInitiatedShutdownBehavior: InstanceInitiatedShutdownBeha
 Indicates whether an instance stops or terminates when you initiate shutdown from the instance (using the operating system command for system shutdown).
 
 > [https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#Using_ChangingInstanceInitiatedShutdownBehavior](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html#Using_ChangingInstanceInitiatedShutdownBehavior)
+
+---
+
+##### `instanceMetadataTags`<sup>Optional</sup> <a name="instanceMetadataTags" id="tm-cdk-constructs.TmSorlEc2Props.property.instanceMetadataTags"></a>
+
+```typescript
+public readonly instanceMetadataTags: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Set to enabled to allow access to instance tags from the instance metadata.
+
+Set to disabled to turn off access to instance tags from the instance metadata.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-instancemetadatatags](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance-metadataoptions.html#cfn-ec2-instance-metadataoptions-instancemetadatatags)
 
 ---
 
@@ -5012,10 +5263,10 @@ The SSH keypair to grant access to the instance.
 ##### `placementGroup`<sup>Optional</sup> <a name="placementGroup" id="tm-cdk-constructs.TmSorlEc2Props.property.placementGroup"></a>
 
 ```typescript
-public readonly placementGroup: IPlacementGroup;
+public readonly placementGroup: IPlacementGroupRef;
 ```
 
-- *Type:* aws-cdk-lib.aws_ec2.IPlacementGroup
+- *Type:* aws-cdk-lib.interfaces.aws_ec2.IPlacementGroupRef
 - *Default:* no placement group will be used for this instance.
 
 The placement group that you want to launch the instance into.
@@ -5060,6 +5311,12 @@ public readonly requireImdsv2: boolean;
 - *Default:* false
 
 Whether IMDSv2 should be required on this instance.
+
+This is a simple boolean flag that enforces IMDSv2 by creating a Launch Template
+with `httpTokens: 'required'`. Use this for straightforward IMDSv2 enforcement.
+
+For more granular control over metadata options (like disabling the metadata endpoint,
+configuring hop limits, or enabling instance tags), use the individual metadata option properties instead.
 
 ---
 
