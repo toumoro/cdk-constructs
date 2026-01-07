@@ -23,7 +23,11 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // devDeps: [],             /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
-  npmProvenance: false,
+  // @ts-ignore - "npmPublishOptions" is hidden by the JsiiProject type definition but supported by the underlying NodeProject
+  publishToNpm: {
+    trustedPublishing: true,
+    npmProvenance: true, // Optional: defaults to true if trustedPublishing is on
+  },
   publishToPypi: {
     distName: 'tm-cdk-constructs',
     module: 'tm-cdk-constructs',
