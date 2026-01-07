@@ -52,7 +52,7 @@ export class TmEcsDeploymentHook extends Construct {
 
     // Deployment Hook Lambda
     const lambdaFunction = new lambda.Function(this, 'LambdaFunction', {
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         // Updated at ${Date.now()} (to trigger at every deployment)

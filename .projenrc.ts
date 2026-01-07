@@ -4,7 +4,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   author: 'Toumoro ',
   authorAddress: 'https://www.toumoro.com/',
   authorOrganization: true,
-  cdkVersion: '2.188.0',
+  cdkVersion: '2.233.0',
   defaultReleaseBranch: 'main',
   jsiiVersion: '^5.2.0',
   name: 'tm-cdk-constructs',
