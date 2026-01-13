@@ -1,4 +1,4 @@
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';;
+import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
 import { Construct } from 'constructs';
 
 interface TmRdsAuroraMysqlDashboardProps {
