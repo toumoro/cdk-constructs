@@ -32,19 +32,19 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
     props?: TmRdsAuroraMysqlServerlessProps,
   ) {
 
-    // Définir l'engine
+    // Define default engine
     const clusterEngine = rds.DatabaseClusterEngine.auroraMysql({
       version: rds.AuroraMysqlEngineVersion.VER_3_08_1,
     });
 
-    // Parameter group par défaut
+    // Default Parameter group
     const defaultParameterGroup = new rds.ParameterGroup(scope, `${id}ParametersGroup`, {
       engine: clusterEngine,
       parameters: {
         sql_mode: 'NO_ENGINE_SUBSTITUTION',
         max_connections: '500',
         wait_timeout: '60',
-        // Activer les slow query logs
+        // Enable slow query logs
         slow_query_log: '1',
         long_query_time: '3',
         log_output: 'FILE',
