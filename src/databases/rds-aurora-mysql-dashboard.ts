@@ -19,7 +19,7 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
 
     // 2. Widget : Top 20 slowest queries (Table)
     const slowQueryList = new cloudwatch.LogQueryWidget({
-      title: "Top 20 Slowest Queries",
+      title: 'Top 20 Slowest Queries',
       logGroupNames: [logGroupName],
       view: cloudwatch.LogQueryVisualizationType.TABLE,
       width: 24,
@@ -37,7 +37,7 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
 
     // 3. Widget : average response time (Graphic)
     const latencyOverTime = new cloudwatch.LogQueryWidget({
-      title: "Average Latency (seconds) over time",
+      title: 'Average Latency (seconds) over time',
       logGroupNames: [logGroupName],
       view: cloudwatch.LogQueryVisualizationType.LINE,
       width: 12,
@@ -51,7 +51,7 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
 
     // 4. Widget : slow queries volume per minute
     const volumeWidget = new cloudwatch.LogQueryWidget({
-      title: "Slow Query Count per minute",
+      title: 'Slow Query Count per minute',
       logGroupNames: [logGroupName],
       view: cloudwatch.LogQueryVisualizationType.BAR,
       width: 12,
