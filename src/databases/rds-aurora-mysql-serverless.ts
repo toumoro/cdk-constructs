@@ -32,6 +32,25 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
     props?: TmRdsAuroraMysqlServerlessProps,
   ) {
 
+    // Définir l'engine
+    const clusterEngine = rds.DatabaseClusterEngine.auroraMysql({
+      version: rds.AuroraMysqlEngineVersion.VER_3_08_1,
+    });
+
+    // Parameter group par défaut
+    const defaultParameterGroup = new rds.ParameterGroup(scope, `${id}ParametersGroup`, {
+      engine: clusterEngine,
+      parameters: {
+        sql_mode: 'NO_ENGINE_SUBSTITUTION',
+        max_connections: '500',
+        wait_timeout: '60',
+        // Activer les slow query logs
+        slow_query_log: '1',
+        long_query_time: '3',
+        log_output: 'FILE',
+      },
+    });
+
     const performanceInsightRetention = rds.PerformanceInsightRetention.DEFAULT;
     // Conditionally create the writer instance props
     const writerProps = props?.provisionedInstanceType
@@ -47,9 +66,8 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
      * The default properties for the RDS Aurora MySQL Serverless database cluster.
      */
     const defaultProps: rds.DatabaseClusterProps = {
-      engine: rds.DatabaseClusterEngine.auroraMysql({
-        version: rds.AuroraMysqlEngineVersion.VER_3_05_2,
-      }),
+      engine: clusterEngine,
+      parameterGroup: defaultParameterGroup,
       writer: writerProps,
       credentials: rds.Credentials.fromUsername('admin'), // The master credentials for the database
       // to true in production
