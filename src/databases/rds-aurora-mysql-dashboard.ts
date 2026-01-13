@@ -12,12 +12,12 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
 
     const logGroupName = `/aws/rds/cluster/${props.clusterIdentifier}/slowquery`;
 
-    // 1. Création du Dashboard
+    // Dashboard creation
     const dashboard = new cloudwatch.Dashboard(this, 'RdsAuroraMysqlDashboard', {
-      dashboardName: props.dashboardName || 'MysqlDashboards',
+      dashboardName: props.dashboardName || 'MysqlDashboard',
     });
 
-    // 2. Widget : Top 20 des requêtes les plus lentes (Tableau)
+    // 2. Widget : Top 20 slowest queries (Table)
     const slowQueryList = new cloudwatch.LogQueryWidget({
       title: "Top 20 Slowest Queries",
       logGroupNames: [logGroupName],
@@ -35,7 +35,7 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
     });
 
 
-    // 3. Widget : Évolution du temps de réponse moyen (Graphique)
+    // 3. Widget : average response time (Graphic)
     const latencyOverTime = new cloudwatch.LogQueryWidget({
       title: "Average Latency (seconds) over time",
       logGroupNames: [logGroupName],
@@ -49,7 +49,7 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
       `,
     });
 
-    // 4. Widget : Volume de requêtes lentes par minute
+    // 4. Widget : slow queries volume per minute
     const volumeWidget = new cloudwatch.LogQueryWidget({
       title: "Slow Query Count per minute",
       logGroupNames: [logGroupName],
@@ -61,7 +61,6 @@ export class TmRdsAuroraMysqlDashboard extends Construct {
       `,
     });
 
-    // Organisation du Dashboard : Une ligne pour les graphiques, une ligne pour le tableau
     dashboard.addWidgets(latencyOverTime, volumeWidget);
     dashboard.addWidgets(slowQueryList);
   }
