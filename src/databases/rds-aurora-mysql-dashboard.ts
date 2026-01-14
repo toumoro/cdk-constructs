@@ -2,7 +2,10 @@ import * as cw from 'aws-cdk-lib/aws-cloudwatch';
 import { Construct } from 'constructs';
 
 export interface TmRdsAuroraMysqlDashboardProps extends cw.DashboardProps {
-    clusterIdentifier: string;
+    /**
+   * The identifier of the RDS cluster to monitor.
+   */
+    readonly clusterIdentifier: string;
 }
 
 export class TmRdsAuroraMysqlDashboard extends cw.Dashboard {
