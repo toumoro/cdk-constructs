@@ -813,6 +813,279 @@ The CodePipeline created by the construct.
 ---
 
 
+### TmRdsAuroraMysqlDashboard <a name="TmRdsAuroraMysqlDashboard" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard"></a>
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer"></a>
+
+```typescript
+import { TmRdsAuroraMysqlDashboard } from 'tm-cdk-constructs'
+
+new TmRdsAuroraMysqlDashboard(scope: Construct, id: string, props: TmRdsAuroraMysqlDashboardProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps">TmRdsAuroraMysqlDashboardProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps">TmRdsAuroraMysqlDashboardProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addVariable">addVariable</a></code> | Add a variable to the dashboard. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addWidgets">addWidgets</a></code> | Add a widget to the dashboard. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `applyRemovalPolicy` <a name="applyRemovalPolicy" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyRemovalPolicy"></a>
+
+```typescript
+public applyRemovalPolicy(policy: RemovalPolicy): void
+```
+
+Apply the given removal policy to this resource.
+
+The Removal Policy controls what happens to this resource when it stops
+being managed by CloudFormation, either because you've removed it from the
+CDK application or because you've made a change that requires the resource
+to be replaced.
+
+The resource can be deleted (`RemovalPolicy.DESTROY`), or left in your AWS
+account for data recovery and cleanup later (`RemovalPolicy.RETAIN`).
+
+###### `policy`<sup>Required</sup> <a name="policy" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyRemovalPolicy.parameter.policy"></a>
+
+- *Type:* aws-cdk-lib.RemovalPolicy
+
+---
+
+##### `addVariable` <a name="addVariable" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addVariable"></a>
+
+```typescript
+public addVariable(variable: IVariable): void
+```
+
+Add a variable to the dashboard.
+
+> [https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_dashboard_variables.html](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_dashboard_variables.html)
+
+###### `variable`<sup>Required</sup> <a name="variable" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addVariable.parameter.variable"></a>
+
+- *Type:* aws-cdk-lib.aws_cloudwatch.IVariable
+
+---
+
+##### `addWidgets` <a name="addWidgets" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addWidgets"></a>
+
+```typescript
+public addWidgets(widgets: ...IWidget[]): void
+```
+
+Add a widget to the dashboard.
+
+Widgets given in multiple calls to add() will be laid out stacked on
+top of each other.
+
+Multiple widgets added in the same call to add() will be laid out next
+to each other.
+
+###### `widgets`<sup>Required</sup> <a name="widgets" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addWidgets.parameter.widgets"></a>
+
+- *Type:* ...aws-cdk-lib.aws_cloudwatch.IWidget[]
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isOwnedResource">isOwnedResource</a></code> | Returns true if the construct was created by CDK, and false otherwise. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isResource">isResource</a></code> | Check whether the given construct is a Resource. |
+
+---
+
+##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isConstruct"></a>
+
+```typescript
+import { TmRdsAuroraMysqlDashboard } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlDashboard.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `isOwnedResource` <a name="isOwnedResource" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isOwnedResource"></a>
+
+```typescript
+import { TmRdsAuroraMysqlDashboard } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlDashboard.isOwnedResource(construct: IConstruct)
+```
+
+Returns true if the construct was created by CDK, and false otherwise.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isOwnedResource.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+---
+
+##### `isResource` <a name="isResource" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isResource"></a>
+
+```typescript
+import { TmRdsAuroraMysqlDashboard } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlDashboard.isResource(construct: IConstruct)
+```
+
+Check whether the given construct is a Resource.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isResource.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this resource belongs to. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.stack">stack</a></code> | <code>aws-cdk-lib.Stack</code> | The stack in which this resource is defined. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.dashboardArn">dashboardArn</a></code> | <code>string</code> | ARN of this dashboard. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.dashboardName">dashboardName</a></code> | <code>string</code> | The name of this dashboard. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this resource belongs to.
+
+For resources that are created and managed in a Stack (those created by
+creating new class instances like `new Role()`, `new Bucket()`, etc.), this
+is always the same as the environment of the stack they belong to.
+
+For referenced resources (those obtained from referencing methods like
+`Role.fromRoleArn()`, `Bucket.fromBucketName()`, etc.), they might be
+different than the stack they were imported into.
+
+---
+
+##### `stack`<sup>Required</sup> <a name="stack" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.stack"></a>
+
+```typescript
+public readonly stack: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+The stack in which this resource is defined.
+
+---
+
+##### `dashboardArn`<sup>Required</sup> <a name="dashboardArn" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.dashboardArn"></a>
+
+```typescript
+public readonly dashboardArn: string;
+```
+
+- *Type:* string
+
+ARN of this dashboard.
+
+---
+
+##### `dashboardName`<sup>Required</sup> <a name="dashboardName" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.dashboardName"></a>
+
+```typescript
+public readonly dashboardName: string;
+```
+
+- *Type:* string
+
+The name of this dashboard.
+
+---
+
+#### Constants <a name="Constants" id="Constants"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.PROPERTY_INJECTION_ID">PROPERTY_INJECTION_ID</a></code> | <code>string</code> | Uniquely identifies this class. |
+
+---
+
+##### `PROPERTY_INJECTION_ID`<sup>Required</sup> <a name="PROPERTY_INJECTION_ID" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.property.PROPERTY_INJECTION_ID"></a>
+
+```typescript
+public readonly PROPERTY_INJECTION_ID: string;
+```
+
+- *Type:* string
+
+Uniquely identifies this class.
+
+---
+
 ### TmRdsAuroraMysqlServerless <a name="TmRdsAuroraMysqlServerless" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless"></a>
 
 #### Initializers <a name="Initializers" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.Initializer"></a>
@@ -3850,6 +4123,156 @@ public readonly synthCommand: string[];
 - *Type:* string[]
 
 The command to run in the synth step.
+
+---
+
+### TmRdsAuroraMysqlDashboardProps <a name="TmRdsAuroraMysqlDashboardProps" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps"></a>
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.Initializer"></a>
+
+```typescript
+import { TmRdsAuroraMysqlDashboardProps } from 'tm-cdk-constructs'
+
+const tmRdsAuroraMysqlDashboardProps: TmRdsAuroraMysqlDashboardProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.dashboardName">dashboardName</a></code> | <code>string</code> | Name of the dashboard. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.defaultInterval">defaultInterval</a></code> | <code>aws-cdk-lib.Duration</code> | Interval duration for metrics. You can specify defaultInterval with the relative time(eg. cdk.Duration.days(7)). |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.end">end</a></code> | <code>string</code> | The end of the time range to use for each widget on the dashboard when the dashboard loads. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.periodOverride">periodOverride</a></code> | <code>aws-cdk-lib.aws_cloudwatch.PeriodOverride</code> | Use this field to specify the period for the graphs when the dashboard loads. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.start">start</a></code> | <code>string</code> | The start of the time range to use for each widget on the dashboard. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.variables">variables</a></code> | <code>aws-cdk-lib.aws_cloudwatch.IVariable[]</code> | A list of dashboard variables. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.widgets">widgets</a></code> | <code>aws-cdk-lib.aws_cloudwatch.IWidget[][]</code> | Initial set of widgets on the dashboard. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.clusterIdentifier">clusterIdentifier</a></code> | <code>string</code> | The identifier of the RDS cluster to monitor. |
+
+---
+
+##### `dashboardName`<sup>Optional</sup> <a name="dashboardName" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.dashboardName"></a>
+
+```typescript
+public readonly dashboardName: string;
+```
+
+- *Type:* string
+- *Default:* automatically generated name
+
+Name of the dashboard.
+
+If set, must only contain alphanumerics, dash (-) and underscore (_)
+
+---
+
+##### `defaultInterval`<sup>Optional</sup> <a name="defaultInterval" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.defaultInterval"></a>
+
+```typescript
+public readonly defaultInterval: Duration;
+```
+
+- *Type:* aws-cdk-lib.Duration
+- *Default:* When the dashboard loads, the defaultInterval time will be the default time range.
+
+Interval duration for metrics. You can specify defaultInterval with the relative time(eg. cdk.Duration.days(7)).
+
+Both properties `defaultInterval` and `start` cannot be set at once.
+
+---
+
+##### `end`<sup>Optional</sup> <a name="end" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.end"></a>
+
+```typescript
+public readonly end: string;
+```
+
+- *Type:* string
+- *Default:* When the dashboard loads, the end date will be the current time.
+
+The end of the time range to use for each widget on the dashboard when the dashboard loads.
+
+If you specify a value for end, you must also specify a value for start.
+Specify an absolute time in the ISO 8601 format. For example, 2018-12-17T06:00:00.000Z.
+
+---
+
+##### `periodOverride`<sup>Optional</sup> <a name="periodOverride" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.periodOverride"></a>
+
+```typescript
+public readonly periodOverride: PeriodOverride;
+```
+
+- *Type:* aws-cdk-lib.aws_cloudwatch.PeriodOverride
+- *Default:* Auto
+
+Use this field to specify the period for the graphs when the dashboard loads.
+
+Specifying `Auto` causes the period of all graphs on the dashboard to automatically adapt to the time range of the dashboard.
+Specifying `Inherit` ensures that the period set for each graph is always obeyed.
+
+---
+
+##### `start`<sup>Optional</sup> <a name="start" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.start"></a>
+
+```typescript
+public readonly start: string;
+```
+
+- *Type:* string
+- *Default:* When the dashboard loads, the start time will be the default time range.
+
+The start of the time range to use for each widget on the dashboard.
+
+You can specify start without specifying end to specify a relative time range that ends with the current time.
+In this case, the value of start must begin with -P, and you can use M, H, D, W and M as abbreviations for
+minutes, hours, days, weeks and months. For example, -PT8H shows the last 8 hours and -P3M shows the last three months.
+You can also use start along with an end field, to specify an absolute time range.
+When specifying an absolute time range, use the ISO 8601 format. For example, 2018-12-17T06:00:00.000Z.
+
+Both properties `defaultInterval` and `start` cannot be set at once.
+
+---
+
+##### `variables`<sup>Optional</sup> <a name="variables" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.variables"></a>
+
+```typescript
+public readonly variables: IVariable[];
+```
+
+- *Type:* aws-cdk-lib.aws_cloudwatch.IVariable[]
+- *Default:* No variables
+
+A list of dashboard variables.
+
+> [https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_dashboard_variables.html#cloudwatch_dashboard_variables_types](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_dashboard_variables.html#cloudwatch_dashboard_variables_types)
+
+---
+
+##### `widgets`<sup>Optional</sup> <a name="widgets" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.widgets"></a>
+
+```typescript
+public readonly widgets: IWidget[][];
+```
+
+- *Type:* aws-cdk-lib.aws_cloudwatch.IWidget[][]
+- *Default:* No widgets
+
+Initial set of widgets on the dashboard.
+
+One array represents a row of widgets.
+
+---
+
+##### `clusterIdentifier`<sup>Required</sup> <a name="clusterIdentifier" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.clusterIdentifier"></a>
+
+```typescript
+public readonly clusterIdentifier: string;
+```
+
+- *Type:* string
+
+The identifier of the RDS cluster to monitor.
 
 ---
 
