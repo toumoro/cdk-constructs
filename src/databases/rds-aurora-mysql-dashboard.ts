@@ -1,7 +1,7 @@
 import * as cw from 'aws-cdk-lib/aws-cloudwatch';
 import { Construct } from 'constructs';
 
-interface TmRdsAuroraMysqlDashboardProps extends cw.DashboardProps {
+export interface TmRdsAuroraMysqlDashboardProps extends cw.DashboardProps {
     clusterIdentifier: string;
 }
 
