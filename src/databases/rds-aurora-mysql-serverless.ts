@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as logs from 'aws-cdk-lib/aws-logs';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import { Construct } from 'constructs';
 
@@ -78,6 +79,8 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PRIVATE_ISOLATED,
       },
+      cloudwatchLogsExports: ['slowquery'],
+      cloudwatchLogsRetention: logs.RetentionDays.ONE_MONTH,
     };
 
     /**
