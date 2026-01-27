@@ -3236,6 +3236,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps">ecsDeploymentHookProps</a></code> | <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a></code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.enableSpotCapacityProvider">enableSpotCapacityProvider</a></code> | <code>boolean</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
@@ -3967,6 +3968,16 @@ public readonly efsVolumes: IIefsVolumes[];
 ```
 
 - *Type:* <a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]
+
+---
+
+##### `enableSpotCapacityProvider`<sup>Optional</sup> <a name="enableSpotCapacityProvider" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.enableSpotCapacityProvider"></a>
+
+```typescript
+public readonly enableSpotCapacityProvider: boolean;
+```
+
+- *Type:* boolean
 
 ---
 
