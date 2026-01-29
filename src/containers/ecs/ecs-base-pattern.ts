@@ -119,6 +119,11 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * targetMemoryUtilizationPercent
   */
   readonly targetMemoryUtilizationPercent?: number;
+
+  /*
+  * Enable Spot Capacity Provider
+  */
+  readonly enableSpotCapacityProvider?: boolean;
 }
 
 
@@ -163,7 +168,27 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       },
     };
 
-    const mergedProps = { ...defautProps, ...props };
+    let capacityProviderStrategies;
+    if (props.enableSpotCapacityProvider) {
+      capacityProviderStrategies = [
+        {
+          capacityProvider: 'FARGATE',
+          base: 1,
+          weight: 0,
+        },
+        {
+          capacityProvider: 'FARGATE_SPOT',
+          base: 0,
+          weight: 1,
+        },
+      ];
+    }
+
+    const mergedProps = {
+      ...defautProps,
+      ...props,
+      ...(capacityProviderStrategies && { capacityProviderStrategies }),
+    };
 
     super(scope, id, mergedProps);
 
