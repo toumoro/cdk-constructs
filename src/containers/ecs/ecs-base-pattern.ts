@@ -87,7 +87,7 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   /*
   * The build container args.
   */
-  readonly buildContainerArgs?: { [key: string]: string};
+  readonly buildContainerArgs?: { [key: string]: string };
   /*
   * The secrets to pass to the container.
   */

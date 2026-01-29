@@ -62,7 +62,7 @@ Returns a string representation of this construct.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.isConstruct"></a>
 
 ```typescript
 import { TmAnsiblePlaybookEc2 } from 'tm-cdk-constructs'
@@ -71,6 +71,20 @@ TmAnsiblePlaybookEc2.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.isConstruct.parameter.x"></a>
 
@@ -161,7 +175,7 @@ Returns a string representation of this construct.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.isConstruct"></a>
 
 ```typescript
 import { TmApplicationLoadBalancedFargateService } from 'tm-cdk-constructs'
@@ -170,6 +184,20 @@ TmApplicationLoadBalancedFargateService.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.isConstruct.parameter.x"></a>
 
@@ -412,7 +440,7 @@ Returns a string representation of this construct.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmEcsDeploymentHook.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmEcsDeploymentHook.isConstruct"></a>
 
 ```typescript
 import { TmEcsDeploymentHook } from 'tm-cdk-constructs'
@@ -421,6 +449,20 @@ TmEcsDeploymentHook.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmEcsDeploymentHook.isConstruct.parameter.x"></a>
 
@@ -511,7 +553,7 @@ Returns a string representation of this construct.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmElasticacheRedisCluster.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmElasticacheRedisCluster.isConstruct"></a>
 
 ```typescript
 import { TmElasticacheRedisCluster } from 'tm-cdk-constructs'
@@ -520,6 +562,20 @@ TmElasticacheRedisCluster.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmElasticacheRedisCluster.isConstruct.parameter.x"></a>
 
@@ -654,7 +710,7 @@ Returns a string representation of this construct.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmPatchManager.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmPatchManager.isConstruct"></a>
 
 ```typescript
 import { TmPatchManager } from 'tm-cdk-constructs'
@@ -663,6 +719,20 @@ TmPatchManager.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmPatchManager.isConstruct.parameter.x"></a>
 
@@ -761,7 +831,7 @@ Returns a string representation of this construct.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmPipeline.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmPipeline.isConstruct"></a>
 
 ```typescript
 import { TmPipeline } from 'tm-cdk-constructs'
@@ -770,6 +840,20 @@ TmPipeline.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmPipeline.isConstruct.parameter.x"></a>
 
@@ -936,7 +1020,7 @@ to each other.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isConstruct"></a>
 
 ```typescript
 import { TmRdsAuroraMysqlDashboard } from 'tm-cdk-constructs'
@@ -945,6 +1029,20 @@ TmRdsAuroraMysqlDashboard.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.isConstruct.parameter.x"></a>
 
@@ -1130,7 +1228,7 @@ new TmRdsAuroraMysqlServerless(scope: Construct, id: string, props?: TmRdsAurora
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.addProxy">addProxy</a></code> | Add a new db proxy to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.asSecretAttachmentTarget">asSecretAttachmentTarget</a></code> | Renders the secret attachment target specifications. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.grantConnect">grantConnect</a></code> | Grant the given identity connection access to the Cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.grantConnect">grantConnect</a></code> | [disable-awslint:no-grants]. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.grantDataApiAccess">grantDataApiAccess</a></code> | Grant the given identity to access the Data API. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metric">metric</a></code> | Return the given named metric for this DBCluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricCPUUtilization">metricCPUUtilization</a></code> | The percentage of CPU utilization. |
@@ -1145,8 +1243,8 @@ new TmRdsAuroraMysqlServerless(scope: Construct, id: string, props?: TmRdsAurora
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricSnapshotStorageUsed">metricSnapshotStorageUsed</a></code> | The total amount of backup storage in bytes consumed by all Aurora snapshots outside its backup retention window. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricTotalBackupStorageBilled">metricTotalBackupStorageBilled</a></code> | The total amount of backup storage in bytes for which you are billed. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeBytesUsed">metricVolumeBytesUsed</a></code> | The amount of storage used by your Aurora DB instance, in bytes. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeReadIOPs">metricVolumeReadIOPs</a></code> | The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeWriteIOPs">metricVolumeWriteIOPs</a></code> | The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeReadIOPs">metricVolumeReadIOPs</a></code> | The average number of disk read I/O operations per second. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeWriteIOPs">metricVolumeWriteIOPs</a></code> | The average number of disk write I/O operations per second. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.addRotationMultiUser">addRotationMultiUser</a></code> | Adds the multi user rotation to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.addRotationSingleUser">addRotationSingleUser</a></code> | Adds the single user rotation of the master password to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricACUUtilization">metricACUUtilization</a></code> | This value is represented as a percentage. |
@@ -1218,7 +1316,7 @@ Renders the secret attachment target specifications.
 public grantConnect(grantee: IGrantable, dbUser: string): Grant
 ```
 
-Grant the given identity connection access to the Cluster.
+[disable-awslint:no-grants].
 
 ###### `grantee`<sup>Required</sup> <a name="grantee" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.grantConnect.parameter.grantee"></a>
 
@@ -1239,6 +1337,8 @@ public grantDataApiAccess(grantee: IGrantable): Grant
 ```
 
 Grant the given identity to access the Data API.
+
+[disable-awslint:no-grants]
 
 ###### `grantee`<sup>Required</sup> <a name="grantee" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.grantDataApiAccess.parameter.grantee"></a>
 
@@ -1464,9 +1564,11 @@ Average over 5 minutes
 public metricVolumeReadIOPs(props?: MetricOptions): Metric
 ```
 
-The number of billed read I/O operations from a cluster volume, reported at 5-minute intervals.
+The average number of disk read I/O operations per second.
 
-Average over 5 minutes
+This metric is only available for Aurora database clusters.
+For non-Aurora RDS clusters, this metric will not return any data
+in CloudWatch.
 
 ###### `props`<sup>Optional</sup> <a name="props" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeReadIOPs.parameter.props"></a>
 
@@ -1480,9 +1582,11 @@ Average over 5 minutes
 public metricVolumeWriteIOPs(props?: MetricOptions): Metric
 ```
 
-The number of write disk I/O operations to the cluster volume, reported at 5-minute intervals.
+The average number of disk write I/O operations per second.
 
-Average over 5 minutes
+This metric is only available for Aurora database clusters.
+For non-Aurora RDS clusters, this metric will not return any data
+in CloudWatch.
 
 ###### `props`<sup>Optional</sup> <a name="props" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.metricVolumeWriteIOPs.parameter.props"></a>
 
@@ -1574,7 +1678,7 @@ As a cluster-level metric, it represents the average of the ServerlessDatabaseCa
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.isConstruct"></a>
 
 ```typescript
 import { TmRdsAuroraMysqlServerless } from 'tm-cdk-constructs'
@@ -1583,6 +1687,20 @@ TmRdsAuroraMysqlServerless.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.isConstruct.parameter.x"></a>
 
@@ -1693,6 +1811,7 @@ Lookup an existing DatabaseCluster using clusterIdentifier.
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.clusterReadEndpoint">clusterReadEndpoint</a></code> | <code>aws-cdk-lib.aws_rds.Endpoint</code> | Endpoint to use for load-balanced read-only operations. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.clusterResourceIdentifier">clusterResourceIdentifier</a></code> | <code>string</code> | The immutable identifier for the cluster; for example: cluster-ABCD1234EFGH5678IJKL90MNOP. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.connections">connections</a></code> | <code>aws-cdk-lib.aws_ec2.Connections</code> | Access to the network connections. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.dbClusterRef">dbClusterRef</a></code> | <code>aws-cdk-lib.interfaces.aws_rds.DBClusterReference</code> | A reference to this database cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.instanceEndpoints">instanceEndpoints</a></code> | <code>aws-cdk-lib.aws_rds.Endpoint[]</code> | Endpoints which address each individual replica. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.instanceIdentifiers">instanceIdentifiers</a></code> | <code>string[]</code> | Identifiers of the replicas. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.engine">engine</a></code> | <code>aws-cdk-lib.aws_rds.IClusterEngine</code> | The engine for this Cluster. |
@@ -1825,6 +1944,18 @@ public readonly connections: Connections;
 - *Type:* aws-cdk-lib.aws_ec2.Connections
 
 Access to the network connections.
+
+---
+
+##### `dbClusterRef`<sup>Required</sup> <a name="dbClusterRef" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.property.dbClusterRef"></a>
+
+```typescript
+public readonly dbClusterRef: DBClusterReference;
+```
+
+- *Type:* aws-cdk-lib.interfaces.aws_rds.DBClusterReference
+
+A reference to this database cluster.
 
 ---
 
@@ -2181,7 +2312,7 @@ This does the following:
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmSolrEc2.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmSolrEc2.isConstruct"></a>
 
 ```typescript
 import { TmSolrEc2 } from 'tm-cdk-constructs'
@@ -2190,6 +2321,20 @@ TmSolrEc2.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmSolrEc2.isConstruct.parameter.x"></a>
 
@@ -2702,7 +2847,7 @@ Returns IDs of selected subnets.
 
 ---
 
-##### ~~`isConstruct`~~ <a name="isConstruct" id="tm-cdk-constructs.TmVpcBase.isConstruct"></a>
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmVpcBase.isConstruct"></a>
 
 ```typescript
 import { TmVpcBase } from 'tm-cdk-constructs'
@@ -2711,6 +2856,20 @@ TmVpcBase.isConstruct(x: any)
 ```
 
 Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
 
 ###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmVpcBase.isConstruct.parameter.x"></a>
 
@@ -4341,7 +4500,7 @@ const tmRdsAuroraMysqlServerlessProps: TmRdsAuroraMysqlServerlessProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageEncrypted">storageEncrypted</a></code> | <code>boolean</code> | Whether to enable storage encryption. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageEncryptionKey">storageEncryptionKey</a></code> | <code>aws-cdk-lib.interfaces.aws_kms.IKeyRef</code> | The KMS key for storage encryption. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.storageType">storageType</a></code> | <code>aws-cdk-lib.aws_rds.DBClusterStorageType</code> | The storage type to be associated with the DB cluster. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.subnetGroup">subnetGroup</a></code> | <code>aws-cdk-lib.aws_rds.ISubnetGroup</code> | Existing subnet group for the cluster. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.subnetGroup">subnetGroup</a></code> | <code>aws-cdk-lib.interfaces.aws_rds.IDBSubnetGroupRef</code> | Existing subnet group for the cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | What subnets to run the RDS instances in. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.vpcSubnets">vpcSubnets</a></code> | <code>aws-cdk-lib.aws_ec2.SubnetSelection</code> | Where to place the instances within the VPC. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.writer">writer</a></code> | <code>aws-cdk-lib.aws_rds.IClusterInstance</code> | The instance to use for the cluster writer. |
@@ -5121,10 +5280,10 @@ The storage type to be associated with the DB cluster.
 ##### `subnetGroup`<sup>Optional</sup> <a name="subnetGroup" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.subnetGroup"></a>
 
 ```typescript
-public readonly subnetGroup: ISubnetGroup;
+public readonly subnetGroup: IDBSubnetGroupRef;
 ```
 
-- *Type:* aws-cdk-lib.aws_rds.ISubnetGroup
+- *Type:* aws-cdk-lib.interfaces.aws_rds.IDBSubnetGroupRef
 - *Default:* a new subnet group will be created.
 
 Existing subnet group for the cluster.
