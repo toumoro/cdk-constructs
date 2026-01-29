@@ -35,7 +35,7 @@ export class TmRdsAuroraMysqlServerless extends rds.DatabaseCluster {
 
     // Define default engine
     const clusterEngine = rds.DatabaseClusterEngine.auroraMysql({
-      version: rds.AuroraMysqlEngineVersion.VER_3_08_1,
+      version: rds.AuroraMysqlEngineVersion.VER_3_10_2,
     });
 
     // Default Parameter group
