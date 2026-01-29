@@ -34,7 +34,7 @@ export interface TmSorlEc2Props extends ec2.InstanceProps {
   /*
     * The build container args.
     */
-  readonly buildContainerArgs?: { [key: string]: string};
+  readonly buildContainerArgs?: { [key: string]: string };
   /*
     * Solr options for the container
     */
