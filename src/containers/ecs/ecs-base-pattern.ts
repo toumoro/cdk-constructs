@@ -161,6 +161,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         containerName: 'web',
         secrets: props.secrets,
       },
+      circuitBreaker: { rollback: true },
     };
 
     const mergedProps = { ...defautProps, ...props };
