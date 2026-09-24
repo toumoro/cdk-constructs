@@ -43,6 +43,7 @@ new TmAnsiblePlaybookEc2(scope: Construct, id: string, props: IAnsiblePlaybookEc
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmAnsiblePlaybookEc2.with">with</a></code> | Applies one or more mixins to this construct. |
 
 ---
 
@@ -53,6 +54,27 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmAnsiblePlaybookEc2.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
 
 #### Static Functions <a name="Static Functions" id="Static Functions"></a>
 
@@ -156,6 +178,7 @@ new TmApplicationLoadBalancedFargateService(scope: Construct, id: string, props:
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.with">with</a></code> | Applies one or more mixins to this construct. |
 
 ---
 
@@ -166,6 +189,27 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
 
 #### Static Functions <a name="Static Functions" id="Static Functions"></a>
 
@@ -421,6 +465,7 @@ new TmEcsDeploymentHook(scope: Construct, id: string, props: ITmEcsDeploymentHoo
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmEcsDeploymentHook.with">with</a></code> | Applies one or more mixins to this construct. |
 
 ---
 
@@ -431,6 +476,27 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmEcsDeploymentHook.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmEcsDeploymentHook.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
 
 #### Static Functions <a name="Static Functions" id="Static Functions"></a>
 
@@ -534,6 +600,7 @@ new TmElasticacheRedisCluster(scope: Construct, id: string, props: IRedisCluster
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmElasticacheRedisCluster.with">with</a></code> | Applies one or more mixins to this construct. |
 
 ---
 
@@ -544,6 +611,27 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmElasticacheRedisCluster.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmElasticacheRedisCluster.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
 
 #### Static Functions <a name="Static Functions" id="Static Functions"></a>
 
@@ -691,6 +779,7 @@ new TmPatchManager(scope: Construct, id: string, props: IPatchManagerProps)
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmPatchManager.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmPatchManager.with">with</a></code> | Applies one or more mixins to this construct. |
 
 ---
 
@@ -701,6 +790,27 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmPatchManager.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmPatchManager.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
 
 #### Static Functions <a name="Static Functions" id="Static Functions"></a>
 
@@ -812,6 +922,7 @@ The properties for the construct.
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmPipeline.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmPipeline.with">with</a></code> | Applies one or more mixins to this construct. |
 
 ---
 
@@ -822,6 +933,27 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmPipeline.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmPipeline.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
 
 #### Static Functions <a name="Static Functions" id="Static Functions"></a>
 
@@ -938,6 +1070,7 @@ new TmRdsAuroraMysqlDashboard(scope: Construct, id: string, props: TmRdsAuroraMy
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.with">with</a></code> | Applies one or more mixins to this construct. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addVariable">addVariable</a></code> | Add a variable to the dashboard. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addWidgets">addWidgets</a></code> | Add a widget to the dashboard. |
@@ -951,6 +1084,25 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
 
 ##### `applyRemovalPolicy` <a name="applyRemovalPolicy" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyRemovalPolicy"></a>
 
@@ -1225,6 +1377,7 @@ new TmRdsAuroraMysqlServerless(scope: Construct, id: string, props?: TmRdsAurora
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.with">with</a></code> | Applies one or more mixins to this construct. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.addProxy">addProxy</a></code> | Add a new db proxy to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.asSecretAttachmentTarget">asSecretAttachmentTarget</a></code> | Renders the secret attachment target specifications. |
@@ -1259,6 +1412,25 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
 
 ##### `applyRemovalPolicy` <a name="applyRemovalPolicy" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyRemovalPolicy"></a>
 
@@ -2192,6 +2364,7 @@ new TmSolrEc2(scope: Construct, id: string, props: TmSorlEc2Props)
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmSolrEc2.with">with</a></code> | Applies one or more mixins to this construct. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.addSecurityGroup">addSecurityGroup</a></code> | Add the security group to the instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.addToRolePolicy">addToRolePolicy</a></code> | Adds a statement to the IAM role assumed by the instance. |
@@ -2207,6 +2380,25 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmSolrEc2.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmSolrEc2.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
 
 ##### `applyRemovalPolicy` <a name="applyRemovalPolicy" id="tm-cdk-constructs.TmSolrEc2.applyRemovalPolicy"></a>
 
@@ -2666,6 +2858,7 @@ new TmVpcBase(scope: Construct, id: string, props: TmVpcProps)
 | **Name** | **Description** |
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmVpcBase.with">with</a></code> | Applies one or more mixins to this construct. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.addClientVpnEndpoint">addClientVpnEndpoint</a></code> | Adds a new client VPN endpoint to this VPC. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.addFlowLog">addFlowLog</a></code> | Adds a new flow log to this VPC. |
@@ -2684,6 +2877,25 @@ public toString(): string
 ```
 
 Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmVpcBase.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmVpcBase.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
 
 ##### `applyRemovalPolicy` <a name="applyRemovalPolicy" id="tm-cdk-constructs.TmVpcBase.applyRemovalPolicy"></a>
 
@@ -4300,7 +4512,7 @@ const tmRdsAuroraMysqlDashboardProps: TmRdsAuroraMysqlDashboardProps = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.dashboardName">dashboardName</a></code> | <code>string</code> | Name of the dashboard. |
-| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.defaultInterval">defaultInterval</a></code> | <code>aws-cdk-lib.Duration</code> | Interval duration for metrics. You can specify defaultInterval with the relative time(eg. cdk.Duration.days(7)). |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.defaultInterval">defaultInterval</a></code> | <code>aws-cdk-lib.Duration</code> | Interval duration for metrics. You can specify defaultInterval with the relative time (e.g. cdk.Duration.days(7)). |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.end">end</a></code> | <code>string</code> | The end of the time range to use for each widget on the dashboard when the dashboard loads. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.periodOverride">periodOverride</a></code> | <code>aws-cdk-lib.aws_cloudwatch.PeriodOverride</code> | Use this field to specify the period for the graphs when the dashboard loads. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboardProps.property.start">start</a></code> | <code>string</code> | The start of the time range to use for each widget on the dashboard. |
@@ -4334,7 +4546,7 @@ public readonly defaultInterval: Duration;
 - *Type:* aws-cdk-lib.Duration
 - *Default:* When the dashboard loads, the defaultInterval time will be the default time range.
 
-Interval duration for metrics. You can specify defaultInterval with the relative time(eg. cdk.Duration.days(7)).
+Interval duration for metrics. You can specify defaultInterval with the relative time (e.g. cdk.Duration.days(7)).
 
 Both properties `defaultInterval` and `start` cannot be set at once.
 
@@ -5583,7 +5795,7 @@ To change this attribute after launch, use [ModifyInstanceAttribute](https://doc
 Alternatively, if you set InstanceInitiatedShutdownBehavior to terminate, you can terminate the instance
 by running the shutdown command from the instance.
 
-> [http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-instance.html#cfn-ec2-instance-disableapitermination](http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-instance.html#cfn-ec2-instance-disableapitermination)
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-instance.html#cfn-ec2-instance-disableapitermination](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-instance.html#cfn-ec2-instance-disableapitermination)
 
 ---
 
