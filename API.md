@@ -3607,6 +3607,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps">ecsDeploymentHookProps</a></code> | <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a></code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancingAlgorithmType">loadBalancingAlgorithmType</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.TargetGroupLoadBalancingAlgorithmType</code> | The load balancing algorithm the target group uses to route requests to its registered targets. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
@@ -4338,6 +4339,19 @@ public readonly efsVolumes: IIefsVolumes[];
 ```
 
 - *Type:* <a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]
+
+---
+
+##### `loadBalancingAlgorithmType`<sup>Optional</sup> <a name="loadBalancingAlgorithmType" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancingAlgorithmType"></a>
+
+```typescript
+public readonly loadBalancingAlgorithmType: TargetGroupLoadBalancingAlgorithmType;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticloadbalancingv2.TargetGroupLoadBalancingAlgorithmType
+- *Default:* TargetGroupLoadBalancingAlgorithmType.LEAST_OUTSTANDING_REQUESTS
+
+The load balancing algorithm the target group uses to route requests to its registered targets.
 
 ---
 
