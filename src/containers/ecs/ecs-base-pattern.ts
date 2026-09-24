@@ -119,6 +119,14 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * targetMemoryUtilizationPercent
   */
   readonly targetMemoryUtilizationPercent?: number;
+
+  /**
+   * The load balancing algorithm the target group uses to route requests to its
+   * registered targets.
+   *
+   * @default TargetGroupLoadBalancingAlgorithmType.LEAST_OUTSTANDING_REQUESTS
+   */
+  readonly loadBalancingAlgorithmType?: elbv2.TargetGroupLoadBalancingAlgorithmType;
 }
 
 
@@ -196,6 +204,14 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
 
     // Keep task definitions active to allow manual rollback from ECS console
     taskDefinition.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+
+    // Configure the target group load balancing algorithm. Defaults to
+    // least outstanding requests, which routes new requests to the target
+    // with the fewest in-flight requests.
+    this.targetGroup.setAttribute(
+      'load_balancing.algorithm.type',
+      mergedProps.loadBalancingAlgorithmType || elbv2.TargetGroupLoadBalancingAlgorithmType.LEAST_OUTSTANDING_REQUESTS,
+    );
 
     // Remove the default action by setting a new default action with conditions
     this.listener.addTargetGroups('HeaderConditionForward', {
