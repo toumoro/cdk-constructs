@@ -233,6 +233,10 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       mergedProps.loadBalancingAlgorithmType || elbv2.TargetGroupLoadBalancingAlgorithmType.LEAST_OUTSTANDING_REQUESTS,
     );
 
+    // Set the target group deregistration delay to 60 seconds. This is the new
+    // default for all consumers (the ELB default is 300 seconds).
+    this.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '60');
+
     // Configure the target group health check only when explicitly provided,
     // so existing consumers keep the default health check unchanged.
     if (targetGroupHealthCheck) {
