@@ -4,16 +4,15 @@ const project = new awscdk.AwsCdkConstructLibrary({
   author: 'Toumoro ',
   authorAddress: 'https://www.toumoro.com/',
   authorOrganization: true,
-  cdkVersion: '2.253.1',
+  cdkVersion: '2.270.0',
   defaultReleaseBranch: 'main',
-  jsiiVersion: '^5.2.0',
+  jsiiVersion: '^5.9.0',
   name: 'tm-cdk-constructs',
   projenrcTs: true,
   repositoryUrl: 'https://github.com/toumoro/cdk-constructs.git',
   description: 'A CDK construct library',
   license: 'GPL-3.0-or-later',
   gitignore: ['.venv', '.env'],
-  npmignore: ['examples'],
   devDeps: [
     'cdk',
     'ts-node',
@@ -35,5 +34,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   // majorVersion: 1,
   stability: 'experimental',
 });
+
+project.addPackageIgnore('examples');
 
 project.synth();
