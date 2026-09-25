@@ -127,6 +127,22 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
    * @default TargetGroupLoadBalancingAlgorithmType.LEAST_OUTSTANDING_REQUESTS
    */
   readonly loadBalancingAlgorithmType?: elbv2.TargetGroupLoadBalancingAlgorithmType;
+
+  /**
+   * The health check configuration applied to the ALB target group.
+   *
+   * When omitted, the target group keeps the default health check provided by
+   * the underlying `ApplicationLoadBalancedFargateService` (this preserves
+   * backwards compatibility: the health check settings are only changed when
+   * this property is explicitly passed).
+   *
+   * Note: this is the ELB *target group* health check
+   * (`elbv2.HealthCheck`), distinct from the base class `healthCheck` prop
+   * which configures the *container* health check (`ecs.HealthCheck`).
+   *
+   * @default - the default target group health check is used unchanged.
+   */
+  readonly targetGroupHealthCheck?: elbv2.HealthCheck;
 }
 
 
@@ -172,9 +188,13 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       circuitBreaker: { rollback: true },
     };
 
+    // targetGroupHealthCheck is consumed by this construct (not by the base
+    // ApplicationLoadBalancedFargateService), so remove it before delegating to
+    // super to avoid any confusion with the base container-level healthCheck.
+    const { targetGroupHealthCheck, ...basePropsForSuper } = { ...defautProps, ...props };
     const mergedProps = { ...defautProps, ...props };
 
-    super(scope, id, mergedProps);
+    super(scope, id, basePropsForSuper);
 
     const taskDefinition = this.taskDefinition;
 
@@ -212,6 +232,12 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       'load_balancing.algorithm.type',
       mergedProps.loadBalancingAlgorithmType || elbv2.TargetGroupLoadBalancingAlgorithmType.LEAST_OUTSTANDING_REQUESTS,
     );
+
+    // Configure the target group health check only when explicitly provided,
+    // so existing consumers keep the default health check unchanged.
+    if (targetGroupHealthCheck) {
+      this.targetGroup.configureHealthCheck(targetGroupHealthCheck);
+    }
 
     // Remove the default action by setting a new default action with conditions
     this.listener.addTargetGroups('HeaderConditionForward', {

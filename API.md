@@ -3711,6 +3711,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.secrets">secrets</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ecs.Secret}</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetGroupHealthCheck">targetGroupHealthCheck</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.HealthCheck</code> | The health check configuration applied to the ALB target group. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | *No description.* |
 
 ---
@@ -4513,6 +4514,28 @@ public readonly targetCpuUtilizationPercent: number;
 ```
 
 - *Type:* number
+
+---
+
+##### `targetGroupHealthCheck`<sup>Optional</sup> <a name="targetGroupHealthCheck" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetGroupHealthCheck"></a>
+
+```typescript
+public readonly targetGroupHealthCheck: HealthCheck;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticloadbalancingv2.HealthCheck
+- *Default:* the default target group health check is used unchanged.
+
+The health check configuration applied to the ALB target group.
+
+When omitted, the target group keeps the default health check provided by
+the underlying `ApplicationLoadBalancedFargateService` (this preserves
+backwards compatibility: the health check settings are only changed when
+this property is explicitly passed).
+
+Note: this is the ELB *target group* health check
+(`elbv2.HealthCheck`), distinct from the base class `healthCheck` prop
+which configures the *container* health check (`ecs.HealthCheck`).
 
 ---
 
