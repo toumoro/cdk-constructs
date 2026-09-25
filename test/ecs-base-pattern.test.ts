@@ -30,6 +30,28 @@ test('target group uses least outstanding requests by default', () => {
   });
 });
 
+test('target group deregistration delay defaults to 60 seconds', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    minTaskCount: 1,
+    maxTaskCount: 2,
+  });
+
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::ElasticLoadBalancingV2::TargetGroup', {
+    TargetGroupAttributes: Match.arrayWith([
+      { Key: 'deregistration_delay.timeout_seconds', Value: '60' },
+    ]),
+  });
+});
+
 test('target group load balancing algorithm is overridable', () => {
   const app = new cdk.App();
   const stack = new cdk.Stack(app, 'TestStack');
