@@ -1071,6 +1071,7 @@ new TmRdsAuroraMysqlDashboard(scope: Construct, id: string, props: TmRdsAuroraMy
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.toString">toString</a></code> | Returns a string representation of this construct. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyCrossStackReferenceStrength">applyCrossStackReferenceStrength</a></code> | Override the cross-stack reference strength for this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addVariable">addVariable</a></code> | Add a variable to the dashboard. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addWidgets">addWidgets</a></code> | Add a widget to the dashboard. |
@@ -1101,6 +1102,28 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
+
+---
+
+##### `applyCrossStackReferenceStrength` <a name="applyCrossStackReferenceStrength" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyCrossStackReferenceStrength"></a>
+
+```typescript
+public applyCrossStackReferenceStrength(strength: ReferenceStrength): void
+```
+
+Override the cross-stack reference strength for this resource.
+
+When set, any cross-stack reference to this resource will use the specified
+mechanism instead of the global default determined by the
+`@aws-cdk/core:defaultCrossStackReferences` context key. This is useful for
+selectively weakening specific references to avoid the "deadly embrace" problem
+without changing the app-wide default.
+
+###### `strength`<sup>Required</sup> <a name="strength" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.applyCrossStackReferenceStrength.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use for this resource.
 
 ---
 
@@ -1154,7 +1177,12 @@ Widgets given in multiple calls to add() will be laid out stacked on
 top of each other.
 
 Multiple widgets added in the same call to add() will be laid out next
-to each other.
+to each other. **However**, keep in mind that CloudWatch will vertically
+compact your dashboard. That means that if there is unused space
+above a widget, it will be shifted upwards as far as possible to fill
+that space. Add empty `TextWidget`s as a spacer in the row above
+your widgets you need to keep multiple side-by-side widgets
+consistently spaced.
 
 ###### `widgets`<sup>Required</sup> <a name="widgets" id="tm-cdk-constructs.TmRdsAuroraMysqlDashboard.addWidgets.parameter.widgets"></a>
 
@@ -1378,6 +1406,7 @@ new TmRdsAuroraMysqlServerless(scope: Construct, id: string, props?: TmRdsAurora
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.toString">toString</a></code> | Returns a string representation of this construct. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyCrossStackReferenceStrength">applyCrossStackReferenceStrength</a></code> | Override the cross-stack reference strength for this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.addProxy">addProxy</a></code> | Add a new db proxy to this cluster. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerless.asSecretAttachmentTarget">asSecretAttachmentTarget</a></code> | Renders the secret attachment target specifications. |
@@ -1429,6 +1458,28 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
+
+---
+
+##### `applyCrossStackReferenceStrength` <a name="applyCrossStackReferenceStrength" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyCrossStackReferenceStrength"></a>
+
+```typescript
+public applyCrossStackReferenceStrength(strength: ReferenceStrength): void
+```
+
+Override the cross-stack reference strength for this resource.
+
+When set, any cross-stack reference to this resource will use the specified
+mechanism instead of the global default determined by the
+`@aws-cdk/core:defaultCrossStackReferences` context key. This is useful for
+selectively weakening specific references to avoid the "deadly embrace" problem
+without changing the app-wide default.
+
+###### `strength`<sup>Required</sup> <a name="strength" id="tm-cdk-constructs.TmRdsAuroraMysqlServerless.applyCrossStackReferenceStrength.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use for this resource.
 
 ---
 
@@ -2365,6 +2416,7 @@ new TmSolrEc2(scope: Construct, id: string, props: TmSorlEc2Props)
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.toString">toString</a></code> | Returns a string representation of this construct. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmSolrEc2.applyCrossStackReferenceStrength">applyCrossStackReferenceStrength</a></code> | Override the cross-stack reference strength for this resource. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.addSecurityGroup">addSecurityGroup</a></code> | Add the security group to the instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.addToRolePolicy">addToRolePolicy</a></code> | Adds a statement to the IAM role assumed by the instance. |
@@ -2397,6 +2449,28 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmSolrEc2.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
+
+---
+
+##### `applyCrossStackReferenceStrength` <a name="applyCrossStackReferenceStrength" id="tm-cdk-constructs.TmSolrEc2.applyCrossStackReferenceStrength"></a>
+
+```typescript
+public applyCrossStackReferenceStrength(strength: ReferenceStrength): void
+```
+
+Override the cross-stack reference strength for this resource.
+
+When set, any cross-stack reference to this resource will use the specified
+mechanism instead of the global default determined by the
+`@aws-cdk/core:defaultCrossStackReferences` context key. This is useful for
+selectively weakening specific references to avoid the "deadly embrace" problem
+without changing the app-wide default.
+
+###### `strength`<sup>Required</sup> <a name="strength" id="tm-cdk-constructs.TmSolrEc2.applyCrossStackReferenceStrength.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use for this resource.
 
 ---
 
@@ -2859,6 +2933,7 @@ new TmVpcBase(scope: Construct, id: string, props: TmVpcProps)
 | --- | --- |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.toString">toString</a></code> | Returns a string representation of this construct. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmVpcBase.applyCrossStackReferenceStrength">applyCrossStackReferenceStrength</a></code> | Override the cross-stack reference strength for this resource. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.applyRemovalPolicy">applyRemovalPolicy</a></code> | Apply the given removal policy to this resource. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.addClientVpnEndpoint">addClientVpnEndpoint</a></code> | Adds a new client VPN endpoint to this VPC. |
 | <code><a href="#tm-cdk-constructs.TmVpcBase.addFlowLog">addFlowLog</a></code> | Adds a new flow log to this VPC. |
@@ -2894,6 +2969,28 @@ constructs.
 ###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmVpcBase.with.parameter.mixins"></a>
 
 - *Type:* ...constructs.IMixin[]
+
+---
+
+##### `applyCrossStackReferenceStrength` <a name="applyCrossStackReferenceStrength" id="tm-cdk-constructs.TmVpcBase.applyCrossStackReferenceStrength"></a>
+
+```typescript
+public applyCrossStackReferenceStrength(strength: ReferenceStrength): void
+```
+
+Override the cross-stack reference strength for this resource.
+
+When set, any cross-stack reference to this resource will use the specified
+mechanism instead of the global default determined by the
+`@aws-cdk/core:defaultCrossStackReferences` context key. This is useful for
+selectively weakening specific references to avoid the "deadly embrace" problem
+without changing the app-wide default.
+
+###### `strength`<sup>Required</sup> <a name="strength" id="tm-cdk-constructs.TmVpcBase.applyCrossStackReferenceStrength.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use for this resource.
 
 ---
 
@@ -4703,6 +4800,7 @@ const tmRdsAuroraMysqlServerlessProps: TmRdsAuroraMysqlServerlessProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instanceProps">instanceProps</a></code> | <code>aws-cdk-lib.aws_rds.InstanceProps</code> | Settings for the individual instances that are launched. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instances">instances</a></code> | <code>number</code> | How many replicas/instances to create. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.instanceUpdateBehaviour">instanceUpdateBehaviour</a></code> | <code>aws-cdk-lib.aws_rds.InstanceUpdateBehaviour</code> | The ordering of updates for instances. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.manageMasterUserPassword">manageMasterUserPassword</a></code> | <code>boolean</code> | Whether to use RDS native integration with AWS Secrets Manager for master user password management. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.monitoringInterval">monitoringInterval</a></code> | <code>aws-cdk-lib.Duration</code> | The interval between points when Amazon RDS collects enhanced monitoring metrics. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.monitoringRole">monitoringRole</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | Role that will be used to manage DB monitoring. |
 | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.networkType">networkType</a></code> | <code>aws-cdk-lib.aws_rds.NetworkType</code> | The network type of the DB instance. |
@@ -5135,6 +5233,24 @@ public readonly instanceUpdateBehaviour: InstanceUpdateBehaviour;
 - *Default:* InstanceUpdateBehaviour.BULK
 
 The ordering of updates for instances.
+
+---
+
+##### `manageMasterUserPassword`<sup>Optional</sup> <a name="manageMasterUserPassword" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessProps.property.manageMasterUserPassword"></a>
+
+```typescript
+public readonly manageMasterUserPassword: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to use RDS native integration with AWS Secrets Manager for master user password management.
+
+When enabled, RDS generates and manages the master user password in Secrets Manager.
+Cannot be used together with credentials containing a password.
+
+> [https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-secrets-manager.html)
 
 ---
 
