@@ -52,6 +52,59 @@ test('target group deregistration delay defaults to 60 seconds', () => {
   });
 });
 
+test('service enables high-resolution 20s CPUUtilization monitoring by default', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    minTaskCount: 1,
+    maxTaskCount: 2,
+  });
+
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::ECS::Service', {
+    Monitoring: {
+      MetricConfigurations: [
+        { MetricNames: ['CPUUtilization'], ResolutionSeconds: 20 },
+      ],
+    },
+  });
+});
+
+test('service monitoring configuration is overridable', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    minTaskCount: 1,
+    maxTaskCount: 2,
+    monitoringConfiguration: {
+      metricConfigurations: [
+        { metricNames: ['CPUUtilization', 'MemoryUtilization'], resolutionSeconds: 20 },
+      ],
+    },
+  });
+
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::ECS::Service', {
+    Monitoring: {
+      MetricConfigurations: [
+        { MetricNames: ['CPUUtilization', 'MemoryUtilization'], ResolutionSeconds: 20 },
+      ],
+    },
+  });
+});
+
 test('target group load balancing algorithm is overridable', () => {
   const app = new cdk.App();
   const stack = new cdk.Stack(app, 'TestStack');
