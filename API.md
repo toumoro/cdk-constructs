@@ -3707,6 +3707,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancingAlgorithmType">loadBalancingAlgorithmType</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.TargetGroupLoadBalancingAlgorithmType</code> | The load balancing algorithm the target group uses to route requests to its registered targets. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.monitoringConfiguration">monitoringConfiguration</a></code> | <code>aws-cdk-lib.aws_ecs.CfnService.MonitoringConfigurationProperty</code> | The CloudWatch monitoring configuration applied to the ECS service, which controls the resolution of the service-level `CPUUtilization` and `MemoryUtilization` metrics. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.secrets">secrets</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ecs.Secret}</code> | *No description.* |
@@ -4474,6 +4475,24 @@ public readonly minTaskCount: number;
 - *Type:* number
 
 The minumun number od tasks.
+
+---
+
+##### `monitoringConfiguration`<sup>Optional</sup> <a name="monitoringConfiguration" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.monitoringConfiguration"></a>
+
+```typescript
+public readonly monitoringConfiguration: MonitoringConfigurationProperty;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.CfnService.MonitoringConfigurationProperty
+- *Default:* { metricConfigurations: [{ metricNames: ['CPUUtilization'], resolutionSeconds: 20 }] }
+
+The CloudWatch monitoring configuration applied to the ECS service, which controls the resolution of the service-level `CPUUtilization` and `MemoryUtilization` metrics.
+
+By default this construct enables high-resolution (20-second) collection of
+the `CPUUtilization` metric, so that target-tracking auto scaling can react
+faster. Pass this property to override that default entirely (e.g. to add
+`MemoryUtilization`, or to fall back to the standard 60-second resolution).
 
 ---
 

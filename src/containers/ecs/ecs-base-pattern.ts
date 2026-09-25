@@ -143,6 +143,20 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
    * @default - the default target group health check is used unchanged.
    */
   readonly targetGroupHealthCheck?: elbv2.HealthCheck;
+
+  /**
+   * The CloudWatch monitoring configuration applied to the ECS service, which
+   * controls the resolution of the service-level `CPUUtilization` and
+   * `MemoryUtilization` metrics.
+   *
+   * By default this construct enables high-resolution (20-second) collection of
+   * the `CPUUtilization` metric, so that target-tracking auto scaling can react
+   * faster. Pass this property to override that default entirely (e.g. to add
+   * `MemoryUtilization`, or to fall back to the standard 60-second resolution).
+   *
+   * @default - { metricConfigurations: [{ metricNames: ['CPUUtilization'], resolutionSeconds: 20 }] }
+   */
+  readonly monitoringConfiguration?: ecs.CfnService.MonitoringConfigurationProperty;
 }
 
 
@@ -236,6 +250,22 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     // Set the target group deregistration delay to 60 seconds. This is the new
     // default for all consumers (the ELB default is 300 seconds).
     this.targetGroup.setAttribute('deregistration_delay.timeout_seconds', '60');
+
+    // Enable high-resolution (20-second) collection of the service CPUUtilization
+    // metric so target-tracking auto scaling reacts faster than with the ECS
+    // default of 60-second resolution. This is the new default for all consumers
+    // and is applied unconditionally, but can be overridden entirely via the
+    // monitoringConfiguration prop (e.g. to add MemoryUtilization or revert to
+    // 60-second resolution).
+    const cfnService = this.service.node.defaultChild as ecs.CfnService;
+    cfnService.monitoring = mergedProps.monitoringConfiguration ?? {
+      metricConfigurations: [
+        {
+          metricNames: ['CPUUtilization'],
+          resolutionSeconds: 20,
+        },
+      ],
+    };
 
     // Configure the target group health check only when explicitly provided,
     // so existing consumers keep the default health check unchanged.
