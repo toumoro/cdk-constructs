@@ -266,6 +266,7 @@ Any object.
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.assignPublicIp">assignPublicIp</a></code> | <code>boolean</code> | Determines whether the service will be assigned a public IP address. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.service">service</a></code> | <code>aws-cdk-lib.aws_ecs.FargateService</code> | The Fargate service in this construct. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.taskDefinition">taskDefinition</a></code> | <code>aws-cdk-lib.aws_ecs.FargateTaskDefinition</code> | The Fargate task definition in this construct. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.scalableTaskCount">scalableTaskCount</a></code> | <code>aws-cdk-lib.aws_ecs.ScalableTaskCount</code> | The scalable attribute representing the task count of the service. |
 
 ---
 
@@ -401,6 +402,23 @@ public readonly taskDefinition: FargateTaskDefinition;
 - *Type:* aws-cdk-lib.aws_ecs.FargateTaskDefinition
 
 The Fargate task definition in this construct.
+
+---
+
+##### `scalableTaskCount`<sup>Required</sup> <a name="scalableTaskCount" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.scalableTaskCount"></a>
+
+```typescript
+public readonly scalableTaskCount: ScalableTaskCount;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.ScalableTaskCount
+
+The scalable attribute representing the task count of the service.
+
+This is always created (with the `minTaskCount` / `maxTaskCount` capacity
+bounds) regardless of `disableDefaultScaling`, so consumers can attach
+their own scaling policies to it — especially when they set
+`disableDefaultScaling: true` to fully override the built-in policies.
 
 ---
 
@@ -3702,6 +3720,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableDefaultScaling">disableDefaultScaling</a></code> | <code>boolean</code> | Completely disable the built-in auto-scaling policies. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps">ecsDeploymentHookProps</a></code> | <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a></code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancingAlgorithmType">loadBalancingAlgorithmType</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.TargetGroupLoadBalancingAlgorithmType</code> | The load balancing algorithm the target group uses to route requests to its registered targets. |
@@ -4418,6 +4437,34 @@ public readonly customHttpHeaderValue: string;
 - *Type:* string
 
 Custom http header value.
+
+---
+
+##### `disableDefaultScaling`<sup>Optional</sup> <a name="disableDefaultScaling" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableDefaultScaling"></a>
+
+```typescript
+public readonly disableDefaultScaling: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - the built-in CPU + memory target-tracking policies apply.
+
+Completely disable the built-in auto-scaling policies.
+
+By default this construct enables target-tracking auto scaling on both CPU
+and memory utilization (targets from `targetCpuUtilizationPercent` /
+`targetMemoryUtilizationPercent`, 60-second scale-in/scale-out cooldowns,
+capacity from `minTaskCount` / `maxTaskCount`).
+
+Set this to `true` to skip those default policies entirely and take full
+control of scaling yourself. The construct still creates the
+`ScalableTaskCount` (with the `minTaskCount` / `maxTaskCount` capacity
+bounds) and exposes it as {@link scalableTaskCount }, so you can attach any
+scaling policy you want (custom CPU/memory targets, request-count scaling,
+scheduled scaling, step scaling, ...) from your own stack.
+
+This keeps the current behavior as the default for everyone who does not
+pass it, while allowing a complete override.
 
 ---
 
