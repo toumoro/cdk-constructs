@@ -157,10 +157,42 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
    * @default - { metricConfigurations: [{ metricNames: ['CPUUtilization'], resolutionSeconds: 20 }] }
    */
   readonly monitoringConfiguration?: ecs.CfnService.MonitoringConfigurationProperty;
+
+  /**
+   * Completely disable the built-in auto-scaling policies.
+   *
+   * By default this construct enables target-tracking auto scaling on both CPU
+   * and memory utilization (targets from `targetCpuUtilizationPercent` /
+   * `targetMemoryUtilizationPercent`, 60-second scale-in/scale-out cooldowns,
+   * capacity from `minTaskCount` / `maxTaskCount`).
+   *
+   * Set this to `true` to skip those default policies entirely and take full
+   * control of scaling yourself. The construct still creates the
+   * `ScalableTaskCount` (with the `minTaskCount` / `maxTaskCount` capacity
+   * bounds) and exposes it as {@link scalableTaskCount}, so you can attach any
+   * scaling policy you want (custom CPU/memory targets, request-count scaling,
+   * scheduled scaling, step scaling, ...) from your own stack.
+   *
+   * This keeps the current behavior as the default for everyone who does not
+   * pass it, while allowing a complete override.
+   *
+   * @default false - the built-in CPU + memory target-tracking policies apply.
+   */
+  readonly disableDefaultScaling?: boolean;
 }
 
 
 export class TmApplicationLoadBalancedFargateService extends ecsPatterns.ApplicationLoadBalancedFargateService {
+
+  /**
+   * The scalable attribute representing the task count of the service.
+   *
+   * This is always created (with the `minTaskCount` / `maxTaskCount` capacity
+   * bounds) regardless of `disableDefaultScaling`, so consumers can attach
+   * their own scaling policies to it — especially when they set
+   * `disableDefaultScaling: true` to fully override the built-in policies.
+   */
+  public readonly scalableTaskCount: ecs.ScalableTaskCount;
 
   constructor(scope: Construct, id: string, props: TmApplicationLoadBalancedFargateServiceProps) {
 
@@ -290,25 +322,34 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       }),
     });
 
-    // Configure auto-scaling
+    // Configure auto-scaling. The scalable task count is always created and
+    // exposed via `this.scalableTaskCount` so consumers can attach their own
+    // policies.
     const scaling = this.service.autoScaleTaskCount({
       minCapacity: mergedProps.minTaskCount,
       maxCapacity: mergedProps.maxTaskCount || 30,
     });
+    this.scalableTaskCount = scaling;
 
-    // Scale based on CPU utilization
-    scaling.scaleOnCpuUtilization('CpuScaling', {
-      targetUtilizationPercent: mergedProps.targetCpuUtilizationPercent || 30,
-      scaleInCooldown: cdk.Duration.seconds(60),
-      scaleOutCooldown: cdk.Duration.seconds(60),
-    });
+    if (mergedProps.disableDefaultScaling) {
+      // The consumer takes full control of the scaling policies via
+      // `this.scalableTaskCount`. The default CPU + memory target-tracking
+      // policies below are NOT applied.
+    } else {
+      // Scale based on CPU utilization
+      scaling.scaleOnCpuUtilization('CpuScaling', {
+        targetUtilizationPercent: mergedProps.targetCpuUtilizationPercent || 30,
+        scaleInCooldown: cdk.Duration.seconds(60),
+        scaleOutCooldown: cdk.Duration.seconds(60),
+      });
 
-    // Scale based on Memory utilization
-    scaling.scaleOnMemoryUtilization('MemoryScaling', {
-      targetUtilizationPercent: mergedProps.targetMemoryUtilizationPercent || 30,
-      scaleInCooldown: cdk.Duration.seconds(60),
-      scaleOutCooldown: cdk.Duration.seconds(60),
-    });
+      // Scale based on Memory utilization
+      scaling.scaleOnMemoryUtilization('MemoryScaling', {
+        targetUtilizationPercent: mergedProps.targetMemoryUtilizationPercent || 30,
+        scaleInCooldown: cdk.Duration.seconds(60),
+        scaleOutCooldown: cdk.Duration.seconds(60),
+      });
+    }
 
 
     if (mergedProps.scheduledTasksCommand) {

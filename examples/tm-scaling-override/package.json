@@ -1,0 +1,16 @@
+{
+  "name": "tm-scaling-override",
+  "version": "0.1.0",
+  "bin": {
+    "tm-scaling-override": "bin/tm-scaling-override.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.5"
+  }
+}

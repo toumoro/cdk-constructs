@@ -191,3 +191,72 @@ test('target group health check is applied when provided', () => {
     Matcher: { HttpCode: '200' },
   });
 });
+
+test('default CPU and memory target-tracking scaling policies are applied by default', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    minTaskCount: 1,
+    maxTaskCount: 2,
+  });
+
+  const template = Template.fromStack(stack);
+  // Two target-tracking policies (CPU + memory), both at 30% by default.
+  template.resourceCountIs('AWS::ApplicationAutoScaling::ScalingPolicy', 2);
+  template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalingPolicy', {
+    PolicyType: 'TargetTrackingScaling',
+    TargetTrackingScalingPolicyConfiguration: {
+      TargetValue: 30,
+      PredefinedMetricSpecification: { PredefinedMetricType: 'ECSServiceAverageCPUUtilization' },
+    },
+  });
+  template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalingPolicy', {
+    PolicyType: 'TargetTrackingScaling',
+    TargetTrackingScalingPolicyConfiguration: {
+      TargetValue: 30,
+      PredefinedMetricSpecification: { PredefinedMetricType: 'ECSServiceAverageMemoryUtilization' },
+    },
+  });
+});
+
+test('disableDefaultScaling removes the built-in policies but keeps the scalable target', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  const service = new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    minTaskCount: 1,
+    maxTaskCount: 5,
+    disableDefaultScaling: true,
+  });
+
+  // The scalable task count is still exposed for a full custom override.
+  expect(service.scalableTaskCount).toBeDefined();
+  service.scalableTaskCount.scaleOnRequestCount('RequestScaling', {
+    requestsPerTarget: 1000,
+    targetGroup: service.targetGroup,
+  });
+
+  const template = Template.fromStack(stack);
+  // Only the single custom policy exists; the two defaults are gone.
+  template.resourceCountIs('AWS::ApplicationAutoScaling::ScalingPolicy', 1);
+  template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalableTarget', {
+    MinCapacity: 1,
+    MaxCapacity: 5,
+  });
+  template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalingPolicy', {
+    TargetTrackingScalingPolicyConfiguration: {
+      PredefinedMetricSpecification: { PredefinedMetricType: 'ALBRequestCountPerTarget' },
+    },
+  });
+});
