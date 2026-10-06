@@ -260,3 +260,59 @@ test('disableDefaultScaling removes the built-in policies but keeps the scalable
     },
   });
 });
+
+test('phpFpmContainer adds a php-fpm container sharing the volumes', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  const service = new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    phpFpmContainer: { buildContextPath, buildDockerfile: 'Dockerfile', memoryLimitMiB: 1024 },
+    efsVolumes: [{ name: 'assets', path: '/var/www/public/typo3temp/assets' }],
+    sharedVolumes: [{ name: 'shared', path: '/mnt/shared' }],
+    scheduledTasksCommand: '/usr/local/bin/run-scheduler.sh',
+    scheduledTaskContainerName: 'php-fpm',
+  });
+
+  expect(service.phpFpmContainer?.containerName).toBe('php-fpm');
+  expect(service.efsFileSystems).toHaveLength(1);
+  const mountPoints = [
+    { ContainerPath: '/var/www/public/typo3temp/assets', SourceVolume: 'assets', ReadOnly: false },
+    { ContainerPath: '/mnt/shared', SourceVolume: 'shared', ReadOnly: false },
+  ];
+  const template = Template.fromStack(stack);
+  template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+    Volumes: Match.arrayWith([{ Name: 'shared' }]),
+    ContainerDefinitions: [
+      Match.objectLike({ Name: 'web', MountPoints: mountPoints, DependsOn: [{ ContainerName: 'php-fpm', Condition: 'START' }] }),
+      Match.objectLike({ Name: 'php-fpm', Memory: 1024, MountPoints: mountPoints, PortMappings: [Match.objectLike({ ContainerPort: 9000 })] }),
+    ],
+  });
+  template.hasResourceProperties('AWS::Events::Rule', {
+    Targets: [Match.objectLike({
+      Input: Match.serializedJson(Match.objectLike({ containerOverrides: [Match.objectLike({ name: 'php-fpm' })] })),
+    })],
+  });
+});
+
+test('without phpFpmContainer the task keeps a single web container', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  const service = new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+  });
+
+  expect(service.phpFpmContainer).toBeUndefined();
+  Template.fromStack(stack).hasResourceProperties('AWS::ECS::TaskDefinition', {
+    ContainerDefinitions: [Match.objectLike({ Name: 'web', EntryPoint: Match.absent(), Command: Match.absent() })],
+  });
+});

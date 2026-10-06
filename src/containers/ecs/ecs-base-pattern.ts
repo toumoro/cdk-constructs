@@ -3,6 +3,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecr_assets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
+import * as efs from 'aws-cdk-lib/aws-efs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as events_targets from 'aws-cdk-lib/aws-events-targets';
@@ -19,6 +20,78 @@ export interface IIefsVolumes {
 export interface IIEcsDeploymentHookProps {
   containerName: string;
   command: string[];
+}
+
+/**
+ * A php-fpm container added to the task, next to the web container.
+ */
+export interface TmPhpFpmContainerOptions {
+  /**
+   * The build context path.
+   */
+  readonly buildContextPath: string;
+
+  /**
+   * The build dockerfile, relative to the build context.
+   */
+  readonly buildDockerfile: string;
+
+  /**
+   * The build container args.
+   *
+   * @default - no build args
+   */
+  readonly buildContainerArgs?: { [key: string]: string };
+
+  /**
+   * The container name.
+   *
+   * @default 'php-fpm'
+   */
+  readonly containerName?: string;
+
+  /**
+   * The port php-fpm listens on.
+   *
+   * @default 9000
+   */
+  readonly containerPort?: number;
+
+  /**
+   * CPU units reserved for the container.
+   *
+   * @default - no reservation
+   */
+  readonly cpu?: number;
+
+  /**
+   * Hard memory limit of the container, in MiB.
+   *
+   * @default - no container limit
+   */
+  readonly memoryLimitMiB?: number;
+
+  /**
+   * Plain environment variables. The secrets of the service are passed too.
+   *
+   * @default - none
+   */
+  readonly environment?: { [key: string]: string };
+}
+
+/**
+ * A volume on the task's ephemeral storage, shared by every container of the task.
+ */
+export interface TmSharedVolume {
+  /**
+   * The volume name.
+   */
+  readonly name: string;
+
+  /**
+   * The mount path, the same in every container.
+   */
+  readonly path: string;
 }
 
 /**
@@ -179,6 +252,43 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
    * @default false - the built-in CPU + memory target-tracking policies apply.
    */
   readonly disableDefaultScaling?: boolean;
+
+  /**
+   * Adds a php-fpm container to the task. The web container (behind the load
+   * balancer) then serves static files and forwards PHP requests to it.
+   * Both containers get the service secrets and the EFS and shared volumes.
+   *
+   * @default - a single web container
+   */
+  readonly phpFpmContainer?: TmPhpFpmContainerOptions;
+
+  /**
+   * Volumes on the task's ephemeral storage, mounted in every container.
+   *
+   * @default - none
+   */
+  readonly sharedVolumes?: TmSharedVolume[];
+
+  /**
+   * Entry point of the web container.
+   *
+   * @default - the image's entry point
+   */
+  readonly containerEntryPoint?: string[];
+
+  /**
+   * Command of the web container.
+   *
+   * @default - the image's command
+   */
+  readonly containerCommand?: string[];
+
+  /**
+   * Container in which the scheduled task runs `scheduledTasksCommand`.
+   *
+   * @default - the web container
+   */
+  readonly scheduledTaskContainerName?: string;
 }
 
 
@@ -193,6 +303,16 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
    * `disableDefaultScaling: true` to fully override the built-in policies.
    */
   public readonly scalableTaskCount: ecs.ScalableTaskCount;
+
+  /**
+   * The php-fpm container, when `phpFpmContainer` is set.
+   */
+  public readonly phpFpmContainer?: ecs.ContainerDefinition;
+
+  /**
+   * The EFS file systems created for `efsVolumes`.
+   */
+  public readonly efsFileSystems: efs.FileSystem[];
 
   constructor(scope: Construct, id: string, props: TmApplicationLoadBalancedFargateServiceProps) {
 
@@ -230,6 +350,8 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         enableLogging: true,
         containerName: 'web',
         secrets: props.secrets,
+        entryPoint: props.containerEntryPoint,
+        command: props.containerCommand,
       },
       circuitBreaker: { rollback: true },
     };
@@ -243,6 +365,34 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     super(scope, id, basePropsForSuper);
 
     const taskDefinition = this.taskDefinition;
+    const webContainer = taskDefinition.defaultContainer!;
+    this.efsFileSystems = [];
+
+    if (mergedProps.phpFpmContainer) {
+      const fpm = mergedProps.phpFpmContainer;
+      const fpmImageAsset = new ecr_assets.DockerImageAsset(this, 'PhpFpmImage', {
+        directory: fpm.buildContextPath,
+        file: fpm.buildDockerfile,
+        buildArgs: fpm.buildContainerArgs,
+        followSymlinks: cdk.SymlinkFollowMode.ALWAYS,
+      });
+      const fpmPort = fpm.containerPort ?? 9000;
+      this.phpFpmContainer = taskDefinition.addContainer('PhpFpm', {
+        containerName: fpm.containerName ?? 'php-fpm',
+        image: ecs.ContainerImage.fromDockerImageAsset(fpmImageAsset),
+        cpu: fpm.cpu,
+        memoryLimitMiB: fpm.memoryLimitMiB,
+        environment: fpm.environment,
+        secrets: props.secrets,
+        logging: ecs.LogDrivers.awsLogs({ streamPrefix: 'php-fpm' }),
+        portMappings: [{ containerPort: fpmPort }],
+      });
+      webContainer.addContainerDependencies({
+        container: this.phpFpmContainer,
+        condition: ecs.ContainerDependencyCondition.START,
+      });
+    }
+    const containers = this.phpFpmContainer ? [webContainer, this.phpFpmContainer] : [webContainer];
 
     mergedProps.efsVolumes?.forEach((volume) => {
       const efsVolume = new TmEfsFileSystem(this, `EfsVolume-${volume.name}`, {
@@ -260,12 +410,22 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
           transitEncryption: 'ENABLED',
         },
       });
-      taskDefinition.defaultContainer?.addMountPoints({
+      containers.forEach(container => container.addMountPoints({
         containerPath: volume.path,
         sourceVolume: volume.name,
         readOnly: false,
-      });
+      }));
       efsVolume.efsFileSystem.connections.allowDefaultPortFrom(this.service, 'Allow from ECS Service');
+      this.efsFileSystems.push(efsVolume.efsFileSystem);
+    });
+
+    mergedProps.sharedVolumes?.forEach((volume) => {
+      taskDefinition.addVolume({ name: volume.name });
+      containers.forEach(container => container.addMountPoints({
+        containerPath: volume.path,
+        sourceVolume: volume.name,
+        readOnly: false,
+      }));
     });
 
     // Keep task definitions active to allow manual rollback from ECS console
@@ -369,7 +529,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         cluster: this.cluster,
         taskDefinition: this.taskDefinition,
         containerOverrides: [{
-          containerName: this.taskDefinition.defaultContainer!.containerName,
+          containerName: mergedProps.scheduledTaskContainerName ?? this.taskDefinition.defaultContainer!.containerName,
           command: mergedProps.scheduledTasksCommand.split(' '),
         }],
         role: scheduledTaskRole,
