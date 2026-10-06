@@ -266,7 +266,9 @@ Any object.
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.assignPublicIp">assignPublicIp</a></code> | <code>boolean</code> | Determines whether the service will be assigned a public IP address. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.service">service</a></code> | <code>aws-cdk-lib.aws_ecs.FargateService</code> | The Fargate service in this construct. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.taskDefinition">taskDefinition</a></code> | <code>aws-cdk-lib.aws_ecs.FargateTaskDefinition</code> | The Fargate task definition in this construct. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.efsFileSystems">efsFileSystems</a></code> | <code>aws-cdk-lib.aws_efs.FileSystem[]</code> | The EFS file systems created for `efsVolumes`. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.scalableTaskCount">scalableTaskCount</a></code> | <code>aws-cdk-lib.aws_ecs.ScalableTaskCount</code> | The scalable attribute representing the task count of the service. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.phpFpmContainer">phpFpmContainer</a></code> | <code>aws-cdk-lib.aws_ecs.ContainerDefinition</code> | The php-fpm container, when `phpFpmContainer` is set. |
 
 ---
 
@@ -405,6 +407,18 @@ The Fargate task definition in this construct.
 
 ---
 
+##### `efsFileSystems`<sup>Required</sup> <a name="efsFileSystems" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.efsFileSystems"></a>
+
+```typescript
+public readonly efsFileSystems: FileSystem[];
+```
+
+- *Type:* aws-cdk-lib.aws_efs.FileSystem[]
+
+The EFS file systems created for `efsVolumes`.
+
+---
+
 ##### `scalableTaskCount`<sup>Required</sup> <a name="scalableTaskCount" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.scalableTaskCount"></a>
 
 ```typescript
@@ -419,6 +433,18 @@ This is always created (with the `minTaskCount` / `maxTaskCount` capacity
 bounds) regardless of `disableDefaultScaling`, so consumers can attach
 their own scaling policies to it — especially when they set
 `disableDefaultScaling: true` to fully override the built-in policies.
+
+---
+
+##### `phpFpmContainer`<sup>Optional</sup> <a name="phpFpmContainer" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateService.property.phpFpmContainer"></a>
+
+```typescript
+public readonly phpFpmContainer: ContainerDefinition;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.ContainerDefinition
+
+The php-fpm container, when `phpFpmContainer` is set.
 
 ---
 
@@ -441,6 +467,4525 @@ public readonly PROPERTY_INJECTION_ID: string;
 Uniquely identifies this class.
 
 ---
+
+### TmBackupStack <a name="TmBackupStack" id="tm-cdk-constructs.TmBackupStack"></a>
+
+Daily AWS Backup plans for every EBS volume and RDS cluster of the account, in an encrypted vault.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmBackupStack.Initializer"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+new TmBackupStack(scope: Construct, id: string, props?: TmBackupStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmBackupStackProps">TmBackupStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmBackupStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmBackupStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Optional</sup> <a name="props" id="tm-cdk-constructs.TmBackupStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmBackupStackProps">TmBackupStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmBackupStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmBackupStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmBackupStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmBackupStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmBackupStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmBackupStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmBackupStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmBackupStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmBackupStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmBackupStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmBackupStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmBackupStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmBackupStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmBackupStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmBackupStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmBackupStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmBackupStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmBackupStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmBackupStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmBackupStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmBackupStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmBackupStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmBackupStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmBackupStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmBackupStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmBackupStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmBackupStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmBackupStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmBackupStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmBackupStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmBackupStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmBackupStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmBackupStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmBackupStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmBackupStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmBackupStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmBackupStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmBackupStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmBackupStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmBackupStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmBackupStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmBackupStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmBackupStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmBackupStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmBackupStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmBackupStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmBackupStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmBackupStack.isConstruct"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+TmBackupStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmBackupStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmBackupStack.consumeListReference"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+TmBackupStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmBackupStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmBackupStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmBackupStack.consumeReference"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+TmBackupStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmBackupStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmBackupStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmBackupStack.isStack"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+TmBackupStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmBackupStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmBackupStack.of"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+TmBackupStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmBackupStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmBackupStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmBackupStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmBackupStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmBackupStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmBackupStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmBackupStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmBackupStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmBackupStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmBackupStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmBackupStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmBackupStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmBackupStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmBackupStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmBackupStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmBackupStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmBackupStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmBackupStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmBackupStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmBackupStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmBackupStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmBackupStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmBackupStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+
+### TmBastionStack <a name="TmBastionStack" id="tm-cdk-constructs.TmBastionStack"></a>
+
+Bastion host in a public subnet, reachable through SSM Session Manager, patched by Patch Manager and configured by the tm-ansible playbook.
+
+Publishes its security group ID in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmBastionStack.Initializer"></a>
+
+```typescript
+import { TmBastionStack } from 'tm-cdk-constructs'
+
+new TmBastionStack(scope: Construct, id: string, props: TmBastionStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmBastionStackProps">TmBastionStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmBastionStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmBastionStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmBastionStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmBastionStackProps">TmBastionStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmBastionStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmBastionStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmBastionStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmBastionStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmBastionStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmBastionStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmBastionStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmBastionStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmBastionStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmBastionStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmBastionStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmBastionStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmBastionStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmBastionStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmBastionStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmBastionStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmBastionStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmBastionStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmBastionStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmBastionStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmBastionStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmBastionStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmBastionStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmBastionStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmBastionStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmBastionStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmBastionStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmBastionStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmBastionStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmBastionStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmBastionStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmBastionStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmBastionStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmBastionStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmBastionStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmBastionStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmBastionStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmBastionStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmBastionStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmBastionStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmBastionStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmBastionStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmBastionStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmBastionStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmBastionStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmBastionStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmBastionStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmBastionStack.isConstruct"></a>
+
+```typescript
+import { TmBastionStack } from 'tm-cdk-constructs'
+
+TmBastionStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmBastionStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmBastionStack.consumeListReference"></a>
+
+```typescript
+import { TmBastionStack } from 'tm-cdk-constructs'
+
+TmBastionStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmBastionStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmBastionStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmBastionStack.consumeReference"></a>
+
+```typescript
+import { TmBastionStack } from 'tm-cdk-constructs'
+
+TmBastionStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmBastionStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmBastionStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmBastionStack.isStack"></a>
+
+```typescript
+import { TmBastionStack } from 'tm-cdk-constructs'
+
+TmBastionStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmBastionStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmBastionStack.of"></a>
+
+```typescript
+import { TmBastionStack } from 'tm-cdk-constructs'
+
+TmBastionStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmBastionStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.bastionHost">bastionHost</a></code> | <code>aws-cdk-lib.aws_ec2.BastionHostLinux</code> | The bastion host. |
+| <code><a href="#tm-cdk-constructs.TmBastionStack.property.securityGroup">securityGroup</a></code> | <code>aws-cdk-lib.aws_ec2.SecurityGroup</code> | Security group of the bastion. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmBastionStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmBastionStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmBastionStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmBastionStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmBastionStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmBastionStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmBastionStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmBastionStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmBastionStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmBastionStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmBastionStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmBastionStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmBastionStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmBastionStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmBastionStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmBastionStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmBastionStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmBastionStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmBastionStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmBastionStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmBastionStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmBastionStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `bastionHost`<sup>Required</sup> <a name="bastionHost" id="tm-cdk-constructs.TmBastionStack.property.bastionHost"></a>
+
+```typescript
+public readonly bastionHost: BastionHostLinux;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.BastionHostLinux
+
+The bastion host.
+
+---
+
+##### `securityGroup`<sup>Required</sup> <a name="securityGroup" id="tm-cdk-constructs.TmBastionStack.property.securityGroup"></a>
+
+```typescript
+public readonly securityGroup: SecurityGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.SecurityGroup
+
+Security group of the bastion.
+
+---
+
+
+### TmCloudfrontCdnStack <a name="TmCloudfrontCdnStack" id="tm-cdk-constructs.TmCloudfrontCdnStack"></a>
+
+CDN distribution serving the FAL content bucket through origin access control, with CORS headers for fonts and other cross-origin assets.
+
+Publishes its ID in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmCloudfrontCdnStack.Initializer"></a>
+
+```typescript
+import { TmCloudfrontCdnStack } from 'tm-cdk-constructs'
+
+new TmCloudfrontCdnStack(scope: Construct, id: string, props: TmCloudfrontCdnStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps">TmCloudfrontCdnStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmCloudfrontCdnStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmCloudfrontCdnStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmCloudfrontCdnStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps">TmCloudfrontCdnStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmCloudfrontCdnStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmCloudfrontCdnStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmCloudfrontCdnStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmCloudfrontCdnStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmCloudfrontCdnStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmCloudfrontCdnStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmCloudfrontCdnStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmCloudfrontCdnStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmCloudfrontCdnStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmCloudfrontCdnStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmCloudfrontCdnStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmCloudfrontCdnStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmCloudfrontCdnStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmCloudfrontCdnStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmCloudfrontCdnStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmCloudfrontCdnStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmCloudfrontCdnStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmCloudfrontCdnStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmCloudfrontCdnStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmCloudfrontCdnStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmCloudfrontCdnStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmCloudfrontCdnStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmCloudfrontCdnStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmCloudfrontCdnStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmCloudfrontCdnStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmCloudfrontCdnStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmCloudfrontCdnStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmCloudfrontCdnStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmCloudfrontCdnStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmCloudfrontCdnStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmCloudfrontCdnStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmCloudfrontCdnStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmCloudfrontCdnStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmCloudfrontCdnStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmCloudfrontCdnStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmCloudfrontCdnStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmCloudfrontCdnStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmCloudfrontCdnStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmCloudfrontCdnStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmCloudfrontCdnStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmCloudfrontCdnStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmCloudfrontCdnStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmCloudfrontCdnStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmCloudfrontCdnStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmCloudfrontCdnStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmCloudfrontCdnStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmCloudfrontCdnStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmCloudfrontCdnStack.isConstruct"></a>
+
+```typescript
+import { TmCloudfrontCdnStack } from 'tm-cdk-constructs'
+
+TmCloudfrontCdnStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmCloudfrontCdnStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmCloudfrontCdnStack.consumeListReference"></a>
+
+```typescript
+import { TmCloudfrontCdnStack } from 'tm-cdk-constructs'
+
+TmCloudfrontCdnStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmCloudfrontCdnStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmCloudfrontCdnStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmCloudfrontCdnStack.consumeReference"></a>
+
+```typescript
+import { TmCloudfrontCdnStack } from 'tm-cdk-constructs'
+
+TmCloudfrontCdnStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmCloudfrontCdnStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmCloudfrontCdnStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmCloudfrontCdnStack.isStack"></a>
+
+```typescript
+import { TmCloudfrontCdnStack } from 'tm-cdk-constructs'
+
+TmCloudfrontCdnStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmCloudfrontCdnStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmCloudfrontCdnStack.of"></a>
+
+```typescript
+import { TmCloudfrontCdnStack } from 'tm-cdk-constructs'
+
+TmCloudfrontCdnStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmCloudfrontCdnStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack.property.distribution">distribution</a></code> | <code>aws-cdk-lib.aws_cloudfront.Distribution</code> | The CDN distribution. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `distribution`<sup>Required</sup> <a name="distribution" id="tm-cdk-constructs.TmCloudfrontCdnStack.property.distribution"></a>
+
+```typescript
+public readonly distribution: Distribution;
+```
+
+- *Type:* aws-cdk-lib.aws_cloudfront.Distribution
+
+The CDN distribution.
+
+---
+
+
+### TmCloudfrontStack <a name="TmCloudfrontStack" id="tm-cdk-constructs.TmCloudfrontStack"></a>
+
+www distributions in front of the load balancer, one per domain, with the TYPO3 cache policy and an uncached `/typo3/*` behavior.
+
+Publishes each
+distribution ID in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmCloudfrontStack.Initializer"></a>
+
+```typescript
+import { TmCloudfrontStack } from 'tm-cdk-constructs'
+
+new TmCloudfrontStack(scope: Construct, id: string, props: TmCloudfrontStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps">TmCloudfrontStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmCloudfrontStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmCloudfrontStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmCloudfrontStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmCloudfrontStackProps">TmCloudfrontStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmCloudfrontStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmCloudfrontStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmCloudfrontStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmCloudfrontStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmCloudfrontStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmCloudfrontStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmCloudfrontStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmCloudfrontStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmCloudfrontStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmCloudfrontStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmCloudfrontStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmCloudfrontStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmCloudfrontStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmCloudfrontStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmCloudfrontStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmCloudfrontStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmCloudfrontStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmCloudfrontStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmCloudfrontStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmCloudfrontStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmCloudfrontStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmCloudfrontStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmCloudfrontStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmCloudfrontStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmCloudfrontStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmCloudfrontStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmCloudfrontStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmCloudfrontStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmCloudfrontStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmCloudfrontStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmCloudfrontStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmCloudfrontStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmCloudfrontStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmCloudfrontStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmCloudfrontStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmCloudfrontStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmCloudfrontStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmCloudfrontStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmCloudfrontStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmCloudfrontStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmCloudfrontStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmCloudfrontStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmCloudfrontStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmCloudfrontStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmCloudfrontStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmCloudfrontStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmCloudfrontStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmCloudfrontStack.isConstruct"></a>
+
+```typescript
+import { TmCloudfrontStack } from 'tm-cdk-constructs'
+
+TmCloudfrontStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmCloudfrontStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmCloudfrontStack.consumeListReference"></a>
+
+```typescript
+import { TmCloudfrontStack } from 'tm-cdk-constructs'
+
+TmCloudfrontStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmCloudfrontStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmCloudfrontStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmCloudfrontStack.consumeReference"></a>
+
+```typescript
+import { TmCloudfrontStack } from 'tm-cdk-constructs'
+
+TmCloudfrontStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmCloudfrontStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmCloudfrontStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmCloudfrontStack.isStack"></a>
+
+```typescript
+import { TmCloudfrontStack } from 'tm-cdk-constructs'
+
+TmCloudfrontStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmCloudfrontStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmCloudfrontStack.of"></a>
+
+```typescript
+import { TmCloudfrontStack } from 'tm-cdk-constructs'
+
+TmCloudfrontStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmCloudfrontStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStack.property.distributions">distributions</a></code> | <code>aws-cdk-lib.aws_cloudfront.Distribution[]</code> | The distributions, in the order of `domains`. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmCloudfrontStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmCloudfrontStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmCloudfrontStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmCloudfrontStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmCloudfrontStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmCloudfrontStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmCloudfrontStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmCloudfrontStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmCloudfrontStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmCloudfrontStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmCloudfrontStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmCloudfrontStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmCloudfrontStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmCloudfrontStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmCloudfrontStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmCloudfrontStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmCloudfrontStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmCloudfrontStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmCloudfrontStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmCloudfrontStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmCloudfrontStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmCloudfrontStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `distributions`<sup>Required</sup> <a name="distributions" id="tm-cdk-constructs.TmCloudfrontStack.property.distributions"></a>
+
+```typescript
+public readonly distributions: Distribution[];
+```
+
+- *Type:* aws-cdk-lib.aws_cloudfront.Distribution[]
+
+The distributions, in the order of `domains`.
+
+---
+
+
+### TmDistributionIdsParameter <a name="TmDistributionIdsParameter" id="tm-cdk-constructs.TmDistributionIdsParameter"></a>
+
+Writes the distribution-ID parameter: a plain ID, a JSON list of IDs, or a JSON object mapping every domain to its distribution ID.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmDistributionIdsParameter.Initializer"></a>
+
+```typescript
+import { TmDistributionIdsParameter } from 'tm-cdk-constructs'
+
+new TmDistributionIdsParameter(scope: Construct, id: string, options: TmDistributionIdsOptions, entries: TmDistributionEntry[])
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.options">options</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.entries">entries</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionEntry">TmDistributionEntry</a>[]</code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `options`<sup>Required</sup> <a name="options" id="tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.options"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a>
+
+---
+
+##### `entries`<sup>Required</sup> <a name="entries" id="tm-cdk-constructs.TmDistributionIdsParameter.Initializer.parameter.entries"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmDistributionEntry">TmDistributionEntry</a>[]
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.with">with</a></code> | Applies one or more mixins to this construct. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmDistributionIdsParameter.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmDistributionIdsParameter.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmDistributionIdsParameter.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmDistributionIdsParameter.isConstruct"></a>
+
+```typescript
+import { TmDistributionIdsParameter } from 'tm-cdk-constructs'
+
+TmDistributionIdsParameter.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmDistributionIdsParameter.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsParameter.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmDistributionIdsParameter.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
 
 ### TmEcsDeploymentHook <a name="TmEcsDeploymentHook" id="tm-cdk-constructs.TmEcsDeploymentHook"></a>
 
@@ -573,6 +5118,1141 @@ public readonly node: Node;
 - *Type:* constructs.Node
 
 The tree node.
+
+---
+
+
+### TmEcsStack <a name="TmEcsStack" id="tm-cdk-constructs.TmEcsStack"></a>
+
+Fargate service behind an application load balancer that only accepts CloudFront requests carrying the secret header.
+
+Reaches RDS and Redis, and
+mounts `typo3temp/assets` (plus the EFS FAL directories) from EFS, which the
+bastion can reach too. Publishes the load balancer DNS name in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmEcsStack.Initializer"></a>
+
+```typescript
+import { TmEcsStack } from 'tm-cdk-constructs'
+
+new TmEcsStack(scope: Construct, id: string, props: TmEcsStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmEcsStackProps">TmEcsStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmEcsStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmEcsStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmEcsStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmEcsStackProps">TmEcsStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmEcsStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmEcsStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmEcsStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmEcsStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmEcsStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmEcsStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmEcsStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmEcsStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmEcsStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmEcsStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmEcsStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmEcsStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmEcsStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmEcsStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmEcsStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmEcsStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmEcsStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmEcsStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmEcsStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmEcsStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmEcsStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmEcsStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmEcsStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmEcsStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmEcsStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmEcsStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmEcsStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmEcsStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmEcsStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmEcsStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmEcsStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmEcsStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmEcsStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmEcsStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmEcsStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmEcsStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmEcsStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmEcsStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmEcsStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmEcsStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmEcsStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmEcsStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmEcsStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmEcsStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmEcsStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmEcsStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmEcsStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmEcsStack.isConstruct"></a>
+
+```typescript
+import { TmEcsStack } from 'tm-cdk-constructs'
+
+TmEcsStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmEcsStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmEcsStack.consumeListReference"></a>
+
+```typescript
+import { TmEcsStack } from 'tm-cdk-constructs'
+
+TmEcsStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmEcsStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmEcsStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmEcsStack.consumeReference"></a>
+
+```typescript
+import { TmEcsStack } from 'tm-cdk-constructs'
+
+TmEcsStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmEcsStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmEcsStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmEcsStack.isStack"></a>
+
+```typescript
+import { TmEcsStack } from 'tm-cdk-constructs'
+
+TmEcsStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmEcsStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmEcsStack.of"></a>
+
+```typescript
+import { TmEcsStack } from 'tm-cdk-constructs'
+
+TmEcsStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmEcsStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.cluster">cluster</a></code> | <code>aws-cdk-lib.aws_ecs.ICluster</code> | The ECS cluster. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.fargateService">fargateService</a></code> | <code>aws-cdk-lib.aws_ecs.FargateService</code> | The Fargate service. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.loadbalancer">loadbalancer</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.ILoadBalancerV2</code> | The application load balancer. |
+| <code><a href="#tm-cdk-constructs.TmEcsStack.property.service">service</a></code> | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService">TmApplicationLoadBalancedFargateService</a></code> | The service pattern. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmEcsStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmEcsStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmEcsStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmEcsStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmEcsStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmEcsStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmEcsStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmEcsStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmEcsStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmEcsStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmEcsStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmEcsStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmEcsStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmEcsStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmEcsStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmEcsStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmEcsStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmEcsStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmEcsStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmEcsStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmEcsStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmEcsStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `cluster`<sup>Required</sup> <a name="cluster" id="tm-cdk-constructs.TmEcsStack.property.cluster"></a>
+
+```typescript
+public readonly cluster: ICluster;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.ICluster
+
+The ECS cluster.
+
+---
+
+##### `fargateService`<sup>Required</sup> <a name="fargateService" id="tm-cdk-constructs.TmEcsStack.property.fargateService"></a>
+
+```typescript
+public readonly fargateService: FargateService;
+```
+
+- *Type:* aws-cdk-lib.aws_ecs.FargateService
+
+The Fargate service.
+
+---
+
+##### `loadbalancer`<sup>Required</sup> <a name="loadbalancer" id="tm-cdk-constructs.TmEcsStack.property.loadbalancer"></a>
+
+```typescript
+public readonly loadbalancer: ILoadBalancerV2;
+```
+
+- *Type:* aws-cdk-lib.aws_elasticloadbalancingv2.ILoadBalancerV2
+
+The application load balancer.
+
+---
+
+##### `service`<sup>Required</sup> <a name="service" id="tm-cdk-constructs.TmEcsStack.property.service"></a>
+
+```typescript
+public readonly service: TmApplicationLoadBalancedFargateService;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateService">TmApplicationLoadBalancedFargateService</a>
+
+The service pattern.
 
 ---
 
@@ -1043,6 +6723,1132 @@ public readonly pipeline: CodePipeline;
 - *Type:* aws-cdk-lib.pipelines.CodePipeline
 
 The CodePipeline created by the construct.
+
+---
+
+
+### TmPipelineStack <a name="TmPipelineStack" id="tm-cdk-constructs.TmPipelineStack"></a>
+
+Self-mutating CodePipeline that synthesizes the infrastructure repository with the application repository checked out in it, deploys `TmWebappAppStage`, then invalidates the CloudFront distributions.
+
+The synth runs without context lookups, so `cdk.context.json` must be
+committed with every value the app needs (run `cdk synth` locally first).
+
+Every CloudFormation resource of this stack gets the removal policy from the
+`removalPolicy` context value (`RETAIN` or `DESTROY`, default `RETAIN`).
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmPipelineStack.Initializer"></a>
+
+```typescript
+import { TmPipelineStack } from 'tm-cdk-constructs'
+
+new TmPipelineStack(scope: Construct, id: string, props: TmPipelineStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmPipelineStackProps">TmPipelineStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmPipelineStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmPipelineStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmPipelineStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmPipelineStackProps">TmPipelineStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmPipelineStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmPipelineStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmPipelineStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmPipelineStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmPipelineStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmPipelineStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmPipelineStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmPipelineStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmPipelineStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmPipelineStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmPipelineStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmPipelineStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmPipelineStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmPipelineStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmPipelineStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmPipelineStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmPipelineStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmPipelineStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmPipelineStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmPipelineStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmPipelineStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmPipelineStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmPipelineStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmPipelineStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmPipelineStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmPipelineStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmPipelineStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmPipelineStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmPipelineStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmPipelineStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmPipelineStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmPipelineStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmPipelineStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmPipelineStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmPipelineStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmPipelineStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmPipelineStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmPipelineStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmPipelineStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmPipelineStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmPipelineStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmPipelineStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmPipelineStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmPipelineStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmPipelineStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmPipelineStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmPipelineStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmPipelineStack.isConstruct"></a>
+
+```typescript
+import { TmPipelineStack } from 'tm-cdk-constructs'
+
+TmPipelineStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmPipelineStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmPipelineStack.consumeListReference"></a>
+
+```typescript
+import { TmPipelineStack } from 'tm-cdk-constructs'
+
+TmPipelineStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmPipelineStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmPipelineStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmPipelineStack.consumeReference"></a>
+
+```typescript
+import { TmPipelineStack } from 'tm-cdk-constructs'
+
+TmPipelineStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmPipelineStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmPipelineStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmPipelineStack.isStack"></a>
+
+```typescript
+import { TmPipelineStack } from 'tm-cdk-constructs'
+
+TmPipelineStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmPipelineStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmPipelineStack.of"></a>
+
+```typescript
+import { TmPipelineStack } from 'tm-cdk-constructs'
+
+TmPipelineStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmPipelineStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.appStage">appStage</a></code> | <code><a href="#tm-cdk-constructs.TmWebappAppStage">TmWebappAppStage</a></code> | The application stage. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.crossRegionSupportStacks">crossRegionSupportStacks</a></code> | <code>aws-cdk-lib.Stack[]</code> | Stacks CodePipeline creates for its artifact buckets in the other regions of the stage (us-east-1 with a WebACL). |
+| <code><a href="#tm-cdk-constructs.TmPipelineStack.property.pipeline">pipeline</a></code> | <code>aws-cdk-lib.pipelines.CodePipeline</code> | The pipeline. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmPipelineStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmPipelineStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmPipelineStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmPipelineStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmPipelineStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmPipelineStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmPipelineStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmPipelineStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmPipelineStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmPipelineStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmPipelineStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmPipelineStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmPipelineStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmPipelineStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmPipelineStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmPipelineStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmPipelineStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmPipelineStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmPipelineStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmPipelineStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmPipelineStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmPipelineStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `appStage`<sup>Required</sup> <a name="appStage" id="tm-cdk-constructs.TmPipelineStack.property.appStage"></a>
+
+```typescript
+public readonly appStage: TmWebappAppStage;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmWebappAppStage">TmWebappAppStage</a>
+
+The application stage.
+
+---
+
+##### `crossRegionSupportStacks`<sup>Required</sup> <a name="crossRegionSupportStacks" id="tm-cdk-constructs.TmPipelineStack.property.crossRegionSupportStacks"></a>
+
+```typescript
+public readonly crossRegionSupportStacks: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Stacks CodePipeline creates for its artifact buckets in the other regions of the stage (us-east-1 with a WebACL).
+
+They are deployed with this stack.
+
+---
+
+##### `pipeline`<sup>Required</sup> <a name="pipeline" id="tm-cdk-constructs.TmPipelineStack.property.pipeline"></a>
+
+```typescript
+public readonly pipeline: CodePipeline;
+```
+
+- *Type:* aws-cdk-lib.pipelines.CodePipeline
+
+The pipeline.
 
 ---
 
@@ -2392,6 +9198,5505 @@ Uniquely identifies this class.
 
 ---
 
+### TmRdsAuroraMysqlServerlessStack <a name="TmRdsAuroraMysqlServerlessStack" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack"></a>
+
+Aurora MySQL cluster, reachable from the bastion, with capacity alarms and a slow-query dashboard.
+
+Publishes its endpoints, ARN and security group ID in
+SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStack } from 'tm-cdk-constructs'
+
+new TmRdsAuroraMysqlServerlessStack(scope: Construct, id: string, props: TmRdsAuroraMysqlServerlessStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps">TmRdsAuroraMysqlServerlessStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps">TmRdsAuroraMysqlServerlessStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.isConstruct"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStack } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlServerlessStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeListReference"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStack } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlServerlessStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeReference"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStack } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlServerlessStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.isStack"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStack } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlServerlessStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.of"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStack } from 'tm-cdk-constructs'
+
+TmRdsAuroraMysqlServerlessStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.securityGroup">securityGroup</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup</code> | Security group of the cluster. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `securityGroup`<sup>Required</sup> <a name="securityGroup" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack.property.securityGroup"></a>
+
+```typescript
+public readonly securityGroup: ISecurityGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup
+
+Security group of the cluster.
+
+---
+
+
+### TmRedirectionsEc2Stack <a name="TmRedirectionsEc2Stack" id="tm-cdk-constructs.TmRedirectionsEc2Stack"></a>
+
+Public EC2 instance with an Elastic IP, open on ports 80 and 443, that serves domain redirections (e.g. apex to `www`). The redirections are configured on the instance, outside CDK. Publishes the Elastic IP in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer"></a>
+
+```typescript
+import { TmRedirectionsEc2Stack } from 'tm-cdk-constructs'
+
+new TmRedirectionsEc2Stack(scope: Construct, id: string, props: TmRedirectionsEc2StackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps">TmRedirectionsEc2StackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmRedirectionsEc2Stack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps">TmRedirectionsEc2StackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmRedirectionsEc2Stack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmRedirectionsEc2Stack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRedirectionsEc2Stack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmRedirectionsEc2Stack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmRedirectionsEc2Stack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmRedirectionsEc2Stack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmRedirectionsEc2Stack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmRedirectionsEc2Stack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmRedirectionsEc2Stack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmRedirectionsEc2Stack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmRedirectionsEc2Stack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmRedirectionsEc2Stack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmRedirectionsEc2Stack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmRedirectionsEc2Stack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmRedirectionsEc2Stack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmRedirectionsEc2Stack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmRedirectionsEc2Stack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmRedirectionsEc2Stack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmRedirectionsEc2Stack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmRedirectionsEc2Stack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmRedirectionsEc2Stack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmRedirectionsEc2Stack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmRedirectionsEc2Stack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmRedirectionsEc2Stack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmRedirectionsEc2Stack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRedirectionsEc2Stack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmRedirectionsEc2Stack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmRedirectionsEc2Stack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmRedirectionsEc2Stack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmRedirectionsEc2Stack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRedirectionsEc2Stack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmRedirectionsEc2Stack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmRedirectionsEc2Stack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRedirectionsEc2Stack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmRedirectionsEc2Stack.isConstruct"></a>
+
+```typescript
+import { TmRedirectionsEc2Stack } from 'tm-cdk-constructs'
+
+TmRedirectionsEc2Stack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRedirectionsEc2Stack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmRedirectionsEc2Stack.consumeListReference"></a>
+
+```typescript
+import { TmRedirectionsEc2Stack } from 'tm-cdk-constructs'
+
+TmRedirectionsEc2Stack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRedirectionsEc2Stack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmRedirectionsEc2Stack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmRedirectionsEc2Stack.consumeReference"></a>
+
+```typescript
+import { TmRedirectionsEc2Stack } from 'tm-cdk-constructs'
+
+TmRedirectionsEc2Stack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRedirectionsEc2Stack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmRedirectionsEc2Stack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmRedirectionsEc2Stack.isStack"></a>
+
+```typescript
+import { TmRedirectionsEc2Stack } from 'tm-cdk-constructs'
+
+TmRedirectionsEc2Stack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRedirectionsEc2Stack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmRedirectionsEc2Stack.of"></a>
+
+```typescript
+import { TmRedirectionsEc2Stack } from 'tm-cdk-constructs'
+
+TmRedirectionsEc2Stack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmRedirectionsEc2Stack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.publicIp">publicIp</a></code> | <code>string</code> | Public IP the redirected domains point to. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack.property.securityGroup">securityGroup</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup</code> | Security group of the instance. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `publicIp`<sup>Required</sup> <a name="publicIp" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.publicIp"></a>
+
+```typescript
+public readonly publicIp: string;
+```
+
+- *Type:* string
+
+Public IP the redirected domains point to.
+
+---
+
+##### `securityGroup`<sup>Required</sup> <a name="securityGroup" id="tm-cdk-constructs.TmRedirectionsEc2Stack.property.securityGroup"></a>
+
+```typescript
+public readonly securityGroup: ISecurityGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup
+
+Security group of the instance.
+
+---
+
+
+### TmRedisStack <a name="TmRedisStack" id="tm-cdk-constructs.TmRedisStack"></a>
+
+Redis replication group (cluster mode disabled), reachable from the bastion.
+
+Publishes its primary endpoint and security group ID in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmRedisStack.Initializer"></a>
+
+```typescript
+import { TmRedisStack } from 'tm-cdk-constructs'
+
+new TmRedisStack(scope: Construct, id: string, props: TmRedisStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmRedisStackProps">TmRedisStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmRedisStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmRedisStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmRedisStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmRedisStackProps">TmRedisStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmRedisStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmRedisStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmRedisStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmRedisStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmRedisStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmRedisStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmRedisStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmRedisStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRedisStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmRedisStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmRedisStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmRedisStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmRedisStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmRedisStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmRedisStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmRedisStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmRedisStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmRedisStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmRedisStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmRedisStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmRedisStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmRedisStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmRedisStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmRedisStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmRedisStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmRedisStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmRedisStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmRedisStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmRedisStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmRedisStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmRedisStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmRedisStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmRedisStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmRedisStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmRedisStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmRedisStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmRedisStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmRedisStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRedisStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmRedisStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmRedisStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmRedisStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmRedisStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRedisStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmRedisStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmRedisStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmRedisStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmRedisStack.isConstruct"></a>
+
+```typescript
+import { TmRedisStack } from 'tm-cdk-constructs'
+
+TmRedisStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRedisStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmRedisStack.consumeListReference"></a>
+
+```typescript
+import { TmRedisStack } from 'tm-cdk-constructs'
+
+TmRedisStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRedisStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmRedisStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmRedisStack.consumeReference"></a>
+
+```typescript
+import { TmRedisStack } from 'tm-cdk-constructs'
+
+TmRedisStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmRedisStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmRedisStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmRedisStack.isStack"></a>
+
+```typescript
+import { TmRedisStack } from 'tm-cdk-constructs'
+
+TmRedisStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmRedisStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmRedisStack.of"></a>
+
+```typescript
+import { TmRedisStack } from 'tm-cdk-constructs'
+
+TmRedisStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmRedisStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStack.property.securityGroup">securityGroup</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup</code> | Security group of the replication group. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmRedisStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmRedisStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmRedisStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmRedisStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmRedisStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmRedisStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmRedisStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmRedisStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmRedisStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmRedisStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmRedisStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmRedisStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmRedisStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmRedisStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmRedisStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmRedisStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmRedisStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmRedisStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmRedisStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmRedisStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmRedisStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmRedisStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `securityGroup`<sup>Required</sup> <a name="securityGroup" id="tm-cdk-constructs.TmRedisStack.property.securityGroup"></a>
+
+```typescript
+public readonly securityGroup: ISecurityGroup;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.ISecurityGroup
+
+Security group of the replication group.
+
+---
+
+
+### TmS3Stack <a name="TmS3Stack" id="tm-cdk-constructs.TmS3Stack"></a>
+
+Buckets used by the distributions: FAL content, CloudFront access logs and error pages.
+
+CloudFront distributions of the account read the content and
+error buckets through origin access control. Publishes the bucket names in
+SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmS3Stack.Initializer"></a>
+
+```typescript
+import { TmS3Stack } from 'tm-cdk-constructs'
+
+new TmS3Stack(scope: Construct, id: string, props: TmS3StackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmS3StackProps">TmS3StackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmS3Stack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmS3Stack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmS3Stack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmS3StackProps">TmS3StackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmS3Stack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmS3Stack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmS3Stack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmS3Stack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmS3Stack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmS3Stack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmS3Stack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmS3Stack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmS3Stack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmS3Stack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmS3Stack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmS3Stack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmS3Stack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmS3Stack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmS3Stack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmS3Stack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmS3Stack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmS3Stack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmS3Stack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmS3Stack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmS3Stack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmS3Stack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmS3Stack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmS3Stack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmS3Stack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmS3Stack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmS3Stack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmS3Stack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmS3Stack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmS3Stack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmS3Stack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmS3Stack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmS3Stack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmS3Stack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmS3Stack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmS3Stack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmS3Stack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmS3Stack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmS3Stack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmS3Stack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmS3Stack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmS3Stack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmS3Stack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmS3Stack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmS3Stack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmS3Stack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmS3Stack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmS3Stack.isConstruct"></a>
+
+```typescript
+import { TmS3Stack } from 'tm-cdk-constructs'
+
+TmS3Stack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmS3Stack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmS3Stack.consumeListReference"></a>
+
+```typescript
+import { TmS3Stack } from 'tm-cdk-constructs'
+
+TmS3Stack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmS3Stack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmS3Stack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmS3Stack.consumeReference"></a>
+
+```typescript
+import { TmS3Stack } from 'tm-cdk-constructs'
+
+TmS3Stack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmS3Stack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmS3Stack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmS3Stack.isStack"></a>
+
+```typescript
+import { TmS3Stack } from 'tm-cdk-constructs'
+
+TmS3Stack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmS3Stack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmS3Stack.of"></a>
+
+```typescript
+import { TmS3Stack } from 'tm-cdk-constructs'
+
+TmS3Stack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmS3Stack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.contentBucket">contentBucket</a></code> | <code>aws-cdk-lib.aws_s3.Bucket</code> | The FAL content bucket. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.errorBucket">errorBucket</a></code> | <code>aws-cdk-lib.aws_s3.Bucket</code> | The error page bucket. |
+| <code><a href="#tm-cdk-constructs.TmS3Stack.property.logBucket">logBucket</a></code> | <code>aws-cdk-lib.aws_s3.Bucket</code> | The CloudFront access log bucket. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmS3Stack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmS3Stack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmS3Stack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmS3Stack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmS3Stack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmS3Stack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmS3Stack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmS3Stack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmS3Stack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmS3Stack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmS3Stack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmS3Stack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmS3Stack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmS3Stack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmS3Stack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmS3Stack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmS3Stack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmS3Stack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmS3Stack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmS3Stack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmS3Stack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmS3Stack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `contentBucket`<sup>Optional</sup> <a name="contentBucket" id="tm-cdk-constructs.TmS3Stack.property.contentBucket"></a>
+
+```typescript
+public readonly contentBucket: Bucket;
+```
+
+- *Type:* aws-cdk-lib.aws_s3.Bucket
+
+The FAL content bucket.
+
+---
+
+##### `errorBucket`<sup>Optional</sup> <a name="errorBucket" id="tm-cdk-constructs.TmS3Stack.property.errorBucket"></a>
+
+```typescript
+public readonly errorBucket: Bucket;
+```
+
+- *Type:* aws-cdk-lib.aws_s3.Bucket
+
+The error page bucket.
+
+---
+
+##### `logBucket`<sup>Optional</sup> <a name="logBucket" id="tm-cdk-constructs.TmS3Stack.property.logBucket"></a>
+
+```typescript
+public readonly logBucket: Bucket;
+```
+
+- *Type:* aws-cdk-lib.aws_s3.Bucket
+
+The CloudFront access log bucket.
+
+---
+
+
+### TmServiceIamUsersStack <a name="TmServiceIamUsersStack" id="tm-cdk-constructs.TmServiceIamUsersStack"></a>
+
+IAM users whose access keys TYPO3 uses (tm_s3assets, tm_cloudfront).
+
+Each
+key is stored in a Secrets Manager secret (`AccessKeyId` and
+`SecretAccessKey` fields) whose ARN is published in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmServiceIamUsersStack.Initializer"></a>
+
+```typescript
+import { TmServiceIamUsersStack } from 'tm-cdk-constructs'
+
+new TmServiceIamUsersStack(scope: Construct, id: string, props: TmServiceIamUsersStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps">TmServiceIamUsersStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmServiceIamUsersStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmServiceIamUsersStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmServiceIamUsersStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmServiceIamUsersStackProps">TmServiceIamUsersStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmServiceIamUsersStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmServiceIamUsersStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmServiceIamUsersStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmServiceIamUsersStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmServiceIamUsersStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmServiceIamUsersStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmServiceIamUsersStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmServiceIamUsersStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmServiceIamUsersStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmServiceIamUsersStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmServiceIamUsersStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmServiceIamUsersStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmServiceIamUsersStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmServiceIamUsersStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmServiceIamUsersStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmServiceIamUsersStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmServiceIamUsersStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmServiceIamUsersStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmServiceIamUsersStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmServiceIamUsersStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmServiceIamUsersStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmServiceIamUsersStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmServiceIamUsersStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmServiceIamUsersStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmServiceIamUsersStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmServiceIamUsersStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmServiceIamUsersStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmServiceIamUsersStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmServiceIamUsersStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmServiceIamUsersStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmServiceIamUsersStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmServiceIamUsersStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmServiceIamUsersStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmServiceIamUsersStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmServiceIamUsersStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmServiceIamUsersStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmServiceIamUsersStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmServiceIamUsersStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmServiceIamUsersStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmServiceIamUsersStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmServiceIamUsersStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmServiceIamUsersStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmServiceIamUsersStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmServiceIamUsersStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmServiceIamUsersStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmServiceIamUsersStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmServiceIamUsersStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmServiceIamUsersStack.isConstruct"></a>
+
+```typescript
+import { TmServiceIamUsersStack } from 'tm-cdk-constructs'
+
+TmServiceIamUsersStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmServiceIamUsersStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmServiceIamUsersStack.consumeListReference"></a>
+
+```typescript
+import { TmServiceIamUsersStack } from 'tm-cdk-constructs'
+
+TmServiceIamUsersStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmServiceIamUsersStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmServiceIamUsersStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmServiceIamUsersStack.consumeReference"></a>
+
+```typescript
+import { TmServiceIamUsersStack } from 'tm-cdk-constructs'
+
+TmServiceIamUsersStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmServiceIamUsersStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmServiceIamUsersStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmServiceIamUsersStack.isStack"></a>
+
+```typescript
+import { TmServiceIamUsersStack } from 'tm-cdk-constructs'
+
+TmServiceIamUsersStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmServiceIamUsersStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmServiceIamUsersStack.of"></a>
+
+```typescript
+import { TmServiceIamUsersStack } from 'tm-cdk-constructs'
+
+TmServiceIamUsersStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmServiceIamUsersStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmServiceIamUsersStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmServiceIamUsersStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmServiceIamUsersStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmServiceIamUsersStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmServiceIamUsersStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmServiceIamUsersStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmServiceIamUsersStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmServiceIamUsersStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmServiceIamUsersStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmServiceIamUsersStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmServiceIamUsersStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmServiceIamUsersStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmServiceIamUsersStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmServiceIamUsersStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmServiceIamUsersStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmServiceIamUsersStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmServiceIamUsersStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmServiceIamUsersStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmServiceIamUsersStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmServiceIamUsersStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmServiceIamUsersStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmServiceIamUsersStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+
 ### TmSolrEc2 <a name="TmSolrEc2" id="tm-cdk-constructs.TmSolrEc2"></a>
 
 #### Initializers <a name="Initializers" id="tm-cdk-constructs.TmSolrEc2.Initializer"></a>
@@ -3654,7 +15959,3760 @@ Uniquely identifies this class.
 
 ---
 
+### TmVpcBaseStack <a name="TmVpcBaseStack" id="tm-cdk-constructs.TmVpcBaseStack"></a>
+
+VPC (public, private and isolated subnets over two AZs) and a private hosted zone.
+
+Publishes the VPC and subnet IDs in SSM.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmVpcBaseStack.Initializer"></a>
+
+```typescript
+import { TmVpcBaseStack } from 'tm-cdk-constructs'
+
+new TmVpcBaseStack(scope: Construct, id: string, props: TmVpcBaseStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps">TmVpcBaseStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmVpcBaseStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmVpcBaseStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmVpcBaseStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmVpcBaseStackProps">TmVpcBaseStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmVpcBaseStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmVpcBaseStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmVpcBaseStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmVpcBaseStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmVpcBaseStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmVpcBaseStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmVpcBaseStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmVpcBaseStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmVpcBaseStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmVpcBaseStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmVpcBaseStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmVpcBaseStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmVpcBaseStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmVpcBaseStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmVpcBaseStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmVpcBaseStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmVpcBaseStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmVpcBaseStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmVpcBaseStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmVpcBaseStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmVpcBaseStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmVpcBaseStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmVpcBaseStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmVpcBaseStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmVpcBaseStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmVpcBaseStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmVpcBaseStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmVpcBaseStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmVpcBaseStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmVpcBaseStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmVpcBaseStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmVpcBaseStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmVpcBaseStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmVpcBaseStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmVpcBaseStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmVpcBaseStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmVpcBaseStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmVpcBaseStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmVpcBaseStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmVpcBaseStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmVpcBaseStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmVpcBaseStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmVpcBaseStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmVpcBaseStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmVpcBaseStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmVpcBaseStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmVpcBaseStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmVpcBaseStack.isConstruct"></a>
+
+```typescript
+import { TmVpcBaseStack } from 'tm-cdk-constructs'
+
+TmVpcBaseStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmVpcBaseStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmVpcBaseStack.consumeListReference"></a>
+
+```typescript
+import { TmVpcBaseStack } from 'tm-cdk-constructs'
+
+TmVpcBaseStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmVpcBaseStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmVpcBaseStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmVpcBaseStack.consumeReference"></a>
+
+```typescript
+import { TmVpcBaseStack } from 'tm-cdk-constructs'
+
+TmVpcBaseStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmVpcBaseStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmVpcBaseStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmVpcBaseStack.isStack"></a>
+
+```typescript
+import { TmVpcBaseStack } from 'tm-cdk-constructs'
+
+TmVpcBaseStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmVpcBaseStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmVpcBaseStack.of"></a>
+
+```typescript
+import { TmVpcBaseStack } from 'tm-cdk-constructs'
+
+TmVpcBaseStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmVpcBaseStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.hostedZone">hostedZone</a></code> | <code>aws-cdk-lib.aws_route53.IHostedZone</code> | The private hosted zone. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStack.property.vpc">vpc</a></code> | <code>aws-cdk-lib.aws_ec2.IVpc</code> | The VPC. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmVpcBaseStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmVpcBaseStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmVpcBaseStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmVpcBaseStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmVpcBaseStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmVpcBaseStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmVpcBaseStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmVpcBaseStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmVpcBaseStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmVpcBaseStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmVpcBaseStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmVpcBaseStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmVpcBaseStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmVpcBaseStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmVpcBaseStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmVpcBaseStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmVpcBaseStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmVpcBaseStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmVpcBaseStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmVpcBaseStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmVpcBaseStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmVpcBaseStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `hostedZone`<sup>Required</sup> <a name="hostedZone" id="tm-cdk-constructs.TmVpcBaseStack.property.hostedZone"></a>
+
+```typescript
+public readonly hostedZone: IHostedZone;
+```
+
+- *Type:* aws-cdk-lib.aws_route53.IHostedZone
+
+The private hosted zone.
+
+---
+
+##### `vpc`<sup>Required</sup> <a name="vpc" id="tm-cdk-constructs.TmVpcBaseStack.property.vpc"></a>
+
+```typescript
+public readonly vpc: IVpc;
+```
+
+- *Type:* aws-cdk-lib.aws_ec2.IVpc
+
+The VPC.
+
+---
+
+
+### TmWafStack <a name="TmWafStack" id="tm-cdk-constructs.TmWafStack"></a>
+
+Baseline CloudFront-scope WebACL, derived from pgu's: AWS IP reputation, known bad inputs, a per-IP rate limit, and the common, SQL injection and PHP rule sets outside the TYPO3 backend (`/typo3/`).
+
+Anonymous IPs are counted
+only. Must be deployed in us-east-1. The ARN is published in SSM in the
+application region.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmWafStack.Initializer"></a>
+
+```typescript
+import { TmWafStack } from 'tm-cdk-constructs'
+
+new TmWafStack(scope: Construct, id: string, props: TmWafStackProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWafStack.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWafStack.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWafStack.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmWafStackProps">TmWafStackProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmWafStack.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmWafStack.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmWafStack.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmWafStackProps">TmWafStackProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWafStack.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.addDependency">addDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.addMetadata">addMetadata</a></code> | Adds an arbitrary key-value pair, with information you want to record about the stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.addStackDependency">addStackDependency</a></code> | Add a dependency between this stack and another stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.addStackTag">addStackTag</a></code> | Configure a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.addTransform">addTransform</a></code> | Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.exportStringListValue">exportStringListValue</a></code> | Create a CloudFormation Export for a string list value. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.exportValue">exportValue</a></code> | Create a CloudFormation Export for a string value. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.formatArn">formatArn</a></code> | Creates an ARN from components. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.getLogicalId">getLogicalId</a></code> | Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.regionalFact">regionalFact</a></code> | Look up a fact value for the given fact for the region of this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.removeStackTag">removeStackTag</a></code> | Remove a stack tag. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.renameLogicalId">renameLogicalId</a></code> | Rename a generated logical identities. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.reportMissingContextKey">reportMissingContextKey</a></code> | Indicate that a context key was expected. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.resolve">resolve</a></code> | Resolve a tokenized value in the context of the current stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.splitArn">splitArn</a></code> | Splits the provided ARN into its components. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.toJsonString">toJsonString</a></code> | Convert an object, potentially containing tokens, to a JSON string. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.toYamlString">toYamlString</a></code> | Convert an object, potentially containing tokens, to a YAML string. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmWafStack.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmWafStack.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmWafStack.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+---
+
+##### ~~`addDependency`~~ <a name="addDependency" id="tm-cdk-constructs.TmWafStack.addDependency"></a>
+
+```typescript
+public addDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method has been renamed to `addStackDependency` to more clearly
+set it apart from `construct.node.addDependency`. See the documentation
+of that function for more details.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmWafStack.addDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmWafStack.addDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addMetadata` <a name="addMetadata" id="tm-cdk-constructs.TmWafStack.addMetadata"></a>
+
+```typescript
+public addMetadata(key: string, value: any): void
+```
+
+Adds an arbitrary key-value pair, with information you want to record about the stack.
+
+These get translated to the Metadata section of the generated template.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/metadata-section-structure.html)
+
+###### `key`<sup>Required</sup> <a name="key" id="tm-cdk-constructs.TmWafStack.addMetadata.parameter.key"></a>
+
+- *Type:* string
+
+---
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmWafStack.addMetadata.parameter.value"></a>
+
+- *Type:* any
+
+---
+
+##### `addStackDependency` <a name="addStackDependency" id="tm-cdk-constructs.TmWafStack.addStackDependency"></a>
+
+```typescript
+public addStackDependency(target: Stack, reason?: string): void
+```
+
+Add a dependency between this stack and another stack.
+
+This can be used to define dependencies between any two stacks within an
+app, and also supports nested stacks.
+
+Stack dependencies may not cross Stage boundaries.
+
+This method only adds dependencies between stacks. If you are looking
+for a generic construct-to-construct dependency mechanism, use
+`construct.node.addDependency` instead.
+
+###### `target`<sup>Required</sup> <a name="target" id="tm-cdk-constructs.TmWafStack.addStackDependency.parameter.target"></a>
+
+- *Type:* aws-cdk-lib.Stack
+
+---
+
+###### `reason`<sup>Optional</sup> <a name="reason" id="tm-cdk-constructs.TmWafStack.addStackDependency.parameter.reason"></a>
+
+- *Type:* string
+
+---
+
+##### `addStackTag` <a name="addStackTag" id="tm-cdk-constructs.TmWafStack.addStackTag"></a>
+
+```typescript
+public addStackTag(tagName: string, tagValue: string): void
+```
+
+Configure a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmWafStack.addStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+###### `tagValue`<sup>Required</sup> <a name="tagValue" id="tm-cdk-constructs.TmWafStack.addStackTag.parameter.tagValue"></a>
+
+- *Type:* string
+
+---
+
+##### `addTransform` <a name="addTransform" id="tm-cdk-constructs.TmWafStack.addTransform"></a>
+
+```typescript
+public addTransform(transform: string): void
+```
+
+Add a Transform to this stack. A Transform is a macro that AWS CloudFormation uses to process your template.
+
+Duplicate values are removed when stack is synthesized.
+
+> [https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/transform-section-structure.html)
+
+*Example*
+
+```typescript
+declare const stack: Stack;
+
+stack.addTransform('AWS::Serverless-2016-10-31')
+```
+
+
+###### `transform`<sup>Required</sup> <a name="transform" id="tm-cdk-constructs.TmWafStack.addTransform.parameter.transform"></a>
+
+- *Type:* string
+
+The transform to add.
+
+---
+
+##### `exportStringListValue` <a name="exportStringListValue" id="tm-cdk-constructs.TmWafStack.exportStringListValue"></a>
+
+```typescript
+public exportStringListValue(exportedValue: any, options?: ExportValueOptions): string[]
+```
+
+Create a CloudFormation Export for a string list value.
+
+Returns a string list representing the corresponding `Fn.importValue()`
+expression for this Export. The export expression is automatically wrapped with an
+`Fn::Join` and the import value with an `Fn::Split`, since CloudFormation can only
+export strings. You can control the name for the export by passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+See `exportValue` for an example of this process.
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmWafStack.exportStringListValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmWafStack.exportStringListValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `exportValue` <a name="exportValue" id="tm-cdk-constructs.TmWafStack.exportValue"></a>
+
+```typescript
+public exportValue(exportedValue: any, options?: ExportValueOptions): string
+```
+
+Create a CloudFormation Export for a string value.
+
+Returns a string representing the corresponding `Fn.importValue()`
+expression for this Export. You can control the name for the export by
+passing the `name` option.
+
+If you don't supply a value for `name`, the value you're exporting must be
+a Resource attribute (for example: `bucket.bucketName`) and it will be
+given the same name as the automatic cross-stack reference that would be created
+if you used the attribute in another Stack.
+
+One of the uses for this method is to *remove* the relationship between
+two Stacks established by automatic cross-stack references. It will
+temporarily ensure that the CloudFormation Export still exists while you
+remove the reference from the consuming stack. After that, you can remove
+the resource and the manual export.
+
+Here is how the process works. Let's say there are two stacks,
+`producerStack` and `consumerStack`, and `producerStack` has a bucket
+called `bucket`, which is referenced by `consumerStack` (perhaps because
+an AWS Lambda Function writes into it, or something like that).
+
+It is not safe to remove `producerStack.bucket` because as the bucket is being
+deleted, `consumerStack` might still be using it.
+
+Instead, the process takes two deployments:
+
+**Deployment 1: break the relationship**:
+
+- Make sure `consumerStack` no longer references `bucket.bucketName` (maybe the consumer
+  stack now uses its own bucket, or it writes to an AWS DynamoDB table, or maybe you just
+  remove the Lambda Function altogether).
+- In the `ProducerStack` class, call `this.exportValue(this.bucket.bucketName)`. This
+  will make sure the CloudFormation Export continues to exist while the relationship
+  between the two stacks is being broken.
+- Deploy (this will effectively only change the `consumerStack`, but it's safe to deploy both).
+
+**Deployment 2: remove the bucket resource**:
+
+- You are now free to remove the `bucket` resource from `producerStack`.
+- Don't forget to remove the `exportValue()` call as well.
+- Deploy again (this time only the `producerStack` will be changed -- the bucket will be deleted).
+
+###### `exportedValue`<sup>Required</sup> <a name="exportedValue" id="tm-cdk-constructs.TmWafStack.exportValue.parameter.exportedValue"></a>
+
+- *Type:* any
+
+---
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmWafStack.exportValue.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.ExportValueOptions
+
+---
+
+##### `formatArn` <a name="formatArn" id="tm-cdk-constructs.TmWafStack.formatArn"></a>
+
+```typescript
+public formatArn(components: ArnComponents): string
+```
+
+Creates an ARN from components.
+
+If `partition`, `region` or `account` are not specified, the stack's
+partition, region and account will be used.
+
+If any component is the empty string, an empty string will be inserted
+into the generated ARN at the location that component corresponds to.
+
+The ARN will be formatted as follows:
+
+  arn:{partition}:{service}:{region}:{account}:{resource}{sep}{resource-name}
+
+The required ARN pieces that are omitted will be taken from the stack that
+the 'scope' is attached to. If all ARN pieces are supplied, the supplied scope
+can be 'undefined'.
+
+###### `components`<sup>Required</sup> <a name="components" id="tm-cdk-constructs.TmWafStack.formatArn.parameter.components"></a>
+
+- *Type:* aws-cdk-lib.ArnComponents
+
+---
+
+##### `getLogicalId` <a name="getLogicalId" id="tm-cdk-constructs.TmWafStack.getLogicalId"></a>
+
+```typescript
+public getLogicalId(element: CfnElement): string
+```
+
+Allocates a stack-unique CloudFormation-compatible logical identity for a specific resource.
+
+This method is called when a `CfnElement` is created and used to render the
+initial logical identity of resources. Logical ID renames are applied at
+this stage.
+
+This method uses the protected method `allocateLogicalId` to render the
+logical ID for an element. To modify the naming scheme, extend the `Stack`
+class and override this method.
+
+###### `element`<sup>Required</sup> <a name="element" id="tm-cdk-constructs.TmWafStack.getLogicalId.parameter.element"></a>
+
+- *Type:* aws-cdk-lib.CfnElement
+
+The CloudFormation element for which a logical identity is needed.
+
+---
+
+##### `regionalFact` <a name="regionalFact" id="tm-cdk-constructs.TmWafStack.regionalFact"></a>
+
+```typescript
+public regionalFact(factName: string, defaultValue?: string): string
+```
+
+Look up a fact value for the given fact for the region of this stack.
+
+Will return a definite value only if the region of the current stack is resolved.
+If not, a lookup map will be added to the stack and the lookup will be done at
+CDK deployment time.
+
+What regions will be included in the lookup map is controlled by the
+`@aws-cdk/core:target-partitions` context value: it must be set to a list
+of partitions, and only regions from the given partitions will be included.
+If no such context key is set, all regions will be included.
+
+This function is intended to be used by construct library authors. Application
+builders can rely on the abstractions offered by construct libraries and do
+not have to worry about regional facts.
+
+If `defaultValue` is not given, it is an error if the fact is unknown for
+the given region.
+
+###### `factName`<sup>Required</sup> <a name="factName" id="tm-cdk-constructs.TmWafStack.regionalFact.parameter.factName"></a>
+
+- *Type:* string
+
+---
+
+###### `defaultValue`<sup>Optional</sup> <a name="defaultValue" id="tm-cdk-constructs.TmWafStack.regionalFact.parameter.defaultValue"></a>
+
+- *Type:* string
+
+---
+
+##### `removeStackTag` <a name="removeStackTag" id="tm-cdk-constructs.TmWafStack.removeStackTag"></a>
+
+```typescript
+public removeStackTag(tagName: string): void
+```
+
+Remove a stack tag.
+
+At deploy time, CloudFormation will automatically apply all stack tags to all resources in the stack.
+
+###### `tagName`<sup>Required</sup> <a name="tagName" id="tm-cdk-constructs.TmWafStack.removeStackTag.parameter.tagName"></a>
+
+- *Type:* string
+
+---
+
+##### `renameLogicalId` <a name="renameLogicalId" id="tm-cdk-constructs.TmWafStack.renameLogicalId"></a>
+
+```typescript
+public renameLogicalId(oldId: string, newId: string): void
+```
+
+Rename a generated logical identities.
+
+To modify the naming scheme strategy, extend the `Stack` class and
+override the `allocateLogicalId` method.
+
+###### `oldId`<sup>Required</sup> <a name="oldId" id="tm-cdk-constructs.TmWafStack.renameLogicalId.parameter.oldId"></a>
+
+- *Type:* string
+
+---
+
+###### `newId`<sup>Required</sup> <a name="newId" id="tm-cdk-constructs.TmWafStack.renameLogicalId.parameter.newId"></a>
+
+- *Type:* string
+
+---
+
+##### `reportMissingContextKey` <a name="reportMissingContextKey" id="tm-cdk-constructs.TmWafStack.reportMissingContextKey"></a>
+
+```typescript
+public reportMissingContextKey(report: MissingContext): void
+```
+
+Indicate that a context key was expected.
+
+Contains instructions which will be emitted into the cloud assembly on how
+the key should be supplied.
+
+###### `report`<sup>Required</sup> <a name="report" id="tm-cdk-constructs.TmWafStack.reportMissingContextKey.parameter.report"></a>
+
+- *Type:* aws-cdk-lib.cloud_assembly_schema.MissingContext
+
+The set of parameters needed to obtain the context.
+
+---
+
+##### `resolve` <a name="resolve" id="tm-cdk-constructs.TmWafStack.resolve"></a>
+
+```typescript
+public resolve(obj: any): any
+```
+
+Resolve a tokenized value in the context of the current stack.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmWafStack.resolve.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+##### `splitArn` <a name="splitArn" id="tm-cdk-constructs.TmWafStack.splitArn"></a>
+
+```typescript
+public splitArn(arn: string, arnFormat: ArnFormat): ArnComponents
+```
+
+Splits the provided ARN into its components.
+
+Works both if 'arn' is a string like 'arn:aws:s3:::bucket',
+and a Token representing a dynamic CloudFormation expression
+(in which case the returned components will also be dynamic CloudFormation expressions,
+encoded as Tokens).
+
+###### `arn`<sup>Required</sup> <a name="arn" id="tm-cdk-constructs.TmWafStack.splitArn.parameter.arn"></a>
+
+- *Type:* string
+
+the ARN to split into its components.
+
+---
+
+###### `arnFormat`<sup>Required</sup> <a name="arnFormat" id="tm-cdk-constructs.TmWafStack.splitArn.parameter.arnFormat"></a>
+
+- *Type:* aws-cdk-lib.ArnFormat
+
+the expected format of 'arn' - depends on what format the service 'arn' represents uses.
+
+---
+
+##### `toJsonString` <a name="toJsonString" id="tm-cdk-constructs.TmWafStack.toJsonString"></a>
+
+```typescript
+public toJsonString(obj: any, space?: number): string
+```
+
+Convert an object, potentially containing tokens, to a JSON string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmWafStack.toJsonString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+###### `space`<sup>Optional</sup> <a name="space" id="tm-cdk-constructs.TmWafStack.toJsonString.parameter.space"></a>
+
+- *Type:* number
+
+---
+
+##### `toYamlString` <a name="toYamlString" id="tm-cdk-constructs.TmWafStack.toYamlString"></a>
+
+```typescript
+public toYamlString(obj: any): string
+```
+
+Convert an object, potentially containing tokens, to a YAML string.
+
+###### `obj`<sup>Required</sup> <a name="obj" id="tm-cdk-constructs.TmWafStack.toYamlString.parameter.obj"></a>
+
+- *Type:* any
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWafStack.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.consumeListReference">consumeListReference</a></code> | Override the reference strength for a specific cross-stack string list reference. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmWafStack.isConstruct"></a>
+
+```typescript
+import { TmWafStack } from 'tm-cdk-constructs'
+
+TmWafStack.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmWafStack.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `consumeListReference` <a name="consumeListReference" id="tm-cdk-constructs.TmWafStack.consumeListReference"></a>
+
+```typescript
+import { TmWafStack } from 'tm-cdk-constructs'
+
+TmWafStack.consumeListReference(value: string[], strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack string list reference.
+
+This is the string list equivalent of `consumeReference`.
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmWafStack.consumeListReference.parameter.value"></a>
+
+- *Type:* string[]
+
+A tokenized string list reference.
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmWafStack.consumeListReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `consumeReference` <a name="consumeReference" id="tm-cdk-constructs.TmWafStack.consumeReference"></a>
+
+```typescript
+import { TmWafStack } from 'tm-cdk-constructs'
+
+TmWafStack.consumeReference(value: string, strength?: ReferenceStrength)
+```
+
+Override the reference strength for a specific cross-stack reference value.
+
+Use this to weaken (or strengthen) an individual reference without
+affecting other references to the same resource. For example:
+
+```ts
+// producerStack defines an SNS topic
+declare const topic: sns.Topic;
+
+// consumerStack subscribes to it with a weak reference,
+// so the producer can be torn down without blocking on this consumer
+const consumerStack = new Stack(app, 'Consumer', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+new sns.Subscription(consumerStack, 'Subscription', {
+  topic: sns.Topic.fromTopicArn(consumerStack, 'Topic', Stack.consumeReference(topic.topicArn)),
+  endpoint: 'https://example.com/webhook',
+  protocol: sns.SubscriptionProtocol.HTTPS,
+});
+```
+
+###### `value`<sup>Required</sup> <a name="value" id="tm-cdk-constructs.TmWafStack.consumeReference.parameter.value"></a>
+
+- *Type:* string
+
+A tokenized string reference (e.g. `bucket.bucketArn`).
+
+---
+
+###### `strength`<sup>Optional</sup> <a name="strength" id="tm-cdk-constructs.TmWafStack.consumeReference.parameter.strength"></a>
+
+- *Type:* aws-cdk-lib.ReferenceStrength
+
+The reference strength to use.
+
+Defaults to `BOTH`.
+
+---
+
+##### `isStack` <a name="isStack" id="tm-cdk-constructs.TmWafStack.isStack"></a>
+
+```typescript
+import { TmWafStack } from 'tm-cdk-constructs'
+
+TmWafStack.isStack(x: any)
+```
+
+Return whether the given object is a Stack.
+
+We do attribute detection since we can't reliably use 'instanceof'.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmWafStack.isStack.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmWafStack.of"></a>
+
+```typescript
+import { TmWafStack } from 'tm-cdk-constructs'
+
+TmWafStack.of(construct: IConstruct)
+```
+
+Looks up the first stack scope in which `construct` is defined.
+
+Fails if there is no stack up the tree.
+
+Will return the closest containing `Stack` or `NestedStack`.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmWafStack.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+The construct to start the search from.
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.account">account</a></code> | <code>string</code> | The AWS account into which this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.artifactId">artifactId</a></code> | <code>string</code> | The ID of the cloud assembly artifact for this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.availabilityZones">availabilityZones</a></code> | <code>string[]</code> | Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.bundlingRequired">bundlingRequired</a></code> | <code>boolean</code> | Indicates whether the stack requires bundling or not. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.dependencies">dependencies</a></code> | <code>aws-cdk-lib.Stack[]</code> | Return the stacks this stack depends on. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.env">env</a></code> | <code>aws-cdk-lib.interfaces.ResourceEnvironment</code> | The environment this Stack deploys to. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.environment">environment</a></code> | <code>string</code> | The environment coordinates in which this stack is deployed. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.nested">nested</a></code> | <code>boolean</code> | Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | Returns the list of notification Amazon Resource Names (ARNs) for the current stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.partition">partition</a></code> | <code>string</code> | The partition in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.region">region</a></code> | <code>string</code> | The AWS region into which this stack will be deployed (e.g. `us-west-2`). |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.stackId">stackId</a></code> | <code>string</code> | The ID of the stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.stackName">stackName</a></code> | <code>string</code> | The concrete CloudFormation physical stack name. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method for this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.tags">tags</a></code> | <code>aws-cdk-lib.TagManager</code> | Tags to be applied to the stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.templateFile">templateFile</a></code> | <code>string</code> | The name of the CloudFormation template file emitted to the output directory during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.templateOptions">templateOptions</a></code> | <code>aws-cdk-lib.ITemplateOptions</code> | Options for CloudFormation template (like version, transform, description). |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.urlSuffix">urlSuffix</a></code> | <code>string</code> | The Amazon domain suffix for the region in which this stack is defined. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.nestedStackParent">nestedStackParent</a></code> | <code>aws-cdk-lib.Stack</code> | If this is a nested stack, returns its parent stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.nestedStackResource">nestedStackResource</a></code> | <code>aws-cdk-lib.CfnResource</code> | If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether termination protection is enabled for this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStack.property.webAclArn">webAclArn</a></code> | <code>string</code> | ARN of the WebACL. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmWafStack.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.TmWafStack.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The AWS account into which this stack will be deployed.
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.account` when the stack is defined. This can
+   either be a concrete account (e.g. `585695031111`) or the
+   `Aws.ACCOUNT_ID` token.
+3. `Aws.ACCOUNT_ID`, which represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::AccountId" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.account)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into an **account-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other account-agnostic behavior.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmWafStack.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+The ID of the cloud assembly artifact for this stack.
+
+---
+
+##### `availabilityZones`<sup>Required</sup> <a name="availabilityZones" id="tm-cdk-constructs.TmWafStack.property.availabilityZones"></a>
+
+```typescript
+public readonly availabilityZones: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of AZs that are available in the AWS environment (account/region) associated with this stack.
+
+If the stack is environment-agnostic (either account and/or region are
+tokens), this property will return an array with 2 tokens that will resolve
+at deploy-time to the first two availability zones returned from CloudFormation's
+`Fn::GetAZs` intrinsic function.
+
+If they are not available in the context, returns a set of dummy values and
+reports them as missing, and let the CLI resolve them by calling EC2
+`DescribeAvailabilityZones` on the target environment.
+
+To specify a different strategy for selecting availability zones override this method.
+
+---
+
+##### `bundlingRequired`<sup>Required</sup> <a name="bundlingRequired" id="tm-cdk-constructs.TmWafStack.property.bundlingRequired"></a>
+
+```typescript
+public readonly bundlingRequired: boolean;
+```
+
+- *Type:* boolean
+
+Indicates whether the stack requires bundling or not.
+
+---
+
+##### `dependencies`<sup>Required</sup> <a name="dependencies" id="tm-cdk-constructs.TmWafStack.property.dependencies"></a>
+
+```typescript
+public readonly dependencies: Stack[];
+```
+
+- *Type:* aws-cdk-lib.Stack[]
+
+Return the stacks this stack depends on.
+
+---
+
+##### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmWafStack.property.env"></a>
+
+```typescript
+public readonly env: ResourceEnvironment;
+```
+
+- *Type:* aws-cdk-lib.interfaces.ResourceEnvironment
+
+The environment this Stack deploys to.
+
+---
+
+##### `environment`<sup>Required</sup> <a name="environment" id="tm-cdk-constructs.TmWafStack.property.environment"></a>
+
+```typescript
+public readonly environment: string;
+```
+
+- *Type:* string
+
+The environment coordinates in which this stack is deployed.
+
+In the form
+`aws://account/region`. Use `stack.account` and `stack.region` to obtain
+the specific values, no need to parse.
+
+You can use this value to determine if two stacks are targeting the same
+environment.
+
+If either `stack.account` or `stack.region` are not concrete values (e.g.
+`Aws.ACCOUNT_ID` or `Aws.REGION`) the special strings `unknown-account` and/or
+`unknown-region` will be used respectively to indicate this stack is
+region/account-agnostic.
+
+---
+
+##### `nested`<sup>Required</sup> <a name="nested" id="tm-cdk-constructs.TmWafStack.property.nested"></a>
+
+```typescript
+public readonly nested: boolean;
+```
+
+- *Type:* boolean
+
+Indicates if this is a nested stack, in which case `parentStack` will include a reference to its parent.
+
+---
+
+##### `notificationArns`<sup>Required</sup> <a name="notificationArns" id="tm-cdk-constructs.TmWafStack.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+
+Returns the list of notification Amazon Resource Names (ARNs) for the current stack.
+
+---
+
+##### `partition`<sup>Required</sup> <a name="partition" id="tm-cdk-constructs.TmWafStack.property.partition"></a>
+
+```typescript
+public readonly partition: string;
+```
+
+- *Type:* string
+
+The partition in which this stack is defined.
+
+---
+
+##### `region`<sup>Required</sup> <a name="region" id="tm-cdk-constructs.TmWafStack.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The AWS region into which this stack will be deployed (e.g. `us-west-2`).
+
+This value is resolved according to the following rules:
+
+1. The value provided to `env.region` when the stack is defined. This can
+   either be a concrete region (e.g. `us-west-2`) or the `Aws.REGION`
+   token.
+3. `Aws.REGION`, which is represents the CloudFormation intrinsic reference
+   `{ "Ref": "AWS::Region" }` encoded as a string token.
+
+Preferably, you should use the return value as an opaque string and not
+attempt to parse it to implement your logic. If you do, you must first
+check that it is a concrete value an not an unresolved token. If this
+value is an unresolved token (`Token.isUnresolved(stack.region)` returns
+`true`), this implies that the user wishes that this stack will synthesize
+into a **region-agnostic template**. In this case, your code should either
+fail (throw an error, emit a synth error using `Annotations.of(construct).addError()`) or
+implement some other region-agnostic behavior.
+
+---
+
+##### `stackId`<sup>Required</sup> <a name="stackId" id="tm-cdk-constructs.TmWafStack.property.stackId"></a>
+
+```typescript
+public readonly stackId: string;
+```
+
+- *Type:* string
+
+The ID of the stack.
+
+---
+
+*Example*
+
+```typescript
+// After resolving, looks like
+'arn:aws:cloudformation:us-west-2:123456789012:stack/teststack/51af3dc0-da77-11e4-872e-1234567db123'
+```
+
+
+##### `stackName`<sup>Required</sup> <a name="stackName" id="tm-cdk-constructs.TmWafStack.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+
+The concrete CloudFormation physical stack name.
+
+This is either the name defined explicitly in the `stackName` prop or
+allocated based on the stack's location in the construct tree. Stacks that
+are directly defined under the app use their construct `id` as their stack
+name. Stacks that are defined deeper within the tree will use a hashed naming
+scheme based on the construct path to ensure uniqueness.
+
+If you wish to obtain the deploy-time AWS::StackName intrinsic,
+you can use `Aws.STACK_NAME` directly.
+
+---
+
+##### `synthesizer`<sup>Required</sup> <a name="synthesizer" id="tm-cdk-constructs.TmWafStack.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+
+Synthesis method for this stack.
+
+---
+
+##### `tags`<sup>Required</sup> <a name="tags" id="tm-cdk-constructs.TmWafStack.property.tags"></a>
+
+```typescript
+public readonly tags: TagManager;
+```
+
+- *Type:* aws-cdk-lib.TagManager
+
+Tags to be applied to the stack.
+
+---
+
+##### `templateFile`<sup>Required</sup> <a name="templateFile" id="tm-cdk-constructs.TmWafStack.property.templateFile"></a>
+
+```typescript
+public readonly templateFile: string;
+```
+
+- *Type:* string
+
+The name of the CloudFormation template file emitted to the output directory during synthesis.
+
+Example value: `MyStack.template.json`
+
+---
+
+##### `templateOptions`<sup>Required</sup> <a name="templateOptions" id="tm-cdk-constructs.TmWafStack.property.templateOptions"></a>
+
+```typescript
+public readonly templateOptions: ITemplateOptions;
+```
+
+- *Type:* aws-cdk-lib.ITemplateOptions
+
+Options for CloudFormation template (like version, transform, description).
+
+---
+
+##### `urlSuffix`<sup>Required</sup> <a name="urlSuffix" id="tm-cdk-constructs.TmWafStack.property.urlSuffix"></a>
+
+```typescript
+public readonly urlSuffix: string;
+```
+
+- *Type:* string
+
+The Amazon domain suffix for the region in which this stack is defined.
+
+---
+
+##### `nestedStackParent`<sup>Optional</sup> <a name="nestedStackParent" id="tm-cdk-constructs.TmWafStack.property.nestedStackParent"></a>
+
+```typescript
+public readonly nestedStackParent: Stack;
+```
+
+- *Type:* aws-cdk-lib.Stack
+
+If this is a nested stack, returns its parent stack.
+
+---
+
+##### `nestedStackResource`<sup>Optional</sup> <a name="nestedStackResource" id="tm-cdk-constructs.TmWafStack.property.nestedStackResource"></a>
+
+```typescript
+public readonly nestedStackResource: CfnResource;
+```
+
+- *Type:* aws-cdk-lib.CfnResource
+
+If this is a nested stack, this represents its `AWS::CloudFormation::Stack` resource.
+
+`undefined` for top-level (non-nested) stacks.
+
+---
+
+##### `terminationProtection`<sup>Required</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmWafStack.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+
+Whether termination protection is enabled for this stack.
+
+---
+
+##### `webAclArn`<sup>Required</sup> <a name="webAclArn" id="tm-cdk-constructs.TmWafStack.property.webAclArn"></a>
+
+```typescript
+public readonly webAclArn: string;
+```
+
+- *Type:* string
+
+ARN of the WebACL.
+
+---
+
+
+### TmWebappAppStage <a name="TmWebappAppStage" id="tm-cdk-constructs.TmWebappAppStage"></a>
+
+The TYPO3 web application: VPC, bastion, Aurora MySQL, Redis, ECS, backups, and optionally S3, service users, WebACL, www and CDN distributions and a redirection instance, all driven by `EnvironmentParameters`.
+
+Stacks only reference each other through SSM parameters
+(`TmParameterNames`), so no stack is locked by another's exports. The deploy
+order is declared with explicit dependencies.
+
+The stacks are exposed so a repository can add its own stacks to the stage.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmWebappAppStage.Initializer"></a>
+
+```typescript
+import { TmWebappAppStage } from 'tm-cdk-constructs'
+
+new TmWebappAppStage(scope: Construct, id: string, props: TmWebappAppStageProps)
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.Initializer.parameter.scope">scope</a></code> | <code>constructs.Construct</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.Initializer.parameter.id">id</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.Initializer.parameter.props">props</a></code> | <code><a href="#tm-cdk-constructs.TmWebappAppStageProps">TmWebappAppStageProps</a></code> | *No description.* |
+
+---
+
+##### `scope`<sup>Required</sup> <a name="scope" id="tm-cdk-constructs.TmWebappAppStage.Initializer.parameter.scope"></a>
+
+- *Type:* constructs.Construct
+
+---
+
+##### `id`<sup>Required</sup> <a name="id" id="tm-cdk-constructs.TmWebappAppStage.Initializer.parameter.id"></a>
+
+- *Type:* string
+
+---
+
+##### `props`<sup>Required</sup> <a name="props" id="tm-cdk-constructs.TmWebappAppStage.Initializer.parameter.props"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmWebappAppStageProps">TmWebappAppStageProps</a>
+
+---
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.toString">toString</a></code> | Returns a string representation of this construct. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.with">with</a></code> | Applies one or more mixins to this construct. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.synth">synth</a></code> | Synthesize this stage into a cloud assembly. |
+
+---
+
+##### `toString` <a name="toString" id="tm-cdk-constructs.TmWebappAppStage.toString"></a>
+
+```typescript
+public toString(): string
+```
+
+Returns a string representation of this construct.
+
+##### `with` <a name="with" id="tm-cdk-constructs.TmWebappAppStage.with"></a>
+
+```typescript
+public with(mixins: ...IMixin[]): IConstruct
+```
+
+Applies one or more mixins to this construct.
+
+Mixins are applied in order. The list of constructs is captured at the
+start of the call, so constructs added by a mixin will not be visited.
+Use multiple `with()` calls if subsequent mixins should apply to added
+constructs.
+
+###### `mixins`<sup>Required</sup> <a name="mixins" id="tm-cdk-constructs.TmWebappAppStage.with.parameter.mixins"></a>
+
+- *Type:* ...constructs.IMixin[]
+
+The mixins to apply.
+
+---
+
+##### `synth` <a name="synth" id="tm-cdk-constructs.TmWebappAppStage.synth"></a>
+
+```typescript
+public synth(options?: StageSynthesisOptions): CloudAssembly
+```
+
+Synthesize this stage into a cloud assembly.
+
+Once an assembly has been synthesized, it cannot be modified. Subsequent
+calls will return the same assembly.
+
+###### `options`<sup>Optional</sup> <a name="options" id="tm-cdk-constructs.TmWebappAppStage.synth.parameter.options"></a>
+
+- *Type:* aws-cdk-lib.StageSynthesisOptions
+
+---
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.isConstruct">isConstruct</a></code> | Checks if `x` is a construct. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.isStage">isStage</a></code> | Test whether the given construct is a stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.of">of</a></code> | Return the stage this construct is contained with, if available. |
+
+---
+
+##### `isConstruct` <a name="isConstruct" id="tm-cdk-constructs.TmWebappAppStage.isConstruct"></a>
+
+```typescript
+import { TmWebappAppStage } from 'tm-cdk-constructs'
+
+TmWebappAppStage.isConstruct(x: any)
+```
+
+Checks if `x` is a construct.
+
+Use this method instead of `instanceof` to properly detect `Construct`
+instances, even when the construct library is symlinked.
+
+Explanation: in JavaScript, multiple copies of the `constructs` library on
+disk are seen as independent, completely different libraries. As a
+consequence, the class `Construct` in each copy of the `constructs` library
+is seen as a different class, and an instance of one class will not test as
+`instanceof` the other class. `npm install` will not create installations
+like this, but users may manually symlink construct libraries together or
+use a monorepo tool: in those cases, multiple copies of the `constructs`
+library can be accidentally installed, and `instanceof` will behave
+unpredictably. It is safest to avoid using `instanceof`, and using
+this type-testing method instead.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmWebappAppStage.isConstruct.parameter.x"></a>
+
+- *Type:* any
+
+Any object.
+
+---
+
+##### `isStage` <a name="isStage" id="tm-cdk-constructs.TmWebappAppStage.isStage"></a>
+
+```typescript
+import { TmWebappAppStage } from 'tm-cdk-constructs'
+
+TmWebappAppStage.isStage(x: any)
+```
+
+Test whether the given construct is a stage.
+
+###### `x`<sup>Required</sup> <a name="x" id="tm-cdk-constructs.TmWebappAppStage.isStage.parameter.x"></a>
+
+- *Type:* any
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmWebappAppStage.of"></a>
+
+```typescript
+import { TmWebappAppStage } from 'tm-cdk-constructs'
+
+TmWebappAppStage.of(construct: IConstruct)
+```
+
+Return the stage this construct is contained with, if available.
+
+If called
+on a nested stage, returns its parent.
+
+###### `construct`<sup>Required</sup> <a name="construct" id="tm-cdk-constructs.TmWebappAppStage.of.parameter.construct"></a>
+
+- *Type:* constructs.IConstruct
+
+---
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.node">node</a></code> | <code>constructs.Node</code> | The tree node. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.artifactId">artifactId</a></code> | <code>string</code> | Artifact ID of the assembly if it is a nested stage. The root stage (app) will return an empty string. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.assetOutdir">assetOutdir</a></code> | <code>string</code> | The cloud assembly asset output directory. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.outdir">outdir</a></code> | <code>string</code> | The cloud assembly output directory. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.policyValidationBeta1">policyValidationBeta1</a></code> | <code>aws-cdk-lib.IPolicyValidationPluginBeta1[]</code> | Validation plugins to run during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.stageName">stageName</a></code> | <code>string</code> | The name of the stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.account">account</a></code> | <code>string</code> | The default account for all resources defined within this stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.parentStage">parentStage</a></code> | <code>aws-cdk-lib.Stage</code> | The parent stage or `undefined` if this is the app. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.region">region</a></code> | <code>string</code> | The default region for all resources defined within this stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.backupStack">backupStack</a></code> | <code><a href="#tm-cdk-constructs.TmBackupStack">TmBackupStack</a></code> | Backup stack. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.bastionStack">bastionStack</a></code> | <code><a href="#tm-cdk-constructs.TmBastionStack">TmBastionStack</a></code> | Bastion stack. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.ecsStack">ecsStack</a></code> | <code><a href="#tm-cdk-constructs.TmEcsStack">TmEcsStack</a></code> | ECS stack. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.rdsStack">rdsStack</a></code> | <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack">TmRdsAuroraMysqlServerlessStack</a></code> | Aurora MySQL stack. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.redisStack">redisStack</a></code> | <code><a href="#tm-cdk-constructs.TmRedisStack">TmRedisStack</a></code> | Redis stack. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.vpcStack">vpcStack</a></code> | <code><a href="#tm-cdk-constructs.TmVpcBaseStack">TmVpcBaseStack</a></code> | VPC stack. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.cdnStack">cdnStack</a></code> | <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStack">TmCloudfrontCdnStack</a></code> | CDN distribution stack, when `cdn` is set. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.cloudfrontStack">cloudfrontStack</a></code> | <code><a href="#tm-cdk-constructs.TmCloudfrontStack">TmCloudfrontStack</a></code> | www distributions stack, when `cloudfront` is set. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.redirectionsStack">redirectionsStack</a></code> | <code><a href="#tm-cdk-constructs.TmRedirectionsEc2Stack">TmRedirectionsEc2Stack</a></code> | Redirection instance stack, when `redirections` is set. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.s3Stack">s3Stack</a></code> | <code><a href="#tm-cdk-constructs.TmS3Stack">TmS3Stack</a></code> | S3 stack, when a bucket is needed. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.serviceIamUsersStack">serviceIamUsersStack</a></code> | <code><a href="#tm-cdk-constructs.TmServiceIamUsersStack">TmServiceIamUsersStack</a></code> | Service users stack, when `serviceIamUsers` is not empty. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStage.property.wafStack">wafStack</a></code> | <code><a href="#tm-cdk-constructs.TmWafStack">TmWafStack</a></code> | WebACL stack (us-east-1), when `waf` is set. |
+
+---
+
+##### `node`<sup>Required</sup> <a name="node" id="tm-cdk-constructs.TmWebappAppStage.property.node"></a>
+
+```typescript
+public readonly node: Node;
+```
+
+- *Type:* constructs.Node
+
+The tree node.
+
+---
+
+##### `artifactId`<sup>Required</sup> <a name="artifactId" id="tm-cdk-constructs.TmWebappAppStage.property.artifactId"></a>
+
+```typescript
+public readonly artifactId: string;
+```
+
+- *Type:* string
+
+Artifact ID of the assembly if it is a nested stage. The root stage (app) will return an empty string.
+
+Derived from the construct path.
+
+---
+
+##### `assetOutdir`<sup>Required</sup> <a name="assetOutdir" id="tm-cdk-constructs.TmWebappAppStage.property.assetOutdir"></a>
+
+```typescript
+public readonly assetOutdir: string;
+```
+
+- *Type:* string
+
+The cloud assembly asset output directory.
+
+---
+
+##### `outdir`<sup>Required</sup> <a name="outdir" id="tm-cdk-constructs.TmWebappAppStage.property.outdir"></a>
+
+```typescript
+public readonly outdir: string;
+```
+
+- *Type:* string
+
+The cloud assembly output directory.
+
+---
+
+##### ~~`policyValidationBeta1`~~<sup>Required</sup> <a name="policyValidationBeta1" id="tm-cdk-constructs.TmWebappAppStage.property.policyValidationBeta1"></a>
+
+- *Deprecated:* Do not use this function to look up validation plugins. Use `Validations.of(stage).plugins` instead.
+
+```typescript
+public readonly policyValidationBeta1: IPolicyValidationPluginBeta1[];
+```
+
+- *Type:* aws-cdk-lib.IPolicyValidationPluginBeta1[]
+- *Default:* no validation plugins are used
+
+Validation plugins to run during synthesis.
+
+If any plugin reports any violation,
+synthesis will be interrupted and the report displayed to the user.
+
+---
+
+##### `stageName`<sup>Required</sup> <a name="stageName" id="tm-cdk-constructs.TmWebappAppStage.property.stageName"></a>
+
+```typescript
+public readonly stageName: string;
+```
+
+- *Type:* string
+
+The name of the stage.
+
+Based on names of the parent stages separated by
+hypens.
+
+---
+
+##### `account`<sup>Optional</sup> <a name="account" id="tm-cdk-constructs.TmWebappAppStage.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+The default account for all resources defined within this stage.
+
+---
+
+##### `parentStage`<sup>Optional</sup> <a name="parentStage" id="tm-cdk-constructs.TmWebappAppStage.property.parentStage"></a>
+
+```typescript
+public readonly parentStage: Stage;
+```
+
+- *Type:* aws-cdk-lib.Stage
+
+The parent stage or `undefined` if this is the app.
+
+*
+
+---
+
+##### `region`<sup>Optional</sup> <a name="region" id="tm-cdk-constructs.TmWebappAppStage.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+
+The default region for all resources defined within this stage.
+
+---
+
+##### `backupStack`<sup>Required</sup> <a name="backupStack" id="tm-cdk-constructs.TmWebappAppStage.property.backupStack"></a>
+
+```typescript
+public readonly backupStack: TmBackupStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmBackupStack">TmBackupStack</a>
+
+Backup stack.
+
+---
+
+##### `bastionStack`<sup>Required</sup> <a name="bastionStack" id="tm-cdk-constructs.TmWebappAppStage.property.bastionStack"></a>
+
+```typescript
+public readonly bastionStack: TmBastionStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmBastionStack">TmBastionStack</a>
+
+Bastion stack.
+
+---
+
+##### `ecsStack`<sup>Required</sup> <a name="ecsStack" id="tm-cdk-constructs.TmWebappAppStage.property.ecsStack"></a>
+
+```typescript
+public readonly ecsStack: TmEcsStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmEcsStack">TmEcsStack</a>
+
+ECS stack.
+
+---
+
+##### `rdsStack`<sup>Required</sup> <a name="rdsStack" id="tm-cdk-constructs.TmWebappAppStage.property.rdsStack"></a>
+
+```typescript
+public readonly rdsStack: TmRdsAuroraMysqlServerlessStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStack">TmRdsAuroraMysqlServerlessStack</a>
+
+Aurora MySQL stack.
+
+---
+
+##### `redisStack`<sup>Required</sup> <a name="redisStack" id="tm-cdk-constructs.TmWebappAppStage.property.redisStack"></a>
+
+```typescript
+public readonly redisStack: TmRedisStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmRedisStack">TmRedisStack</a>
+
+Redis stack.
+
+---
+
+##### `vpcStack`<sup>Required</sup> <a name="vpcStack" id="tm-cdk-constructs.TmWebappAppStage.property.vpcStack"></a>
+
+```typescript
+public readonly vpcStack: TmVpcBaseStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmVpcBaseStack">TmVpcBaseStack</a>
+
+VPC stack.
+
+---
+
+##### `cdnStack`<sup>Optional</sup> <a name="cdnStack" id="tm-cdk-constructs.TmWebappAppStage.property.cdnStack"></a>
+
+```typescript
+public readonly cdnStack: TmCloudfrontCdnStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmCloudfrontCdnStack">TmCloudfrontCdnStack</a>
+
+CDN distribution stack, when `cdn` is set.
+
+---
+
+##### `cloudfrontStack`<sup>Optional</sup> <a name="cloudfrontStack" id="tm-cdk-constructs.TmWebappAppStage.property.cloudfrontStack"></a>
+
+```typescript
+public readonly cloudfrontStack: TmCloudfrontStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmCloudfrontStack">TmCloudfrontStack</a>
+
+www distributions stack, when `cloudfront` is set.
+
+---
+
+##### `redirectionsStack`<sup>Optional</sup> <a name="redirectionsStack" id="tm-cdk-constructs.TmWebappAppStage.property.redirectionsStack"></a>
+
+```typescript
+public readonly redirectionsStack: TmRedirectionsEc2Stack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmRedirectionsEc2Stack">TmRedirectionsEc2Stack</a>
+
+Redirection instance stack, when `redirections` is set.
+
+---
+
+##### `s3Stack`<sup>Optional</sup> <a name="s3Stack" id="tm-cdk-constructs.TmWebappAppStage.property.s3Stack"></a>
+
+```typescript
+public readonly s3Stack: TmS3Stack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmS3Stack">TmS3Stack</a>
+
+S3 stack, when a bucket is needed.
+
+---
+
+##### `serviceIamUsersStack`<sup>Optional</sup> <a name="serviceIamUsersStack" id="tm-cdk-constructs.TmWebappAppStage.property.serviceIamUsersStack"></a>
+
+```typescript
+public readonly serviceIamUsersStack: TmServiceIamUsersStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmServiceIamUsersStack">TmServiceIamUsersStack</a>
+
+Service users stack, when `serviceIamUsers` is not empty.
+
+---
+
+##### `wafStack`<sup>Optional</sup> <a name="wafStack" id="tm-cdk-constructs.TmWebappAppStage.property.wafStack"></a>
+
+```typescript
+public readonly wafStack: TmWafStack;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmWafStack">TmWafStack</a>
+
+WebACL stack (us-east-1), when `waf` is set.
+
+---
+
+
 ## Structs <a name="Structs" id="Structs"></a>
+
+### BackupSettings <a name="BackupSettings" id="tm-cdk-constructs.BackupSettings"></a>
+
+AWS Backup settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.BackupSettings.Initializer"></a>
+
+```typescript
+import { BackupSettings } from 'tm-cdk-constructs'
+
+const backupSettings: BackupSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.BackupSettings.property.ec2RetentionDays">ec2RetentionDays</a></code> | <code>number</code> | Retention of the EBS volume backups, in days. |
+| <code><a href="#tm-cdk-constructs.BackupSettings.property.rdsRetentionDays">rdsRetentionDays</a></code> | <code>number</code> | Retention of the RDS cluster backups, in days. |
+
+---
+
+##### `ec2RetentionDays`<sup>Optional</sup> <a name="ec2RetentionDays" id="tm-cdk-constructs.BackupSettings.property.ec2RetentionDays"></a>
+
+```typescript
+public readonly ec2RetentionDays: number;
+```
+
+- *Type:* number
+- *Default:* 7
+
+Retention of the EBS volume backups, in days.
+
+---
+
+##### `rdsRetentionDays`<sup>Optional</sup> <a name="rdsRetentionDays" id="tm-cdk-constructs.BackupSettings.property.rdsRetentionDays"></a>
+
+```typescript
+public readonly rdsRetentionDays: number;
+```
+
+- *Type:* number
+- *Default:* 35
+
+Retention of the RDS cluster backups, in days.
+
+---
+
+### BastionSettings <a name="BastionSettings" id="tm-cdk-constructs.BastionSettings"></a>
+
+Bastion host settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.BastionSettings.Initializer"></a>
+
+```typescript
+import { BastionSettings } from 'tm-cdk-constructs'
+
+const bastionSettings: BastionSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.BastionSettings.property.instanceType">instanceType</a></code> | <code>string</code> | EC2 instance type. |
+
+---
+
+##### `instanceType`<sup>Optional</sup> <a name="instanceType" id="tm-cdk-constructs.BastionSettings.property.instanceType"></a>
+
+```typescript
+public readonly instanceType: string;
+```
+
+- *Type:* string
+- *Default:* 't3.small'
+
+EC2 instance type.
+
+---
+
+### CdnSettings <a name="CdnSettings" id="tm-cdk-constructs.CdnSettings"></a>
+
+CDN distribution, serving the FAL content bucket.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.CdnSettings.Initializer"></a>
+
+```typescript
+import { CdnSettings } from 'tm-cdk-constructs'
+
+const cdnSettings: CdnSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.CdnSettings.property.domain">domain</a></code> | <code>string</code> | Domain of the CDN distribution, e.g. `cdn.example.com`. |
+| <code><a href="#tm-cdk-constructs.CdnSettings.property.certificateArn">certificateArn</a></code> | <code>string</code> | ACM certificate ARN (us-east-1). |
+
+---
+
+##### `domain`<sup>Required</sup> <a name="domain" id="tm-cdk-constructs.CdnSettings.property.domain"></a>
+
+```typescript
+public readonly domain: string;
+```
+
+- *Type:* string
+
+Domain of the CDN distribution, e.g. `cdn.example.com`.
+
+---
+
+##### `certificateArn`<sup>Optional</sup> <a name="certificateArn" id="tm-cdk-constructs.CdnSettings.property.certificateArn"></a>
+
+```typescript
+public readonly certificateArn: string;
+```
+
+- *Type:* string
+- *Default:* read from the SSM parameter `TmParameterNames.cloudfrontCdnCertificateArn`
+
+ACM certificate ARN (us-east-1).
+
+---
+
+### CloudfrontSettings <a name="CloudfrontSettings" id="tm-cdk-constructs.CloudfrontSettings"></a>
+
+www distributions (one per domain).
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.CloudfrontSettings.Initializer"></a>
+
+```typescript
+import { CloudfrontSettings } from 'tm-cdk-constructs'
+
+const cloudfrontSettings: CloudfrontSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.domains">domains</a></code> | <code>string[]</code> | Domains served by the application. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.accessLogs">accessLogs</a></code> | <code>boolean</code> | Writes CloudFront access logs to the log bucket. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.additionalDomains">additionalDomains</a></code> | <code>{[ key: string ]: string[]}</code> | Extra aliases of a distribution, keyed by an entry of `domains`. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.basicAuth">basicAuth</a></code> | <code>boolean</code> | Protects the site with HTTP basic authentication. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.basicAuthParameterName">basicAuthParameterName</a></code> | <code>string</code> | SSM parameter holding the base64 `user:password` for basic authentication. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.certificateArns">certificateArns</a></code> | <code>{[ key: string ]: string}</code> | ACM certificate ARNs (us-east-1), keyed by an entry of `domains`. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsFormat">distributionIdsFormat</a></code> | <code><a href="#tm-cdk-constructs.DistributionIdsFormat">DistributionIdsFormat</a></code> | Value format of the distribution-ID parameter. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsParameterName">distributionIdsParameterName</a></code> | <code>string</code> | Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline invalidation step. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value CloudFront sends to the load balancer. |
+
+---
+
+##### `domains`<sup>Required</sup> <a name="domains" id="tm-cdk-constructs.CloudfrontSettings.property.domains"></a>
+
+```typescript
+public readonly domains: string[];
+```
+
+- *Type:* string[]
+
+Domains served by the application.
+
+Each one gets its own distribution and
+certificate. Distributions are identified by position: add new domains at
+the end, and rename a domain in place rather than reordering the list.
+
+---
+
+##### `accessLogs`<sup>Optional</sup> <a name="accessLogs" id="tm-cdk-constructs.CloudfrontSettings.property.accessLogs"></a>
+
+```typescript
+public readonly accessLogs: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Writes CloudFront access logs to the log bucket.
+
+---
+
+##### `additionalDomains`<sup>Optional</sup> <a name="additionalDomains" id="tm-cdk-constructs.CloudfrontSettings.property.additionalDomains"></a>
+
+```typescript
+public readonly additionalDomains: {[ key: string ]: string[]};
+```
+
+- *Type:* {[ key: string ]: string[]}
+- *Default:* {}
+
+Extra aliases of a distribution, keyed by an entry of `domains`.
+
+Only for
+the punycode/homograph case where two names must share one distribution.
+
+---
+
+##### `basicAuth`<sup>Optional</sup> <a name="basicAuth" id="tm-cdk-constructs.CloudfrontSettings.property.basicAuth"></a>
+
+```typescript
+public readonly basicAuth: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Protects the site with HTTP basic authentication.
+
+---
+
+##### `basicAuthParameterName`<sup>Optional</sup> <a name="basicAuthParameterName" id="tm-cdk-constructs.CloudfrontSettings.property.basicAuthParameterName"></a>
+
+```typescript
+public readonly basicAuthParameterName: string;
+```
+
+- *Type:* string
+- *Default:* TmParameterNames.cloudfrontBasicAuth
+
+SSM parameter holding the base64 `user:password` for basic authentication.
+
+---
+
+##### `certificateArns`<sup>Optional</sup> <a name="certificateArns" id="tm-cdk-constructs.CloudfrontSettings.property.certificateArns"></a>
+
+```typescript
+public readonly certificateArns: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* read from the SSM parameter `TmParameterNames.cloudfrontWwwCertificateArn`
+
+ACM certificate ARNs (us-east-1), keyed by an entry of `domains`.
+
+---
+
+##### `distributionIdsFormat`<sup>Optional</sup> <a name="distributionIdsFormat" id="tm-cdk-constructs.CloudfrontSettings.property.distributionIdsFormat"></a>
+
+```typescript
+public readonly distributionIdsFormat: DistributionIdsFormat;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.DistributionIdsFormat">DistributionIdsFormat</a>
+- *Default:* DistributionIdsFormat.JSON_MAP
+
+Value format of the distribution-ID parameter.
+
+Follows the project's
+tm_cloudfront version.
+
+---
+
+##### `distributionIdsParameterName`<sup>Optional</sup> <a name="distributionIdsParameterName" id="tm-cdk-constructs.CloudfrontSettings.property.distributionIdsParameterName"></a>
+
+```typescript
+public readonly distributionIdsParameterName: string;
+```
+
+- *Type:* string
+- *Default:* TmParameterNames.cloudfrontDistributionIds
+
+Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline invalidation step.
+
+---
+
+##### `originCustomHeaderParameterName`<sup>Optional</sup> <a name="originCustomHeaderParameterName" id="tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName"></a>
+
+```typescript
+public readonly originCustomHeaderParameterName: string;
+```
+
+- *Type:* string
+- *Default:* TmParameterNames.cloudfrontOriginCustomHeader
+
+SSM parameter holding the secret header value CloudFront sends to the load balancer.
+
+The load balancer rejects requests without it.
+
+---
+
+### EcsSettings <a name="EcsSettings" id="tm-cdk-constructs.EcsSettings"></a>
+
+ECS service settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.EcsSettings.Initializer"></a>
+
+```typescript
+import { EcsSettings } from 'tm-cdk-constructs'
+
+const ecsSettings: EcsSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.additionalSecretsFromParameterStore">additionalSecretsFromParameterStore</a></code> | <code>{[ key: string ]: string}</code> | Other SSM parameters passed to the containers, as `{ VARIABLE: parameterName }`. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.applicationName">applicationName</a></code> | <code>string</code> | Application name used in the secrets path `/applications/<name>/secrets/`. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.cloudfrontIntegration">cloudfrontIntegration</a></code> | <code>boolean</code> | Passes the tm_cloudfront variables to the containers: `TM_CLOUDFRONT_DISTRIBUTION_IDS`, `TM_CLOUDFRONT_APIKEY` and `TM_CLOUDFRONT_APISECRET`. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.containerTopology">containerTopology</a></code> | <code><a href="#tm-cdk-constructs.ContainerTopology">ContainerTopology</a></code> | Container layout of the task. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.cpu">cpu</a></code> | <code>number</code> | Task CPU units. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.deploymentHookCommand">deploymentHookCommand</a></code> | <code>string[]</code> | Command run in a one-off task after each deployment. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables passed to the containers. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | Autoscaling upper bound. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Task memory in MiB. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | Autoscaling lower bound. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.phpFpmDockerfile">phpFpmDockerfile</a></code> | <code>string</code> | Dockerfile of the `php-fpm` container, relative to the build context. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | Command of the scheduled task (every minute). |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.secretsFromSsmParameterStore">secretsFromSsmParameterStore</a></code> | <code>string[]</code> | Hand-made SecureString parameters passed to the containers, by variable name. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.webDockerfile">webDockerfile</a></code> | <code>string</code> | Dockerfile of the `web` container, relative to the build context. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.wireStageOutputs">wireStageOutputs</a></code> | <code>boolean</code> | Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the `TM_S3ASSETS_*` variables when FAL is on S3. |
+
+---
+
+##### `additionalSecretsFromParameterStore`<sup>Optional</sup> <a name="additionalSecretsFromParameterStore" id="tm-cdk-constructs.EcsSettings.property.additionalSecretsFromParameterStore"></a>
+
+```typescript
+public readonly additionalSecretsFromParameterStore: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Other SSM parameters passed to the containers, as `{ VARIABLE: parameterName }`.
+
+---
+
+##### `applicationName`<sup>Optional</sup> <a name="applicationName" id="tm-cdk-constructs.EcsSettings.property.applicationName"></a>
+
+```typescript
+public readonly applicationName: string;
+```
+
+- *Type:* string
+- *Default:* 'tm'
+
+Application name used in the secrets path `/applications/<name>/secrets/`.
+
+---
+
+##### `cloudfrontIntegration`<sup>Optional</sup> <a name="cloudfrontIntegration" id="tm-cdk-constructs.EcsSettings.property.cloudfrontIntegration"></a>
+
+```typescript
+public readonly cloudfrontIntegration: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Passes the tm_cloudfront variables to the containers: `TM_CLOUDFRONT_DISTRIBUTION_IDS`, `TM_CLOUDFRONT_APIKEY` and `TM_CLOUDFRONT_APISECRET`.
+
+These values are produced by stacks that deploy after the ECS stack (the
+distributions need the load balancer), so ECS reads them by name without a
+stack dependency. Turn this on only once the CloudFront stacks have been
+deployed: on a first deploy, the tasks can't start and the ECS stack fails.
+
+---
+
+##### `containerTopology`<sup>Optional</sup> <a name="containerTopology" id="tm-cdk-constructs.EcsSettings.property.containerTopology"></a>
+
+```typescript
+public readonly containerTopology: ContainerTopology;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ContainerTopology">ContainerTopology</a>
+- *Default:* ContainerTopology.APACHE_PHP_FPM
+
+Container layout of the task.
+
+---
+
+##### `cpu`<sup>Optional</sup> <a name="cpu" id="tm-cdk-constructs.EcsSettings.property.cpu"></a>
+
+```typescript
+public readonly cpu: number;
+```
+
+- *Type:* number
+- *Default:* 1024
+
+Task CPU units.
+
+With two containers, the web container gets a quarter.
+
+---
+
+##### `deploymentHookCommand`<sup>Optional</sup> <a name="deploymentHookCommand" id="tm-cdk-constructs.EcsSettings.property.deploymentHookCommand"></a>
+
+```typescript
+public readonly deploymentHookCommand: string[];
+```
+
+- *Type:* string[]
+- *Default:* ['/usr/local/bin/deployment-hook.sh']
+
+Command run in a one-off task after each deployment.
+
+---
+
+##### `desiredCount`<sup>Optional</sup> <a name="desiredCount" id="tm-cdk-constructs.EcsSettings.property.desiredCount"></a>
+
+```typescript
+public readonly desiredCount: number;
+```
+
+- *Type:* number
+- *Default:* 2
+
+Number of tasks when the service is created.
+
+---
+
+##### `environment`<sup>Optional</sup> <a name="environment" id="tm-cdk-constructs.EcsSettings.property.environment"></a>
+
+```typescript
+public readonly environment: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Plain environment variables passed to the containers.
+
+---
+
+##### `maxTaskCount`<sup>Optional</sup> <a name="maxTaskCount" id="tm-cdk-constructs.EcsSettings.property.maxTaskCount"></a>
+
+```typescript
+public readonly maxTaskCount: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Autoscaling upper bound.
+
+---
+
+##### `memoryLimitMiB`<sup>Optional</sup> <a name="memoryLimitMiB" id="tm-cdk-constructs.EcsSettings.property.memoryLimitMiB"></a>
+
+```typescript
+public readonly memoryLimitMiB: number;
+```
+
+- *Type:* number
+- *Default:* 2048
+
+Task memory in MiB.
+
+With two containers, the web container gets a fifth.
+
+---
+
+##### `minTaskCount`<sup>Optional</sup> <a name="minTaskCount" id="tm-cdk-constructs.EcsSettings.property.minTaskCount"></a>
+
+```typescript
+public readonly minTaskCount: number;
+```
+
+- *Type:* number
+- *Default:* 1
+
+Autoscaling lower bound.
+
+---
+
+##### `phpFpmDockerfile`<sup>Optional</sup> <a name="phpFpmDockerfile" id="tm-cdk-constructs.EcsSettings.property.phpFpmDockerfile"></a>
+
+```typescript
+public readonly phpFpmDockerfile: string;
+```
+
+- *Type:* string
+- *Default:* `docker/tm-php-fpm/Dockerfile` (APACHE_PHP_FPM) or `docker/php-fpm/Dockerfile` (NGINX_PHP_FPM)
+
+Dockerfile of the `php-fpm` container, relative to the build context.
+
+Ignored with the SINGLE topology.
+
+---
+
+##### `scheduledTasksCommand`<sup>Optional</sup> <a name="scheduledTasksCommand" id="tm-cdk-constructs.EcsSettings.property.scheduledTasksCommand"></a>
+
+```typescript
+public readonly scheduledTasksCommand: string;
+```
+
+- *Type:* string
+- *Default:* '/usr/local/bin/run-scheduler.sh'
+
+Command of the scheduled task (every minute).
+
+---
+
+##### `secretsFromSsmParameterStore`<sup>Optional</sup> <a name="secretsFromSsmParameterStore" id="tm-cdk-constructs.EcsSettings.property.secretsFromSsmParameterStore"></a>
+
+```typescript
+public readonly secretsFromSsmParameterStore: string[];
+```
+
+- *Type:* string[]
+- *Default:* []
+
+Hand-made SecureString parameters passed to the containers, by variable name.
+
+Each is read from `/applications/<applicationName>/secrets/<NAME>`.
+
+---
+
+##### `targetCpuUtilizationPercent`<sup>Optional</sup> <a name="targetCpuUtilizationPercent" id="tm-cdk-constructs.EcsSettings.property.targetCpuUtilizationPercent"></a>
+
+```typescript
+public readonly targetCpuUtilizationPercent: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Target CPU utilization of the autoscaling policy.
+
+---
+
+##### `targetMemoryUtilizationPercent`<sup>Optional</sup> <a name="targetMemoryUtilizationPercent" id="tm-cdk-constructs.EcsSettings.property.targetMemoryUtilizationPercent"></a>
+
+```typescript
+public readonly targetMemoryUtilizationPercent: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Target memory utilization of the autoscaling policy.
+
+---
+
+##### `webDockerfile`<sup>Optional</sup> <a name="webDockerfile" id="tm-cdk-constructs.EcsSettings.property.webDockerfile"></a>
+
+```typescript
+public readonly webDockerfile: string;
+```
+
+- *Type:* string
+- *Default:* `docker/php-apache/Dockerfile` (SINGLE), `docker/tm-apache/Dockerfile` (APACHE_PHP_FPM) or `docker/nginx/Dockerfile` (NGINX_PHP_FPM)
+
+Dockerfile of the `web` container, relative to the build context.
+
+---
+
+##### `wireStageOutputs`<sup>Optional</sup> <a name="wireStageOutputs" id="tm-cdk-constructs.EcsSettings.property.wireStageOutputs"></a>
+
+```typescript
+public readonly wireStageOutputs: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the `TM_S3ASSETS_*` variables when FAL is on S3.
+
+---
+
+### EnvironmentParameters <a name="EnvironmentParameters" id="tm-cdk-constructs.EnvironmentParameters"></a>
+
+Everything specific to one environment (one AWS account) of a web application.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.EnvironmentParameters.Initializer"></a>
+
+```typescript
+import { EnvironmentParameters } from 'tm-cdk-constructs'
+
+const environmentParameters: EnvironmentParameters = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.account">account</a></code> | <code>string</code> | AWS account ID. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.ecs">ecs</a></code> | <code><a href="#tm-cdk-constructs.EcsSettings">EcsSettings</a></code> | ECS service settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names, e.g. `prod`. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.fal">fal</a></code> | <code><a href="#tm-cdk-constructs.FalSettings">FalSettings</a></code> | TYPO3 FAL storage. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.vpc">vpc</a></code> | <code><a href="#tm-cdk-constructs.VpcSettings">VpcSettings</a></code> | Network settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.backup">backup</a></code> | <code><a href="#tm-cdk-constructs.BackupSettings">BackupSettings</a></code> | AWS Backup settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.bastion">bastion</a></code> | <code><a href="#tm-cdk-constructs.BastionSettings">BastionSettings</a></code> | Bastion host settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.cdn">cdn</a></code> | <code><a href="#tm-cdk-constructs.CdnSettings">CdnSettings</a></code> | CDN distribution for the FAL content bucket. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.cloudfront">cloudfront</a></code> | <code><a href="#tm-cdk-constructs.CloudfrontSettings">CloudfrontSettings</a></code> | www distributions. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.pipeline">pipeline</a></code> | <code><a href="#tm-cdk-constructs.PipelineSettings">PipelineSettings</a></code> | CodePipeline settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.rds">rds</a></code> | <code><a href="#tm-cdk-constructs.RdsSettings">RdsSettings</a></code> | Aurora MySQL settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.redirections">redirections</a></code> | <code><a href="#tm-cdk-constructs.RedirectionsSettings">RedirectionsSettings</a></code> | Redirection instance. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.redis">redis</a></code> | <code><a href="#tm-cdk-constructs.RedisSettings">RedisSettings</a></code> | Redis settings. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.region">region</a></code> | <code>string</code> | Region of the application. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.serviceIamUsers">serviceIamUsers</a></code> | <code><a href="#tm-cdk-constructs.ServiceIamUser">ServiceIamUser</a>[]</code> | Service users to create, with their access keys in Secrets Manager. |
+| <code><a href="#tm-cdk-constructs.EnvironmentParameters.property.waf">waf</a></code> | <code><a href="#tm-cdk-constructs.WafSettings">WafSettings</a></code> | Baseline WebACL for the distributions. |
+
+---
+
+##### `account`<sup>Required</sup> <a name="account" id="tm-cdk-constructs.EnvironmentParameters.property.account"></a>
+
+```typescript
+public readonly account: string;
+```
+
+- *Type:* string
+
+AWS account ID.
+
+---
+
+##### `ecs`<sup>Required</sup> <a name="ecs" id="tm-cdk-constructs.EnvironmentParameters.property.ecs"></a>
+
+```typescript
+public readonly ecs: EcsSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.EcsSettings">EcsSettings</a>
+
+ECS service settings.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.EnvironmentParameters.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names, e.g. `prod`.
+
+---
+
+##### `fal`<sup>Required</sup> <a name="fal" id="tm-cdk-constructs.EnvironmentParameters.property.fal"></a>
+
+```typescript
+public readonly fal: FalSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.FalSettings">FalSettings</a>
+
+TYPO3 FAL storage.
+
+With `FalStorage.S3`, the stage creates the content
+bucket.
+
+---
+
+##### `vpc`<sup>Required</sup> <a name="vpc" id="tm-cdk-constructs.EnvironmentParameters.property.vpc"></a>
+
+```typescript
+public readonly vpc: VpcSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.VpcSettings">VpcSettings</a>
+
+Network settings.
+
+---
+
+##### `backup`<sup>Optional</sup> <a name="backup" id="tm-cdk-constructs.EnvironmentParameters.property.backup"></a>
+
+```typescript
+public readonly backup: BackupSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.BackupSettings">BackupSettings</a>
+- *Default:* defaults of `BackupSettings`
+
+AWS Backup settings.
+
+---
+
+##### `bastion`<sup>Optional</sup> <a name="bastion" id="tm-cdk-constructs.EnvironmentParameters.property.bastion"></a>
+
+```typescript
+public readonly bastion: BastionSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.BastionSettings">BastionSettings</a>
+- *Default:* defaults of `BastionSettings`
+
+Bastion host settings.
+
+---
+
+##### `cdn`<sup>Optional</sup> <a name="cdn" id="tm-cdk-constructs.EnvironmentParameters.property.cdn"></a>
+
+```typescript
+public readonly cdn: CdnSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.CdnSettings">CdnSettings</a>
+- *Default:* no CDN distribution
+
+CDN distribution for the FAL content bucket.
+
+Requires `FalStorage.S3`.
+
+---
+
+##### `cloudfront`<sup>Optional</sup> <a name="cloudfront" id="tm-cdk-constructs.EnvironmentParameters.property.cloudfront"></a>
+
+```typescript
+public readonly cloudfront: CloudfrontSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.CloudfrontSettings">CloudfrontSettings</a>
+- *Default:* no www distribution
+
+www distributions.
+
+---
+
+##### `pipeline`<sup>Optional</sup> <a name="pipeline" id="tm-cdk-constructs.EnvironmentParameters.property.pipeline"></a>
+
+```typescript
+public readonly pipeline: PipelineSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.PipelineSettings">PipelineSettings</a>
+- *Default:* defaults of `PipelineSettings`
+
+CodePipeline settings.
+
+---
+
+##### `rds`<sup>Optional</sup> <a name="rds" id="tm-cdk-constructs.EnvironmentParameters.property.rds"></a>
+
+```typescript
+public readonly rds: RdsSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.RdsSettings">RdsSettings</a>
+- *Default:* defaults of `RdsSettings`
+
+Aurora MySQL settings.
+
+---
+
+##### `redirections`<sup>Optional</sup> <a name="redirections" id="tm-cdk-constructs.EnvironmentParameters.property.redirections"></a>
+
+```typescript
+public readonly redirections: RedirectionsSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.RedirectionsSettings">RedirectionsSettings</a>
+- *Default:* no redirection instance
+
+Redirection instance.
+
+---
+
+##### `redis`<sup>Optional</sup> <a name="redis" id="tm-cdk-constructs.EnvironmentParameters.property.redis"></a>
+
+```typescript
+public readonly redis: RedisSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.RedisSettings">RedisSettings</a>
+- *Default:* defaults of `RedisSettings`
+
+Redis settings.
+
+---
+
+##### `region`<sup>Optional</sup> <a name="region" id="tm-cdk-constructs.EnvironmentParameters.property.region"></a>
+
+```typescript
+public readonly region: string;
+```
+
+- *Type:* string
+- *Default:* 'ca-central-1'
+
+Region of the application.
+
+---
+
+##### `serviceIamUsers`<sup>Optional</sup> <a name="serviceIamUsers" id="tm-cdk-constructs.EnvironmentParameters.property.serviceIamUsers"></a>
+
+```typescript
+public readonly serviceIamUsers: ServiceIamUser[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ServiceIamUser">ServiceIamUser</a>[]
+- *Default:* []
+
+Service users to create, with their access keys in Secrets Manager.
+
+---
+
+##### `waf`<sup>Optional</sup> <a name="waf" id="tm-cdk-constructs.EnvironmentParameters.property.waf"></a>
+
+```typescript
+public readonly waf: WafSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.WafSettings">WafSettings</a>
+- *Default:* no WebACL
+
+Baseline WebACL for the distributions.
+
+---
+
+### FalSettings <a name="FalSettings" id="tm-cdk-constructs.FalSettings"></a>
+
+TYPO3 FAL storage settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.FalSettings.Initializer"></a>
+
+```typescript
+import { FalSettings } from 'tm-cdk-constructs'
+
+const falSettings: FalSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.FalSettings.property.storage">storage</a></code> | <code><a href="#tm-cdk-constructs.FalStorage">FalStorage</a></code> | FAL backend. |
+| <code><a href="#tm-cdk-constructs.FalSettings.property.efsDirectories">efsDirectories</a></code> | <code>string[]</code> | With `FalStorage.EFS`, the FAL directories stored on EFS, relative to the document root, e.g. `['fileadmin', 'uploads']`. |
+
+---
+
+##### `storage`<sup>Required</sup> <a name="storage" id="tm-cdk-constructs.FalSettings.property.storage"></a>
+
+```typescript
+public readonly storage: FalStorage;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.FalStorage">FalStorage</a>
+
+FAL backend.
+
+Never change it on a deployed environment.
+
+---
+
+##### `efsDirectories`<sup>Optional</sup> <a name="efsDirectories" id="tm-cdk-constructs.FalSettings.property.efsDirectories"></a>
+
+```typescript
+public readonly efsDirectories: string[];
+```
+
+- *Type:* string[]
+- *Default:* ['fileadmin']
+
+With `FalStorage.EFS`, the FAL directories stored on EFS, relative to the document root, e.g. `['fileadmin', 'uploads']`.
+
+---
+
+### PipelineSettings <a name="PipelineSettings" id="tm-cdk-constructs.PipelineSettings"></a>
+
+CodePipeline settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.PipelineSettings.Initializer"></a>
+
+```typescript
+import { PipelineSettings } from 'tm-cdk-constructs'
+
+const pipelineSettings: PipelineSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.applicationRepositoryName">applicationRepositoryName</a></code> | <code>string</code> | CodeCommit repository holding the application, cloned into the build context. |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.branchNameParameterName">branchNameParameterName</a></code> | <code>string</code> | SSM parameter holding the branch both repositories are deployed from. |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.infrastructureRepositoryName">infrastructureRepositoryName</a></code> | <code>string</code> | CodeCommit repository holding the infrastructure code. |
+
+---
+
+##### `applicationRepositoryName`<sup>Optional</sup> <a name="applicationRepositoryName" id="tm-cdk-constructs.PipelineSettings.property.applicationRepositoryName"></a>
+
+```typescript
+public readonly applicationRepositoryName: string;
+```
+
+- *Type:* string
+- *Default:* 'application'
+
+CodeCommit repository holding the application, cloned into the build context.
+
+---
+
+##### `branchNameParameterName`<sup>Optional</sup> <a name="branchNameParameterName" id="tm-cdk-constructs.PipelineSettings.property.branchNameParameterName"></a>
+
+```typescript
+public readonly branchNameParameterName: string;
+```
+
+- *Type:* string
+- *Default:* '/pipeline/parameters/branchName'
+
+SSM parameter holding the branch both repositories are deployed from.
+
+---
+
+##### `infrastructureRepositoryName`<sup>Optional</sup> <a name="infrastructureRepositoryName" id="tm-cdk-constructs.PipelineSettings.property.infrastructureRepositoryName"></a>
+
+```typescript
+public readonly infrastructureRepositoryName: string;
+```
+
+- *Type:* string
+- *Default:* 'infrastructure'
+
+CodeCommit repository holding the infrastructure code.
+
+---
+
+### RdsSettings <a name="RdsSettings" id="tm-cdk-constructs.RdsSettings"></a>
+
+Aurora MySQL settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.RdsSettings.Initializer"></a>
+
+```typescript
+import { RdsSettings } from 'tm-cdk-constructs'
+
+const rdsSettings: RdsSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.RdsSettings.property.instanceType">instanceType</a></code> | <code>string</code> | Instance type of a provisioned writer, e.g. `t3.medium`. |
+| <code><a href="#tm-cdk-constructs.RdsSettings.property.performanceInsights">performanceInsights</a></code> | <code>boolean</code> | Enables Performance Insights. |
+
+---
+
+##### `instanceType`<sup>Optional</sup> <a name="instanceType" id="tm-cdk-constructs.RdsSettings.property.instanceType"></a>
+
+```typescript
+public readonly instanceType: string;
+```
+
+- *Type:* string
+- *Default:* an Aurora Serverless v2 writer
+
+Instance type of a provisioned writer, e.g. `t3.medium`.
+
+---
+
+##### `performanceInsights`<sup>Optional</sup> <a name="performanceInsights" id="tm-cdk-constructs.RdsSettings.property.performanceInsights"></a>
+
+```typescript
+public readonly performanceInsights: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Enables Performance Insights.
+
+Must be `false` on t3 instance classes,
+which don't support it.
+
+---
+
+### RedirectionsSettings <a name="RedirectionsSettings" id="tm-cdk-constructs.RedirectionsSettings"></a>
+
+EC2 instance with an Elastic IP that redirects domains (e.g. the apex domain to `www`). The redirection itself is configured on the instance.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.RedirectionsSettings.Initializer"></a>
+
+```typescript
+import { RedirectionsSettings } from 'tm-cdk-constructs'
+
+const redirectionsSettings: RedirectionsSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.RedirectionsSettings.property.amiId">amiId</a></code> | <code>string</code> | AMI of the instance, pinned so it never changes by itself (a new AMI replaces the instance). |
+| <code><a href="#tm-cdk-constructs.RedirectionsSettings.property.ebsVolumeSize">ebsVolumeSize</a></code> | <code>number</code> | Root volume size in GiB. |
+| <code><a href="#tm-cdk-constructs.RedirectionsSettings.property.instanceType">instanceType</a></code> | <code>string</code> | EC2 instance type. |
+
+---
+
+##### `amiId`<sup>Optional</sup> <a name="amiId" id="tm-cdk-constructs.RedirectionsSettings.property.amiId"></a>
+
+```typescript
+public readonly amiId: string;
+```
+
+- *Type:* string
+- *Default:* the latest Amazon Linux 2023 AMI, looked up once and cached in `cdk.context.json`
+
+AMI of the instance, pinned so it never changes by itself (a new AMI replaces the instance).
+
+---
+
+##### `ebsVolumeSize`<sup>Optional</sup> <a name="ebsVolumeSize" id="tm-cdk-constructs.RedirectionsSettings.property.ebsVolumeSize"></a>
+
+```typescript
+public readonly ebsVolumeSize: number;
+```
+
+- *Type:* number
+- *Default:* 20
+
+Root volume size in GiB.
+
+---
+
+##### `instanceType`<sup>Optional</sup> <a name="instanceType" id="tm-cdk-constructs.RedirectionsSettings.property.instanceType"></a>
+
+```typescript
+public readonly instanceType: string;
+```
+
+- *Type:* string
+- *Default:* 't3a.micro'
+
+EC2 instance type.
+
+---
+
+### RedisSettings <a name="RedisSettings" id="tm-cdk-constructs.RedisSettings"></a>
+
+ElastiCache Redis settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.RedisSettings.Initializer"></a>
+
+```typescript
+import { RedisSettings } from 'tm-cdk-constructs'
+
+const redisSettings: RedisSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.RedisSettings.property.cacheNodeType">cacheNodeType</a></code> | <code>string</code> | Cache node type. |
+| <code><a href="#tm-cdk-constructs.RedisSettings.property.replicasPerNodeGroup">replicasPerNodeGroup</a></code> | <code>number</code> | Number of replicas. |
+
+---
+
+##### `cacheNodeType`<sup>Optional</sup> <a name="cacheNodeType" id="tm-cdk-constructs.RedisSettings.property.cacheNodeType"></a>
+
+```typescript
+public readonly cacheNodeType: string;
+```
+
+- *Type:* string
+- *Default:* 'cache.t3.micro'
+
+Cache node type.
+
+---
+
+##### `replicasPerNodeGroup`<sup>Optional</sup> <a name="replicasPerNodeGroup" id="tm-cdk-constructs.RedisSettings.property.replicasPerNodeGroup"></a>
+
+```typescript
+public readonly replicasPerNodeGroup: number;
+```
+
+- *Type:* number
+- *Default:* 0
+
+Number of replicas.
+
+With at least one replica, automatic failover and
+Multi-AZ are enabled.
+
+---
 
 ### TmApplicationLoadBalancedFargateServiceProps <a name="TmApplicationLoadBalancedFargateServiceProps" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps"></a>
 
@@ -3718,6 +19776,8 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerCommand">containerCommand</a></code> | <code>string[]</code> | Command of the web container. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerEntryPoint">containerEntryPoint</a></code> | <code>string[]</code> | Entry point of the web container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableDefaultScaling">disableDefaultScaling</a></code> | <code>boolean</code> | Completely disable the built-in auto-scaling policies. |
@@ -3727,9 +19787,12 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | The minumun number od tasks. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.monitoringConfiguration">monitoringConfiguration</a></code> | <code>aws-cdk-lib.aws_ecs.CfnService.MonitoringConfigurationProperty</code> | The CloudWatch monitoring configuration applied to the ECS service, which controls the resolution of the service-level `CPUUtilization` and `MemoryUtilization` metrics. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.phpFpmContainer">phpFpmContainer</a></code> | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions">TmPhpFpmContainerOptions</a></code> | Adds a php-fpm container to the task. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskContainerName">scheduledTaskContainerName</a></code> | <code>string</code> | Container in which the scheduled task runs `scheduledTasksCommand`. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression">scheduledTaskScheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.secrets">secrets</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ecs.Secret}</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.sharedVolumes">sharedVolumes</a></code> | <code><a href="#tm-cdk-constructs.TmSharedVolume">TmSharedVolume</a>[]</code> | Volumes on the task's ephemeral storage, mounted in every container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetGroupHealthCheck">targetGroupHealthCheck</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.HealthCheck</code> | The health check configuration applied to the ALB target group. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | *No description.* |
@@ -4416,6 +20479,32 @@ public readonly buildContainerArgs: {[ key: string ]: string};
 
 ---
 
+##### `containerCommand`<sup>Optional</sup> <a name="containerCommand" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerCommand"></a>
+
+```typescript
+public readonly containerCommand: string[];
+```
+
+- *Type:* string[]
+- *Default:* the image's command
+
+Command of the web container.
+
+---
+
+##### `containerEntryPoint`<sup>Optional</sup> <a name="containerEntryPoint" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerEntryPoint"></a>
+
+```typescript
+public readonly containerEntryPoint: string[];
+```
+
+- *Type:* string[]
+- *Default:* the image's entry point
+
+Entry point of the web container.
+
+---
+
 ##### `containerPort`<sup>Optional</sup> <a name="containerPort" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort"></a>
 
 ```typescript
@@ -4543,6 +20632,36 @@ faster. Pass this property to override that default entirely (e.g. to add
 
 ---
 
+##### `phpFpmContainer`<sup>Optional</sup> <a name="phpFpmContainer" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.phpFpmContainer"></a>
+
+```typescript
+public readonly phpFpmContainer: TmPhpFpmContainerOptions;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmPhpFpmContainerOptions">TmPhpFpmContainerOptions</a>
+- *Default:* a single web container
+
+Adds a php-fpm container to the task.
+
+The web container (behind the load
+balancer) then serves static files and forwards PHP requests to it.
+Both containers get the service secrets and the EFS and shared volumes.
+
+---
+
+##### `scheduledTaskContainerName`<sup>Optional</sup> <a name="scheduledTaskContainerName" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskContainerName"></a>
+
+```typescript
+public readonly scheduledTaskContainerName: string;
+```
+
+- *Type:* string
+- *Default:* the web container
+
+Container in which the scheduled task runs `scheduledTasksCommand`.
+
+---
+
 ##### `scheduledTaskScheduleExpression`<sup>Optional</sup> <a name="scheduledTaskScheduleExpression" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTaskScheduleExpression"></a>
 
 ```typescript
@@ -4570,6 +20689,19 @@ public readonly secrets: {[ key: string ]: Secret};
 ```
 
 - *Type:* {[ key: string ]: aws-cdk-lib.aws_ecs.Secret}
+
+---
+
+##### `sharedVolumes`<sup>Optional</sup> <a name="sharedVolumes" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.sharedVolumes"></a>
+
+```typescript
+public readonly sharedVolumes: TmSharedVolume[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmSharedVolume">TmSharedVolume</a>[]
+- *Default:* none
+
+Volumes on the task's ephemeral storage, mounted in every container.
 
 ---
 
@@ -4612,6 +20744,2241 @@ public readonly targetMemoryUtilizationPercent: number;
 ```
 
 - *Type:* number
+
+---
+
+### TmBackupStackProps <a name="TmBackupStackProps" id="tm-cdk-constructs.TmBackupStackProps"></a>
+
+Props for `TmBackupStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmBackupStackProps.Initializer"></a>
+
+```typescript
+import { TmBackupStackProps } from 'tm-cdk-constructs'
+
+const tmBackupStackProps: TmBackupStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.ec2RetentionDays">ec2RetentionDays</a></code> | <code>number</code> | Retention of the EBS volume backups, in days. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.rdsRetentionDays">rdsRetentionDays</a></code> | <code>number</code> | Retention of the RDS cluster backups, in days. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.scheduleExpression">scheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | Backup schedule. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmBackupStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmBackupStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmBackupStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmBackupStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmBackupStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmBackupStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmBackupStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmBackupStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmBackupStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmBackupStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmBackupStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmBackupStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `ec2RetentionDays`<sup>Optional</sup> <a name="ec2RetentionDays" id="tm-cdk-constructs.TmBackupStackProps.property.ec2RetentionDays"></a>
+
+```typescript
+public readonly ec2RetentionDays: number;
+```
+
+- *Type:* number
+- *Default:* 7
+
+Retention of the EBS volume backups, in days.
+
+---
+
+##### `rdsRetentionDays`<sup>Optional</sup> <a name="rdsRetentionDays" id="tm-cdk-constructs.TmBackupStackProps.property.rdsRetentionDays"></a>
+
+```typescript
+public readonly rdsRetentionDays: number;
+```
+
+- *Type:* number
+- *Default:* 35
+
+Retention of the RDS cluster backups, in days.
+
+---
+
+##### `scheduleExpression`<sup>Optional</sup> <a name="scheduleExpression" id="tm-cdk-constructs.TmBackupStackProps.property.scheduleExpression"></a>
+
+```typescript
+public readonly scheduleExpression: Schedule;
+```
+
+- *Type:* aws-cdk-lib.aws_events.Schedule
+- *Default:* daily at midnight UTC
+
+Backup schedule.
+
+---
+
+### TmBastionStackProps <a name="TmBastionStackProps" id="tm-cdk-constructs.TmBastionStackProps"></a>
+
+Props for `TmBastionStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmBastionStackProps.Initializer"></a>
+
+```typescript
+import { TmBastionStackProps } from 'tm-cdk-constructs'
+
+const tmBastionStackProps: TmBastionStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.vpcCidr">vpcCidr</a></code> | <code>string</code> | CIDR range of the VPC. |
+| <code><a href="#tm-cdk-constructs.TmBastionStackProps.property.instanceType">instanceType</a></code> | <code>string</code> | EC2 instance type. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmBastionStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmBastionStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmBastionStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmBastionStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmBastionStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmBastionStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmBastionStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmBastionStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmBastionStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmBastionStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmBastionStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmBastionStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmBastionStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `vpcCidr`<sup>Required</sup> <a name="vpcCidr" id="tm-cdk-constructs.TmBastionStackProps.property.vpcCidr"></a>
+
+```typescript
+public readonly vpcCidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC.
+
+---
+
+##### `instanceType`<sup>Optional</sup> <a name="instanceType" id="tm-cdk-constructs.TmBastionStackProps.property.instanceType"></a>
+
+```typescript
+public readonly instanceType: string;
+```
+
+- *Type:* string
+- *Default:* 't3.small'
+
+EC2 instance type.
+
+---
+
+### TmCloudfrontCdnStackProps <a name="TmCloudfrontCdnStackProps" id="tm-cdk-constructs.TmCloudfrontCdnStackProps"></a>
+
+Props for `TmCloudfrontCdnStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.Initializer"></a>
+
+```typescript
+import { TmCloudfrontCdnStackProps } from 'tm-cdk-constructs'
+
+const tmCloudfrontCdnStackProps: TmCloudfrontCdnStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.domain">domain</a></code> | <code>string</code> | Domain of the CDN distribution. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.accessLogs">accessLogs</a></code> | <code>boolean</code> | Writes access logs to the log bucket of `TmS3Stack`, under `cdn/`. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.certificateArn">certificateArn</a></code> | <code>string</code> | ACM certificate ARN (us-east-1). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.distributionIds">distributionIds</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | Writes the distribution-ID parameter, covering the www distributions of `TmCloudfrontStack` (IDs read from SSM) and this one. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.webAcl">webAcl</a></code> | <code>boolean</code> | Associates the WebACL of `TmWafStack` (ARN read from SSM). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontCdnStackProps.property.wwwDomains">wwwDomains</a></code> | <code>string[][]</code> | Domains of the www distributions, in order, with their extra aliases. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `domain`<sup>Required</sup> <a name="domain" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.domain"></a>
+
+```typescript
+public readonly domain: string;
+```
+
+- *Type:* string
+
+Domain of the CDN distribution.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `accessLogs`<sup>Optional</sup> <a name="accessLogs" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.accessLogs"></a>
+
+```typescript
+public readonly accessLogs: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Writes access logs to the log bucket of `TmS3Stack`, under `cdn/`.
+
+---
+
+##### `certificateArn`<sup>Optional</sup> <a name="certificateArn" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.certificateArn"></a>
+
+```typescript
+public readonly certificateArn: string;
+```
+
+- *Type:* string
+- *Default:* read from `TmParameterNames.cloudfrontCdnCertificateArn`
+
+ACM certificate ARN (us-east-1).
+
+---
+
+##### `distributionIds`<sup>Optional</sup> <a name="distributionIds" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.distributionIds"></a>
+
+```typescript
+public readonly distributionIds: TmDistributionIdsOptions;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a>
+- *Default:* not written by this stack
+
+Writes the distribution-ID parameter, covering the www distributions of `TmCloudfrontStack` (IDs read from SSM) and this one.
+
+---
+
+##### `webAcl`<sup>Optional</sup> <a name="webAcl" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.webAcl"></a>
+
+```typescript
+public readonly webAcl: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Associates the WebACL of `TmWafStack` (ARN read from SSM).
+
+---
+
+##### `wwwDomains`<sup>Optional</sup> <a name="wwwDomains" id="tm-cdk-constructs.TmCloudfrontCdnStackProps.property.wwwDomains"></a>
+
+```typescript
+public readonly wwwDomains: string[][];
+```
+
+- *Type:* string[][]
+- *Default:* []
+
+Domains of the www distributions, in order, with their extra aliases.
+
+Used for the distribution-ID parameter.
+
+---
+
+### TmCloudfrontStackProps <a name="TmCloudfrontStackProps" id="tm-cdk-constructs.TmCloudfrontStackProps"></a>
+
+Props for `TmCloudfrontStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmCloudfrontStackProps.Initializer"></a>
+
+```typescript
+import { TmCloudfrontStackProps } from 'tm-cdk-constructs'
+
+const tmCloudfrontStackProps: TmCloudfrontStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.domains">domains</a></code> | <code>string[]</code> | One distribution per domain. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value sent to the load balancer. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.accessLogs">accessLogs</a></code> | <code>boolean</code> | Writes access logs to the log bucket of `TmS3Stack`, under `www/`. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.additionalDomains">additionalDomains</a></code> | <code>{[ key: string ]: string[]}</code> | Extra aliases of a distribution, keyed by an entry of `domains`. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.basicAuth">basicAuth</a></code> | <code>boolean</code> | Protects the site with HTTP basic authentication. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.basicAuthParameterName">basicAuthParameterName</a></code> | <code>string</code> | SSM parameter holding the base64 `user:password` for basic authentication. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.certificateArns">certificateArns</a></code> | <code>{[ key: string ]: string}</code> | ACM certificate ARNs (us-east-1), keyed by an entry of `domains`. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.distributionIds">distributionIds</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | Writes the distribution-ID parameter for these distributions. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.errorPages">errorPages</a></code> | <code>boolean</code> | Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl">webAcl</a></code> | <code>boolean</code> | Associates the WebACL of `TmWafStack` (ARN read from SSM). |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmCloudfrontStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmCloudfrontStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmCloudfrontStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmCloudfrontStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmCloudfrontStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmCloudfrontStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmCloudfrontStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmCloudfrontStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmCloudfrontStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmCloudfrontStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmCloudfrontStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmCloudfrontStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `domains`<sup>Required</sup> <a name="domains" id="tm-cdk-constructs.TmCloudfrontStackProps.property.domains"></a>
+
+```typescript
+public readonly domains: string[];
+```
+
+- *Type:* string[]
+
+One distribution per domain.
+
+Distributions are identified by position.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmCloudfrontStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `originCustomHeaderParameterName`<sup>Required</sup> <a name="originCustomHeaderParameterName" id="tm-cdk-constructs.TmCloudfrontStackProps.property.originCustomHeaderParameterName"></a>
+
+```typescript
+public readonly originCustomHeaderParameterName: string;
+```
+
+- *Type:* string
+
+SSM parameter holding the secret header value sent to the load balancer.
+
+---
+
+##### `accessLogs`<sup>Optional</sup> <a name="accessLogs" id="tm-cdk-constructs.TmCloudfrontStackProps.property.accessLogs"></a>
+
+```typescript
+public readonly accessLogs: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Writes access logs to the log bucket of `TmS3Stack`, under `www/`.
+
+---
+
+##### `additionalDomains`<sup>Optional</sup> <a name="additionalDomains" id="tm-cdk-constructs.TmCloudfrontStackProps.property.additionalDomains"></a>
+
+```typescript
+public readonly additionalDomains: {[ key: string ]: string[]};
+```
+
+- *Type:* {[ key: string ]: string[]}
+- *Default:* {}
+
+Extra aliases of a distribution, keyed by an entry of `domains`.
+
+---
+
+##### `basicAuth`<sup>Optional</sup> <a name="basicAuth" id="tm-cdk-constructs.TmCloudfrontStackProps.property.basicAuth"></a>
+
+```typescript
+public readonly basicAuth: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Protects the site with HTTP basic authentication.
+
+---
+
+##### `basicAuthParameterName`<sup>Optional</sup> <a name="basicAuthParameterName" id="tm-cdk-constructs.TmCloudfrontStackProps.property.basicAuthParameterName"></a>
+
+```typescript
+public readonly basicAuthParameterName: string;
+```
+
+- *Type:* string
+- *Default:* TmParameterNames.cloudfrontBasicAuth
+
+SSM parameter holding the base64 `user:password` for basic authentication.
+
+---
+
+##### `certificateArns`<sup>Optional</sup> <a name="certificateArns" id="tm-cdk-constructs.TmCloudfrontStackProps.property.certificateArns"></a>
+
+```typescript
+public readonly certificateArns: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* read from `TmParameterNames.cloudfrontWwwCertificateArn`
+
+ACM certificate ARNs (us-east-1), keyed by an entry of `domains`.
+
+---
+
+##### `distributionIds`<sup>Optional</sup> <a name="distributionIds" id="tm-cdk-constructs.TmCloudfrontStackProps.property.distributionIds"></a>
+
+```typescript
+public readonly distributionIds: TmDistributionIdsOptions;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a>
+- *Default:* not written by this stack
+
+Writes the distribution-ID parameter for these distributions.
+
+Leave unset
+when `TmCloudfrontCdnStack` writes it.
+
+---
+
+##### `errorPages`<sup>Optional</sup> <a name="errorPages" id="tm-cdk-constructs.TmCloudfrontStackProps.property.errorPages"></a>
+
+```typescript
+public readonly errorPages: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses.
+
+---
+
+##### `webAcl`<sup>Optional</sup> <a name="webAcl" id="tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl"></a>
+
+```typescript
+public readonly webAcl: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Associates the WebACL of `TmWafStack` (ARN read from SSM).
+
+---
+
+### TmDistributionEntry <a name="TmDistributionEntry" id="tm-cdk-constructs.TmDistributionEntry"></a>
+
+A distribution and the domains it serves.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmDistributionEntry.Initializer"></a>
+
+```typescript
+import { TmDistributionEntry } from 'tm-cdk-constructs'
+
+const tmDistributionEntry: TmDistributionEntry = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmDistributionEntry.property.distributionId">distributionId</a></code> | <code>string</code> | Distribution ID. |
+| <code><a href="#tm-cdk-constructs.TmDistributionEntry.property.domains">domains</a></code> | <code>string[]</code> | Domains of the distribution, the main one first. |
+
+---
+
+##### `distributionId`<sup>Required</sup> <a name="distributionId" id="tm-cdk-constructs.TmDistributionEntry.property.distributionId"></a>
+
+```typescript
+public readonly distributionId: string;
+```
+
+- *Type:* string
+
+Distribution ID.
+
+---
+
+##### `domains`<sup>Required</sup> <a name="domains" id="tm-cdk-constructs.TmDistributionEntry.property.domains"></a>
+
+```typescript
+public readonly domains: string[];
+```
+
+- *Type:* string[]
+
+Domains of the distribution, the main one first.
+
+---
+
+### TmDistributionIdsOptions <a name="TmDistributionIdsOptions" id="tm-cdk-constructs.TmDistributionIdsOptions"></a>
+
+Where and how the distribution IDs are published for tm_cloudfront and the pipeline invalidation step.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmDistributionIdsOptions.Initializer"></a>
+
+```typescript
+import { TmDistributionIdsOptions } from 'tm-cdk-constructs'
+
+const tmDistributionIdsOptions: TmDistributionIdsOptions = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions.property.format">format</a></code> | <code><a href="#tm-cdk-constructs.DistributionIdsFormat">DistributionIdsFormat</a></code> | Value format, which follows the project's tm_cloudfront version. |
+| <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions.property.parameterName">parameterName</a></code> | <code>string</code> | Name of the SSM parameter. |
+
+---
+
+##### `format`<sup>Required</sup> <a name="format" id="tm-cdk-constructs.TmDistributionIdsOptions.property.format"></a>
+
+```typescript
+public readonly format: DistributionIdsFormat;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.DistributionIdsFormat">DistributionIdsFormat</a>
+
+Value format, which follows the project's tm_cloudfront version.
+
+---
+
+##### `parameterName`<sup>Required</sup> <a name="parameterName" id="tm-cdk-constructs.TmDistributionIdsOptions.property.parameterName"></a>
+
+```typescript
+public readonly parameterName: string;
+```
+
+- *Type:* string
+
+Name of the SSM parameter.
+
+---
+
+### TmEcsStackProps <a name="TmEcsStackProps" id="tm-cdk-constructs.TmEcsStackProps"></a>
+
+Props for `TmEcsStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmEcsStackProps.Initializer"></a>
+
+```typescript
+import { TmEcsStackProps } from 'tm-cdk-constructs'
+
+const tmEcsStackProps: TmEcsStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.applicationName">applicationName</a></code> | <code>string</code> | Application name used in the secrets path `/applications/<name>/secrets/`. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | Docker build context (the application repository). |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.containerTopology">containerTopology</a></code> | <code><a href="#tm-cdk-constructs.ContainerTopology">ContainerTopology</a></code> | Container layout of the task. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value sent by CloudFront. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.vpcCidr">vpcCidr</a></code> | <code>string</code> | CIDR range of the VPC. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.webDockerfile">webDockerfile</a></code> | <code>string</code> | Dockerfile of the `web` container, relative to the build context. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.additionalSecretsFromParameterStore">additionalSecretsFromParameterStore</a></code> | <code>{[ key: string ]: string}</code> | Variables read from other SSM parameters, as `{ VARIABLE: parameterName }`. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.cpu">cpu</a></code> | <code>number</code> | Task CPU units. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.deploymentHookCommand">deploymentHookCommand</a></code> | <code>string[]</code> | Command run in a one-off task after each deployment. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.falEfsDirectories">falEfsDirectories</a></code> | <code>string[]</code> | FAL directories stored on EFS, relative to the document root. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | Autoscaling upper bound. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Task memory in MiB. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | Autoscaling lower bound. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.phpFpmDockerfile">phpFpmDockerfile</a></code> | <code>string</code> | Dockerfile of the `php-fpm` container. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | Command of the scheduled task (every minute). |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.secretsFromSecretsManager">secretsFromSecretsManager</a></code> | <code>{[ key: string ]: <a href="#tm-cdk-constructs.TmSecretField">TmSecretField</a>}</code> | Variables read from Secrets Manager secret fields. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.secretsFromSsmParameterStore">secretsFromSsmParameterStore</a></code> | <code>string[]</code> | Variables read from `/applications/<applicationName>/secrets/<NAME>`. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the autoscaling policy. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmEcsStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmEcsStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmEcsStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmEcsStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmEcsStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmEcsStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmEcsStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmEcsStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmEcsStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmEcsStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmEcsStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmEcsStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `applicationName`<sup>Required</sup> <a name="applicationName" id="tm-cdk-constructs.TmEcsStackProps.property.applicationName"></a>
+
+```typescript
+public readonly applicationName: string;
+```
+
+- *Type:* string
+
+Application name used in the secrets path `/applications/<name>/secrets/`.
+
+---
+
+##### `buildContextPath`<sup>Required</sup> <a name="buildContextPath" id="tm-cdk-constructs.TmEcsStackProps.property.buildContextPath"></a>
+
+```typescript
+public readonly buildContextPath: string;
+```
+
+- *Type:* string
+
+Docker build context (the application repository).
+
+---
+
+##### `containerTopology`<sup>Required</sup> <a name="containerTopology" id="tm-cdk-constructs.TmEcsStackProps.property.containerTopology"></a>
+
+```typescript
+public readonly containerTopology: ContainerTopology;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ContainerTopology">ContainerTopology</a>
+
+Container layout of the task.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmEcsStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `originCustomHeaderParameterName`<sup>Required</sup> <a name="originCustomHeaderParameterName" id="tm-cdk-constructs.TmEcsStackProps.property.originCustomHeaderParameterName"></a>
+
+```typescript
+public readonly originCustomHeaderParameterName: string;
+```
+
+- *Type:* string
+
+SSM parameter holding the secret header value sent by CloudFront.
+
+---
+
+##### `vpcCidr`<sup>Required</sup> <a name="vpcCidr" id="tm-cdk-constructs.TmEcsStackProps.property.vpcCidr"></a>
+
+```typescript
+public readonly vpcCidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC.
+
+---
+
+##### `webDockerfile`<sup>Required</sup> <a name="webDockerfile" id="tm-cdk-constructs.TmEcsStackProps.property.webDockerfile"></a>
+
+```typescript
+public readonly webDockerfile: string;
+```
+
+- *Type:* string
+
+Dockerfile of the `web` container, relative to the build context.
+
+---
+
+##### `additionalSecretsFromParameterStore`<sup>Optional</sup> <a name="additionalSecretsFromParameterStore" id="tm-cdk-constructs.TmEcsStackProps.property.additionalSecretsFromParameterStore"></a>
+
+```typescript
+public readonly additionalSecretsFromParameterStore: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Variables read from other SSM parameters, as `{ VARIABLE: parameterName }`.
+
+---
+
+##### `cpu`<sup>Optional</sup> <a name="cpu" id="tm-cdk-constructs.TmEcsStackProps.property.cpu"></a>
+
+```typescript
+public readonly cpu: number;
+```
+
+- *Type:* number
+- *Default:* 1024
+
+Task CPU units.
+
+---
+
+##### `deploymentHookCommand`<sup>Optional</sup> <a name="deploymentHookCommand" id="tm-cdk-constructs.TmEcsStackProps.property.deploymentHookCommand"></a>
+
+```typescript
+public readonly deploymentHookCommand: string[];
+```
+
+- *Type:* string[]
+- *Default:* ['/usr/local/bin/deployment-hook.sh']
+
+Command run in a one-off task after each deployment.
+
+---
+
+##### `desiredCount`<sup>Optional</sup> <a name="desiredCount" id="tm-cdk-constructs.TmEcsStackProps.property.desiredCount"></a>
+
+```typescript
+public readonly desiredCount: number;
+```
+
+- *Type:* number
+- *Default:* 2
+
+Number of tasks when the service is created.
+
+---
+
+##### `environment`<sup>Optional</sup> <a name="environment" id="tm-cdk-constructs.TmEcsStackProps.property.environment"></a>
+
+```typescript
+public readonly environment: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Plain environment variables.
+
+---
+
+##### `falEfsDirectories`<sup>Optional</sup> <a name="falEfsDirectories" id="tm-cdk-constructs.TmEcsStackProps.property.falEfsDirectories"></a>
+
+```typescript
+public readonly falEfsDirectories: string[];
+```
+
+- *Type:* string[]
+- *Default:* []
+
+FAL directories stored on EFS, relative to the document root.
+
+---
+
+##### `maxTaskCount`<sup>Optional</sup> <a name="maxTaskCount" id="tm-cdk-constructs.TmEcsStackProps.property.maxTaskCount"></a>
+
+```typescript
+public readonly maxTaskCount: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Autoscaling upper bound.
+
+---
+
+##### `memoryLimitMiB`<sup>Optional</sup> <a name="memoryLimitMiB" id="tm-cdk-constructs.TmEcsStackProps.property.memoryLimitMiB"></a>
+
+```typescript
+public readonly memoryLimitMiB: number;
+```
+
+- *Type:* number
+- *Default:* 2048
+
+Task memory in MiB.
+
+---
+
+##### `minTaskCount`<sup>Optional</sup> <a name="minTaskCount" id="tm-cdk-constructs.TmEcsStackProps.property.minTaskCount"></a>
+
+```typescript
+public readonly minTaskCount: number;
+```
+
+- *Type:* number
+- *Default:* 1
+
+Autoscaling lower bound.
+
+---
+
+##### `phpFpmDockerfile`<sup>Optional</sup> <a name="phpFpmDockerfile" id="tm-cdk-constructs.TmEcsStackProps.property.phpFpmDockerfile"></a>
+
+```typescript
+public readonly phpFpmDockerfile: string;
+```
+
+- *Type:* string
+- *Default:* none
+
+Dockerfile of the `php-fpm` container.
+
+Required unless the topology is SINGLE.
+
+---
+
+##### `scheduledTasksCommand`<sup>Optional</sup> <a name="scheduledTasksCommand" id="tm-cdk-constructs.TmEcsStackProps.property.scheduledTasksCommand"></a>
+
+```typescript
+public readonly scheduledTasksCommand: string;
+```
+
+- *Type:* string
+- *Default:* '/usr/local/bin/run-scheduler.sh'
+
+Command of the scheduled task (every minute).
+
+---
+
+##### `secretsFromSecretsManager`<sup>Optional</sup> <a name="secretsFromSecretsManager" id="tm-cdk-constructs.TmEcsStackProps.property.secretsFromSecretsManager"></a>
+
+```typescript
+public readonly secretsFromSecretsManager: {[ key: string ]: TmSecretField};
+```
+
+- *Type:* {[ key: string ]: <a href="#tm-cdk-constructs.TmSecretField">TmSecretField</a>}
+- *Default:* {}
+
+Variables read from Secrets Manager secret fields.
+
+---
+
+##### `secretsFromSsmParameterStore`<sup>Optional</sup> <a name="secretsFromSsmParameterStore" id="tm-cdk-constructs.TmEcsStackProps.property.secretsFromSsmParameterStore"></a>
+
+```typescript
+public readonly secretsFromSsmParameterStore: string[];
+```
+
+- *Type:* string[]
+- *Default:* []
+
+Variables read from `/applications/<applicationName>/secrets/<NAME>`.
+
+---
+
+##### `targetCpuUtilizationPercent`<sup>Optional</sup> <a name="targetCpuUtilizationPercent" id="tm-cdk-constructs.TmEcsStackProps.property.targetCpuUtilizationPercent"></a>
+
+```typescript
+public readonly targetCpuUtilizationPercent: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Target CPU utilization of the autoscaling policy.
+
+---
+
+##### `targetMemoryUtilizationPercent`<sup>Optional</sup> <a name="targetMemoryUtilizationPercent" id="tm-cdk-constructs.TmEcsStackProps.property.targetMemoryUtilizationPercent"></a>
+
+```typescript
+public readonly targetMemoryUtilizationPercent: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Target memory utilization of the autoscaling policy.
+
+---
+
+### TmPhpFpmContainerOptions <a name="TmPhpFpmContainerOptions" id="tm-cdk-constructs.TmPhpFpmContainerOptions"></a>
+
+A php-fpm container added to the task, next to the web container.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmPhpFpmContainerOptions.Initializer"></a>
+
+```typescript
+import { TmPhpFpmContainerOptions } from 'tm-cdk-constructs'
+
+const tmPhpFpmContainerOptions: TmPhpFpmContainerOptions = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | The build context path. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | The build dockerfile, relative to the build context. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | The build container args. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.containerName">containerName</a></code> | <code>string</code> | The container name. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.containerPort">containerPort</a></code> | <code>number</code> | The port php-fpm listens on. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.cpu">cpu</a></code> | <code>number</code> | CPU units reserved for the container. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Hard memory limit of the container, in MiB. |
+
+---
+
+##### `buildContextPath`<sup>Required</sup> <a name="buildContextPath" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildContextPath"></a>
+
+```typescript
+public readonly buildContextPath: string;
+```
+
+- *Type:* string
+
+The build context path.
+
+---
+
+##### `buildDockerfile`<sup>Required</sup> <a name="buildDockerfile" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildDockerfile"></a>
+
+```typescript
+public readonly buildDockerfile: string;
+```
+
+- *Type:* string
+
+The build dockerfile, relative to the build context.
+
+---
+
+##### `buildContainerArgs`<sup>Optional</sup> <a name="buildContainerArgs" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildContainerArgs"></a>
+
+```typescript
+public readonly buildContainerArgs: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* no build args
+
+The build container args.
+
+---
+
+##### `containerName`<sup>Optional</sup> <a name="containerName" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.containerName"></a>
+
+```typescript
+public readonly containerName: string;
+```
+
+- *Type:* string
+- *Default:* 'php-fpm'
+
+The container name.
+
+---
+
+##### `containerPort`<sup>Optional</sup> <a name="containerPort" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.containerPort"></a>
+
+```typescript
+public readonly containerPort: number;
+```
+
+- *Type:* number
+- *Default:* 9000
+
+The port php-fpm listens on.
+
+---
+
+##### `cpu`<sup>Optional</sup> <a name="cpu" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.cpu"></a>
+
+```typescript
+public readonly cpu: number;
+```
+
+- *Type:* number
+- *Default:* no reservation
+
+CPU units reserved for the container.
+
+---
+
+##### `environment`<sup>Optional</sup> <a name="environment" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.environment"></a>
+
+```typescript
+public readonly environment: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* none
+
+Plain environment variables.
+
+The secrets of the service are passed too.
+
+---
+
+##### `memoryLimitMiB`<sup>Optional</sup> <a name="memoryLimitMiB" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.memoryLimitMiB"></a>
+
+```typescript
+public readonly memoryLimitMiB: number;
+```
+
+- *Type:* number
+- *Default:* no container limit
+
+Hard memory limit of the container, in MiB.
 
 ---
 
@@ -4694,6 +23061,366 @@ public readonly synthCommand: string[];
 - *Type:* string[]
 
 The command to run in the synth step.
+
+---
+
+### TmPipelineStackProps <a name="TmPipelineStackProps" id="tm-cdk-constructs.TmPipelineStackProps"></a>
+
+Props for `TmPipelineStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmPipelineStackProps.Initializer"></a>
+
+```typescript
+import { TmPipelineStackProps } from 'tm-cdk-constructs'
+
+const tmPipelineStackProps: TmPipelineStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.parameters">parameters</a></code> | <code><a href="#tm-cdk-constructs.EnvironmentParameters">EnvironmentParameters</a></code> | Settings of the environment. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.applicationDirectory">applicationDirectory</a></code> | <code>string</code> | Directory where the pipeline checks out the application repository, relative to the infrastructure repository root (where `cdk.json` is). It is the Docker build context. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.appStageExtension">appStageExtension</a></code> | <code><a href="#tm-cdk-constructs.ITmAppStageExtension">ITmAppStageExtension</a></code> | Adds the repository's own stacks to the application stage. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.errorPagesPath">errorPagesPath</a></code> | <code>string</code> | Local directory of error pages, see `TmWebappAppStageProps.errorPagesPath`. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.stackIds">stackIds</a></code> | <code><a href="#tm-cdk-constructs.TmWebappStackIds">TmWebappStackIds</a></code> | Stack ids of the application stage. |
+| <code><a href="#tm-cdk-constructs.TmPipelineStackProps.property.stageId">stageId</a></code> | <code>string</code> | Id of the application stage. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmPipelineStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmPipelineStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmPipelineStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmPipelineStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmPipelineStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmPipelineStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmPipelineStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmPipelineStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmPipelineStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmPipelineStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmPipelineStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmPipelineStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `parameters`<sup>Required</sup> <a name="parameters" id="tm-cdk-constructs.TmPipelineStackProps.property.parameters"></a>
+
+```typescript
+public readonly parameters: EnvironmentParameters;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.EnvironmentParameters">EnvironmentParameters</a>
+
+Settings of the environment.
+
+---
+
+##### `applicationDirectory`<sup>Optional</sup> <a name="applicationDirectory" id="tm-cdk-constructs.TmPipelineStackProps.property.applicationDirectory"></a>
+
+```typescript
+public readonly applicationDirectory: string;
+```
+
+- *Type:* string
+- *Default:* 'build'
+
+Directory where the pipeline checks out the application repository, relative to the infrastructure repository root (where `cdk.json` is). It is the Docker build context.
+
+---
+
+##### `appStageExtension`<sup>Optional</sup> <a name="appStageExtension" id="tm-cdk-constructs.TmPipelineStackProps.property.appStageExtension"></a>
+
+```typescript
+public readonly appStageExtension: ITmAppStageExtension;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ITmAppStageExtension">ITmAppStageExtension</a>
+- *Default:* only the package stacks
+
+Adds the repository's own stacks to the application stage.
+
+---
+
+##### `errorPagesPath`<sup>Optional</sup> <a name="errorPagesPath" id="tm-cdk-constructs.TmPipelineStackProps.property.errorPagesPath"></a>
+
+```typescript
+public readonly errorPagesPath: string;
+```
+
+- *Type:* string
+- *Default:* CloudFront's default error responses
+
+Local directory of error pages, see `TmWebappAppStageProps.errorPagesPath`.
+
+---
+
+##### `stackIds`<sup>Optional</sup> <a name="stackIds" id="tm-cdk-constructs.TmPipelineStackProps.property.stackIds"></a>
+
+```typescript
+public readonly stackIds: TmWebappStackIds;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmWebappStackIds">TmWebappStackIds</a>
+- *Default:* see `TmWebappStackIds`
+
+Stack ids of the application stage.
+
+---
+
+##### `stageId`<sup>Optional</sup> <a name="stageId" id="tm-cdk-constructs.TmPipelineStackProps.property.stageId"></a>
+
+```typescript
+public readonly stageId: string;
+```
+
+- *Type:* string
+- *Default:* 'AppStage'
+
+Id of the application stage.
+
+Part of every application stack name.
 
 ---
 
@@ -5788,6 +24515,1746 @@ If provided, a provisioned writer will be created instead of a serverless one.
 
 ---
 
+### TmRdsAuroraMysqlServerlessStackProps <a name="TmRdsAuroraMysqlServerlessStackProps" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps"></a>
+
+Props for `TmRdsAuroraMysqlServerlessStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.Initializer"></a>
+
+```typescript
+import { TmRdsAuroraMysqlServerlessStackProps } from 'tm-cdk-constructs'
+
+const tmRdsAuroraMysqlServerlessStackProps: TmRdsAuroraMysqlServerlessStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.vpcCidr">vpcCidr</a></code> | <code>string</code> | CIDR range of the VPC. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.instanceType">instanceType</a></code> | <code>string</code> | Instance type of a provisioned writer, e.g. `t3.medium`. |
+| <code><a href="#tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.performanceInsights">performanceInsights</a></code> | <code>boolean</code> | Enables Performance Insights (unsupported on t3 instance classes). |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `vpcCidr`<sup>Required</sup> <a name="vpcCidr" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.vpcCidr"></a>
+
+```typescript
+public readonly vpcCidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC.
+
+---
+
+##### `instanceType`<sup>Optional</sup> <a name="instanceType" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.instanceType"></a>
+
+```typescript
+public readonly instanceType: string;
+```
+
+- *Type:* string
+- *Default:* an Aurora Serverless v2 writer
+
+Instance type of a provisioned writer, e.g. `t3.medium`.
+
+---
+
+##### `performanceInsights`<sup>Optional</sup> <a name="performanceInsights" id="tm-cdk-constructs.TmRdsAuroraMysqlServerlessStackProps.property.performanceInsights"></a>
+
+```typescript
+public readonly performanceInsights: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Enables Performance Insights (unsupported on t3 instance classes).
+
+---
+
+### TmRedirectionsEc2StackProps <a name="TmRedirectionsEc2StackProps" id="tm-cdk-constructs.TmRedirectionsEc2StackProps"></a>
+
+Props for `TmRedirectionsEc2Stack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.Initializer"></a>
+
+```typescript
+import { TmRedirectionsEc2StackProps } from 'tm-cdk-constructs'
+
+const tmRedirectionsEc2StackProps: TmRedirectionsEc2StackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.vpcCidr">vpcCidr</a></code> | <code>string</code> | CIDR range of the VPC. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.amiId">amiId</a></code> | <code>string</code> | Pinned AMI ID. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.ebsVolumeSize">ebsVolumeSize</a></code> | <code>number</code> | Root volume size in GiB. |
+| <code><a href="#tm-cdk-constructs.TmRedirectionsEc2StackProps.property.instanceType">instanceType</a></code> | <code>string</code> | EC2 instance type. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `vpcCidr`<sup>Required</sup> <a name="vpcCidr" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.vpcCidr"></a>
+
+```typescript
+public readonly vpcCidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC.
+
+---
+
+##### `amiId`<sup>Optional</sup> <a name="amiId" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.amiId"></a>
+
+```typescript
+public readonly amiId: string;
+```
+
+- *Type:* string
+- *Default:* the latest Amazon Linux 2023 AMI, looked up once and cached in `cdk.context.json`
+
+Pinned AMI ID.
+
+---
+
+##### `ebsVolumeSize`<sup>Optional</sup> <a name="ebsVolumeSize" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.ebsVolumeSize"></a>
+
+```typescript
+public readonly ebsVolumeSize: number;
+```
+
+- *Type:* number
+- *Default:* 20
+
+Root volume size in GiB.
+
+---
+
+##### `instanceType`<sup>Optional</sup> <a name="instanceType" id="tm-cdk-constructs.TmRedirectionsEc2StackProps.property.instanceType"></a>
+
+```typescript
+public readonly instanceType: string;
+```
+
+- *Type:* string
+- *Default:* 't3a.micro'
+
+EC2 instance type.
+
+---
+
+### TmRedisStackProps <a name="TmRedisStackProps" id="tm-cdk-constructs.TmRedisStackProps"></a>
+
+Props for `TmRedisStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmRedisStackProps.Initializer"></a>
+
+```typescript
+import { TmRedisStackProps } from 'tm-cdk-constructs'
+
+const tmRedisStackProps: TmRedisStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.vpcCidr">vpcCidr</a></code> | <code>string</code> | CIDR range of the VPC. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.cacheNodeType">cacheNodeType</a></code> | <code>string</code> | Cache node type. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.replicasPerNodeGroup">replicasPerNodeGroup</a></code> | <code>number</code> | Number of replicas. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmRedisStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmRedisStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmRedisStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmRedisStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmRedisStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmRedisStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmRedisStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmRedisStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmRedisStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmRedisStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmRedisStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmRedisStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmRedisStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `vpcCidr`<sup>Required</sup> <a name="vpcCidr" id="tm-cdk-constructs.TmRedisStackProps.property.vpcCidr"></a>
+
+```typescript
+public readonly vpcCidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC.
+
+---
+
+##### `cacheNodeType`<sup>Optional</sup> <a name="cacheNodeType" id="tm-cdk-constructs.TmRedisStackProps.property.cacheNodeType"></a>
+
+```typescript
+public readonly cacheNodeType: string;
+```
+
+- *Type:* string
+- *Default:* 'cache.t3.micro'
+
+Cache node type.
+
+---
+
+##### `replicasPerNodeGroup`<sup>Optional</sup> <a name="replicasPerNodeGroup" id="tm-cdk-constructs.TmRedisStackProps.property.replicasPerNodeGroup"></a>
+
+```typescript
+public readonly replicasPerNodeGroup: number;
+```
+
+- *Type:* number
+- *Default:* 0
+
+Number of replicas.
+
+With at least one, automatic failover and Multi-AZ are on.
+
+---
+
+### TmS3StackProps <a name="TmS3StackProps" id="tm-cdk-constructs.TmS3StackProps"></a>
+
+Props for `TmS3Stack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmS3StackProps.Initializer"></a>
+
+```typescript
+import { TmS3StackProps } from 'tm-cdk-constructs'
+
+const tmS3StackProps: TmS3StackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.contentBucket">contentBucket</a></code> | <code>boolean</code> | Creates the FAL content bucket, served by the CDN distribution. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.errorPagesPath">errorPagesPath</a></code> | <code>string</code> | Local directory of error pages (`<code>.html`). When set, an error bucket is created and the pages are deployed under `errors/`. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.logBucket">logBucket</a></code> | <code>boolean</code> | Creates the bucket receiving the CloudFront access logs. |
+| <code><a href="#tm-cdk-constructs.TmS3StackProps.property.logRetentionDays">logRetentionDays</a></code> | <code>number</code> | Days before CloudFront access logs are deleted. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmS3StackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmS3StackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmS3StackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmS3StackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmS3StackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmS3StackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmS3StackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmS3StackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmS3StackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmS3StackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmS3StackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmS3StackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmS3StackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `contentBucket`<sup>Optional</sup> <a name="contentBucket" id="tm-cdk-constructs.TmS3StackProps.property.contentBucket"></a>
+
+```typescript
+public readonly contentBucket: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Creates the FAL content bucket, served by the CDN distribution.
+
+---
+
+##### `errorPagesPath`<sup>Optional</sup> <a name="errorPagesPath" id="tm-cdk-constructs.TmS3StackProps.property.errorPagesPath"></a>
+
+```typescript
+public readonly errorPagesPath: string;
+```
+
+- *Type:* string
+- *Default:* no error bucket
+
+Local directory of error pages (`<code>.html`). When set, an error bucket is created and the pages are deployed under `errors/`.
+
+---
+
+##### `logBucket`<sup>Optional</sup> <a name="logBucket" id="tm-cdk-constructs.TmS3StackProps.property.logBucket"></a>
+
+```typescript
+public readonly logBucket: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Creates the bucket receiving the CloudFront access logs.
+
+---
+
+##### `logRetentionDays`<sup>Optional</sup> <a name="logRetentionDays" id="tm-cdk-constructs.TmS3StackProps.property.logRetentionDays"></a>
+
+```typescript
+public readonly logRetentionDays: number;
+```
+
+- *Type:* number
+- *Default:* 365
+
+Days before CloudFront access logs are deleted.
+
+---
+
+### TmSecretField <a name="TmSecretField" id="tm-cdk-constructs.TmSecretField"></a>
+
+A field of a Secrets Manager secret passed to the containers.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmSecretField.Initializer"></a>
+
+```typescript
+import { TmSecretField } from 'tm-cdk-constructs'
+
+const tmSecretField: TmSecretField = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmSecretField.property.field">field</a></code> | <code>string</code> | JSON field of the secret. |
+| <code><a href="#tm-cdk-constructs.TmSecretField.property.secretArnParameterName">secretArnParameterName</a></code> | <code>string</code> | SSM parameter holding the complete ARN of the secret. |
+
+---
+
+##### `field`<sup>Required</sup> <a name="field" id="tm-cdk-constructs.TmSecretField.property.field"></a>
+
+```typescript
+public readonly field: string;
+```
+
+- *Type:* string
+
+JSON field of the secret.
+
+---
+
+##### `secretArnParameterName`<sup>Required</sup> <a name="secretArnParameterName" id="tm-cdk-constructs.TmSecretField.property.secretArnParameterName"></a>
+
+```typescript
+public readonly secretArnParameterName: string;
+```
+
+- *Type:* string
+
+SSM parameter holding the complete ARN of the secret.
+
+---
+
+### TmServiceIamUsersStackProps <a name="TmServiceIamUsersStackProps" id="tm-cdk-constructs.TmServiceIamUsersStackProps"></a>
+
+Props for `TmServiceIamUsersStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmServiceIamUsersStackProps.Initializer"></a>
+
+```typescript
+import { TmServiceIamUsersStackProps } from 'tm-cdk-constructs'
+
+const tmServiceIamUsersStackProps: TmServiceIamUsersStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmServiceIamUsersStackProps.property.users">users</a></code> | <code><a href="#tm-cdk-constructs.ServiceIamUser">ServiceIamUser</a>[]</code> | Users to create. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `users`<sup>Required</sup> <a name="users" id="tm-cdk-constructs.TmServiceIamUsersStackProps.property.users"></a>
+
+```typescript
+public readonly users: ServiceIamUser[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ServiceIamUser">ServiceIamUser</a>[]
+
+Users to create.
+
+`ServiceIamUser.S3` needs the content bucket of `TmS3Stack`.
+
+---
+
+### TmSharedVolume <a name="TmSharedVolume" id="tm-cdk-constructs.TmSharedVolume"></a>
+
+A volume on the task's ephemeral storage, shared by every container of the task.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmSharedVolume.Initializer"></a>
+
+```typescript
+import { TmSharedVolume } from 'tm-cdk-constructs'
+
+const tmSharedVolume: TmSharedVolume = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmSharedVolume.property.name">name</a></code> | <code>string</code> | The volume name. |
+| <code><a href="#tm-cdk-constructs.TmSharedVolume.property.path">path</a></code> | <code>string</code> | The mount path, the same in every container. |
+
+---
+
+##### `name`<sup>Required</sup> <a name="name" id="tm-cdk-constructs.TmSharedVolume.property.name"></a>
+
+```typescript
+public readonly name: string;
+```
+
+- *Type:* string
+
+The volume name.
+
+---
+
+##### `path`<sup>Required</sup> <a name="path" id="tm-cdk-constructs.TmSharedVolume.property.path"></a>
+
+```typescript
+public readonly path: string;
+```
+
+- *Type:* string
+
+The mount path, the same in every container.
+
+---
+
 ### TmSorlEc2Props <a name="TmSorlEc2Props" id="tm-cdk-constructs.TmSorlEc2Props"></a>
 
 #### Initializer <a name="Initializer" id="tm-cdk-constructs.TmSorlEc2Props.Initializer"></a>
@@ -6590,6 +27057,320 @@ public readonly ssmPathPrefix: string;
 
 ---
 
+### TmVpcBaseStackProps <a name="TmVpcBaseStackProps" id="tm-cdk-constructs.TmVpcBaseStackProps"></a>
+
+Props for `TmVpcBaseStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmVpcBaseStackProps.Initializer"></a>
+
+```typescript
+import { TmVpcBaseStackProps } from 'tm-cdk-constructs'
+
+const tmVpcBaseStackProps: TmVpcBaseStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.cidr">cidr</a></code> | <code>string</code> | CIDR range of the VPC. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmVpcBaseStackProps.property.hostedZoneName">hostedZoneName</a></code> | <code>string</code> | Name of the private hosted zone. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmVpcBaseStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmVpcBaseStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmVpcBaseStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmVpcBaseStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmVpcBaseStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmVpcBaseStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmVpcBaseStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmVpcBaseStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmVpcBaseStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmVpcBaseStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmVpcBaseStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmVpcBaseStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `cidr`<sup>Required</sup> <a name="cidr" id="tm-cdk-constructs.TmVpcBaseStackProps.property.cidr"></a>
+
+```typescript
+public readonly cidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmVpcBaseStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `hostedZoneName`<sup>Required</sup> <a name="hostedZoneName" id="tm-cdk-constructs.TmVpcBaseStackProps.property.hostedZoneName"></a>
+
+```typescript
+public readonly hostedZoneName: string;
+```
+
+- *Type:* string
+
+Name of the private hosted zone.
+
+---
+
 ### TmVpcProps <a name="TmVpcProps" id="tm-cdk-constructs.TmVpcProps"></a>
 
 Represents the configuration for a VPC.
@@ -7050,6 +27831,1440 @@ Indicates whether to enable the S3 endpoint for the VPC.
 
 ---
 
+### TmWafStackProps <a name="TmWafStackProps" id="tm-cdk-constructs.TmWafStackProps"></a>
+
+Props for `TmWafStack`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmWafStackProps.Initializer"></a>
+
+```typescript
+import { TmWafStackProps } from 'tm-cdk-constructs'
+
+const tmWafStackProps: TmWafStackProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.analyticsReporting">analyticsReporting</a></code> | <code>boolean</code> | Include runtime versioning information in this Stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.crossRegionReferences">crossRegionReferences</a></code> | <code>boolean</code> | Enable this flag to allow native cross region stack references. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.description">description</a></code> | <code>string</code> | A description of the stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | The AWS environment (account/region) where this stack will be deployed. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.notificationArns">notificationArns</a></code> | <code>string[]</code> | SNS Topic ARNs that will receive stack events. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.stackName">stackName</a></code> | <code>string</code> | Name to deploy the stack with. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.suppressTemplateIndentation">suppressTemplateIndentation</a></code> | <code>boolean</code> | Enable this flag to suppress indentation in generated CloudFormation templates. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.synthesizer">synthesizer</a></code> | <code>aws-cdk-lib.IStackSynthesizer</code> | Synthesis method to use while deploying this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.tags">tags</a></code> | <code>{[ key: string ]: string}</code> | Tags that will be applied to the Stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.parameterRegion">parameterRegion</a></code> | <code>string</code> | Region where the WebACL ARN is published in SSM (the application region). |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.blockedCountryCodes">blockedCountryCodes</a></code> | <code>string[]</code> | Country codes whose requests are blocked. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.logging">logging</a></code> | <code>boolean</code> | Sends the WebACL logs to CloudWatch Logs (30-day retention). |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.rateLimit">rateLimit</a></code> | <code>number</code> | Maximum requests per client IP in any 5-minute window. |
+
+---
+
+##### `analyticsReporting`<sup>Optional</sup> <a name="analyticsReporting" id="tm-cdk-constructs.TmWafStackProps.property.analyticsReporting"></a>
+
+```typescript
+public readonly analyticsReporting: boolean;
+```
+
+- *Type:* boolean
+- *Default:* `analyticsReporting` setting of containing `App`, or value of 'aws:cdk:version-reporting' context key
+
+Include runtime versioning information in this Stack.
+
+---
+
+##### `crossRegionReferences`<sup>Optional</sup> <a name="crossRegionReferences" id="tm-cdk-constructs.TmWafStackProps.property.crossRegionReferences"></a>
+
+```typescript
+public readonly crossRegionReferences: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Enable this flag to allow native cross region stack references.
+
+Enabling this will create a CloudFormation custom resource
+in both the producing stack and consuming stack in order to perform the export/import
+
+This feature is currently experimental
+
+---
+
+##### `description`<sup>Optional</sup> <a name="description" id="tm-cdk-constructs.TmWafStackProps.property.description"></a>
+
+```typescript
+public readonly description: string;
+```
+
+- *Type:* string
+- *Default:* No description.
+
+A description of the stack.
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmWafStackProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environment of the containing `Stage` if available, otherwise create the stack will be environment-agnostic.
+
+The AWS environment (account/region) where this stack will be deployed.
+
+Set the `region`/`account` fields of `env` to either a concrete value to
+select the indicated environment (recommended for production stacks), or to
+the values of environment variables
+`CDK_DEFAULT_REGION`/`CDK_DEFAULT_ACCOUNT` to let the target environment
+depend on the AWS credentials/configuration that the CDK CLI is executed
+under (recommended for development stacks).
+
+If the `Stack` is instantiated inside a `Stage`, any undefined
+`region`/`account` fields from `env` will default to the same field on the
+encompassing `Stage`, if configured there.
+
+If either `region` or `account` are not set nor inherited from `Stage`, the
+Stack will be considered "*environment-agnostic*"". Environment-agnostic
+stacks can be deployed to any environment but may not be able to take
+advantage of all features of the CDK. For example, they will not be able to
+use environmental context lookups such as `ec2.Vpc.fromLookup` and will not
+automatically translate Service Principals to the right format based on the
+environment's AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this stack to:
+// `.account` and `.region` will simply return these values.
+new Stack(app, 'Stack1', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  },
+});
+
+// Use the CLI's current credentials to determine the target environment:
+// `.account` and `.region` will reflect the account+region the CLI
+// is configured to use (based on the user CLI credentials)
+new Stack(app, 'Stack2', {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION
+  },
+});
+
+// Define multiple stacks stage associated with an environment
+const myStage = new Stage(app, 'MyStage', {
+  env: {
+    account: '123456789012',
+    region: 'us-east-1'
+  }
+});
+
+// both of these stacks will use the stage's account/region:
+// `.account` and `.region` will resolve to the concrete values as above
+new MyStack(myStage, 'Stack1');
+new YourStack(myStage, 'Stack2');
+
+// Define an environment-agnostic stack:
+// `.account` and `.region` will resolve to `{ "Ref": "AWS::AccountId" }` and `{ "Ref": "AWS::Region" }` respectively.
+// which will only resolve to actual values by CloudFormation during deployment.
+new MyStack(app, 'Stack1');
+```
+
+
+##### `notificationArns`<sup>Optional</sup> <a name="notificationArns" id="tm-cdk-constructs.TmWafStackProps.property.notificationArns"></a>
+
+```typescript
+public readonly notificationArns: string[];
+```
+
+- *Type:* string[]
+- *Default:* no notification arns.
+
+SNS Topic ARNs that will receive stack events.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmWafStackProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmWafStackProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stack.
+
+---
+
+##### `stackName`<sup>Optional</sup> <a name="stackName" id="tm-cdk-constructs.TmWafStackProps.property.stackName"></a>
+
+```typescript
+public readonly stackName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from construct path.
+
+Name to deploy the stack with.
+
+---
+
+##### `suppressTemplateIndentation`<sup>Optional</sup> <a name="suppressTemplateIndentation" id="tm-cdk-constructs.TmWafStackProps.property.suppressTemplateIndentation"></a>
+
+```typescript
+public readonly suppressTemplateIndentation: boolean;
+```
+
+- *Type:* boolean
+- *Default:* the value of `@aws-cdk/core:suppressTemplateIndentation`, or `false` if that is not set.
+
+Enable this flag to suppress indentation in generated CloudFormation templates.
+
+If not specified, the value of the `@aws-cdk/core:suppressTemplateIndentation`
+context key will be used. If that is not specified, then the
+default value `false` will be used.
+
+---
+
+##### `synthesizer`<sup>Optional</sup> <a name="synthesizer" id="tm-cdk-constructs.TmWafStackProps.property.synthesizer"></a>
+
+```typescript
+public readonly synthesizer: IStackSynthesizer;
+```
+
+- *Type:* aws-cdk-lib.IStackSynthesizer
+- *Default:* The synthesizer specified on `App`, or `DefaultStackSynthesizer` otherwise.
+
+Synthesis method to use while deploying this stack.
+
+The Stack Synthesizer controls aspects of synthesis and deployment,
+like how assets are referenced and what IAM roles to use. For more
+information, see the README of the main CDK package.
+
+If not specified, the `defaultStackSynthesizer` from `App` will be used.
+If that is not specified, `DefaultStackSynthesizer` is used if
+`@aws-cdk/core:newStyleStackSynthesis` is set to `true` or the CDK major
+version is v2. In CDK v1 `LegacyStackSynthesizer` is the default if no
+other synthesizer is specified.
+
+---
+
+##### `tags`<sup>Optional</sup> <a name="tags" id="tm-cdk-constructs.TmWafStackProps.property.tags"></a>
+
+```typescript
+public readonly tags: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
+- *Default:* {}
+
+Tags that will be applied to the Stack.
+
+These tags are applied to the CloudFormation Stack itself. They will not
+appear in the CloudFormation template.
+
+However, at deployment time, CloudFormation will apply these tags to all
+resources in the stack that support tagging. You will not be able to exempt
+resources from tagging (using the `excludeResourceTypes` property of
+`Tags.of(...).add()`) for tags applied in this way.
+
+---
+
+##### `terminationProtection`<sup>Optional</sup> <a name="terminationProtection" id="tm-cdk-constructs.TmWafStackProps.property.terminationProtection"></a>
+
+```typescript
+public readonly terminationProtection: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Whether to enable termination protection for this stack.
+
+---
+
+##### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmWafStackProps.property.environmentName"></a>
+
+```typescript
+public readonly environmentName: string;
+```
+
+- *Type:* string
+
+Environment segment of the SSM parameter names.
+
+---
+
+##### `parameterRegion`<sup>Required</sup> <a name="parameterRegion" id="tm-cdk-constructs.TmWafStackProps.property.parameterRegion"></a>
+
+```typescript
+public readonly parameterRegion: string;
+```
+
+- *Type:* string
+
+Region where the WebACL ARN is published in SSM (the application region).
+
+---
+
+##### `blockedCountryCodes`<sup>Optional</sup> <a name="blockedCountryCodes" id="tm-cdk-constructs.TmWafStackProps.property.blockedCountryCodes"></a>
+
+```typescript
+public readonly blockedCountryCodes: string[];
+```
+
+- *Type:* string[]
+- *Default:* []
+
+Country codes whose requests are blocked.
+
+---
+
+##### `logging`<sup>Optional</sup> <a name="logging" id="tm-cdk-constructs.TmWafStackProps.property.logging"></a>
+
+```typescript
+public readonly logging: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Sends the WebACL logs to CloudWatch Logs (30-day retention).
+
+---
+
+##### `rateLimit`<sup>Optional</sup> <a name="rateLimit" id="tm-cdk-constructs.TmWafStackProps.property.rateLimit"></a>
+
+```typescript
+public readonly rateLimit: number;
+```
+
+- *Type:* number
+- *Default:* 2000
+
+Maximum requests per client IP in any 5-minute window.
+
+---
+
+### TmWebappAppStageProps <a name="TmWebappAppStageProps" id="tm-cdk-constructs.TmWebappAppStageProps"></a>
+
+Props for `TmWebappAppStage`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmWebappAppStageProps.Initializer"></a>
+
+```typescript
+import { TmWebappAppStageProps } from 'tm-cdk-constructs'
+
+const tmWebappAppStageProps: TmWebappAppStageProps = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.env">env</a></code> | <code>aws-cdk-lib.Environment</code> | Default AWS environment (account/region) for `Stack`s in this `Stage`. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.outdir">outdir</a></code> | <code>string</code> | The output directory into which to emit synthesized artifacts. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.permissionsBoundary">permissionsBoundary</a></code> | <code>aws-cdk-lib.PermissionsBoundary</code> | Options for applying a permissions boundary to all IAM Roles and Users created within this Stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.policyValidationBeta1">policyValidationBeta1</a></code> | <code>aws-cdk-lib.IPolicyValidationPluginBeta1[]</code> | Validation plugins to run during synthesis. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.propertyInjectors">propertyInjectors</a></code> | <code>aws-cdk-lib.IPropertyInjector[]</code> | A list of IPropertyInjector attached to this Stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.stageName">stageName</a></code> | <code>string</code> | Name of this stage. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | Docker build context: the application repository checkout. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.parameters">parameters</a></code> | <code><a href="#tm-cdk-constructs.EnvironmentParameters">EnvironmentParameters</a></code> | Settings of the environment. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.errorPagesPath">errorPagesPath</a></code> | <code>string</code> | Local directory of error pages (`<code>.html`) served by the www distributions for 4xx and 5xx responses. |
+| <code><a href="#tm-cdk-constructs.TmWebappAppStageProps.property.stackIds">stackIds</a></code> | <code><a href="#tm-cdk-constructs.TmWebappStackIds">TmWebappStackIds</a></code> | Stack ids. |
+
+---
+
+##### `env`<sup>Optional</sup> <a name="env" id="tm-cdk-constructs.TmWebappAppStageProps.property.env"></a>
+
+```typescript
+public readonly env: Environment;
+```
+
+- *Type:* aws-cdk-lib.Environment
+- *Default:* The environments should be configured on the `Stack`s.
+
+Default AWS environment (account/region) for `Stack`s in this `Stage`.
+
+Stacks defined inside this `Stage` with either `region` or `account` missing
+from its env will use the corresponding field given here.
+
+If either `region` or `account`is is not configured for `Stack` (either on
+the `Stack` itself or on the containing `Stage`), the Stack will be
+*environment-agnostic*.
+
+Environment-agnostic stacks can be deployed to any environment, may not be
+able to take advantage of all features of the CDK. For example, they will
+not be able to use environmental context lookups, will not automatically
+translate Service Principals to the right format based on the environment's
+AWS partition, and other such enhancements.
+
+---
+
+*Example*
+
+```typescript
+// Use a concrete account and region to deploy this Stage to
+new Stage(app, 'Stage1', {
+  env: { account: '123456789012', region: 'us-east-1' },
+});
+
+// Use the CLI's current credentials to determine the target environment
+new Stage(app, 'Stage2', {
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
+});
+```
+
+
+##### `outdir`<sup>Optional</sup> <a name="outdir" id="tm-cdk-constructs.TmWebappAppStageProps.property.outdir"></a>
+
+```typescript
+public readonly outdir: string;
+```
+
+- *Type:* string
+- *Default:* for nested stages, outdir will be determined as a relative directory to the outdir of the app. For apps, if outdir is not specified, a temporary directory will be created.
+
+The output directory into which to emit synthesized artifacts.
+
+Can only be specified if this stage is the root stage (the app). If this is
+specified and this stage is nested within another stage, an error will be
+thrown.
+
+---
+
+##### `permissionsBoundary`<sup>Optional</sup> <a name="permissionsBoundary" id="tm-cdk-constructs.TmWebappAppStageProps.property.permissionsBoundary"></a>
+
+```typescript
+public readonly permissionsBoundary: PermissionsBoundary;
+```
+
+- *Type:* aws-cdk-lib.PermissionsBoundary
+- *Default:* no permissions boundary is applied
+
+Options for applying a permissions boundary to all IAM Roles and Users created within this Stage.
+
+Be aware that this feature uses Aspects, and the Aspects are applied at the
+Stack level with a priority of `MUTATING` (if the feature flag
+`@aws-cdk/core:aspectPrioritiesMutating` is set) or `DEFAULT` (if the flag
+is not set). This is relevant if you are both using your own Aspects to
+assign Permissions Boundaries, as well as specifying this property.  The
+Aspect added by this property will overwrite the Permissions Boundary
+assigned by your own Aspect if both: (a) your Aspect has a lower or equal
+priority to the automatic Aspect, and (b) your Aspect is applied *above*
+the Stack level.  If either of those conditions are not true, your own
+Aspect will win.
+
+We recommend assigning Permissions Boundaries only using the provided APIs,
+and not using custom Aspects.
+
+---
+
+##### ~~`policyValidationBeta1`~~<sup>Optional</sup> <a name="policyValidationBeta1" id="tm-cdk-constructs.TmWebappAppStageProps.property.policyValidationBeta1"></a>
+
+- *Deprecated:* Use `Validations.of(stage).addPlugins()` instead.
+
+```typescript
+public readonly policyValidationBeta1: IPolicyValidationPluginBeta1[];
+```
+
+- *Type:* aws-cdk-lib.IPolicyValidationPluginBeta1[]
+- *Default:* no validation plugins are used
+
+Validation plugins to run during synthesis.
+
+If any plugin reports any violation,
+synthesis will be interrupted and the report displayed to the user.
+
+---
+
+##### `propertyInjectors`<sup>Optional</sup> <a name="propertyInjectors" id="tm-cdk-constructs.TmWebappAppStageProps.property.propertyInjectors"></a>
+
+```typescript
+public readonly propertyInjectors: IPropertyInjector[];
+```
+
+- *Type:* aws-cdk-lib.IPropertyInjector[]
+- *Default:* no PropertyInjectors
+
+A list of IPropertyInjector attached to this Stage.
+
+---
+
+##### `stageName`<sup>Optional</sup> <a name="stageName" id="tm-cdk-constructs.TmWebappAppStageProps.property.stageName"></a>
+
+```typescript
+public readonly stageName: string;
+```
+
+- *Type:* string
+- *Default:* Derived from the id.
+
+Name of this stage.
+
+---
+
+##### `buildContextPath`<sup>Required</sup> <a name="buildContextPath" id="tm-cdk-constructs.TmWebappAppStageProps.property.buildContextPath"></a>
+
+```typescript
+public readonly buildContextPath: string;
+```
+
+- *Type:* string
+
+Docker build context: the application repository checkout.
+
+---
+
+##### `parameters`<sup>Required</sup> <a name="parameters" id="tm-cdk-constructs.TmWebappAppStageProps.property.parameters"></a>
+
+```typescript
+public readonly parameters: EnvironmentParameters;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.EnvironmentParameters">EnvironmentParameters</a>
+
+Settings of the environment.
+
+---
+
+##### `errorPagesPath`<sup>Optional</sup> <a name="errorPagesPath" id="tm-cdk-constructs.TmWebappAppStageProps.property.errorPagesPath"></a>
+
+```typescript
+public readonly errorPagesPath: string;
+```
+
+- *Type:* string
+- *Default:* CloudFront's default error responses
+
+Local directory of error pages (`<code>.html`) served by the www distributions for 4xx and 5xx responses.
+
+---
+
+##### `stackIds`<sup>Optional</sup> <a name="stackIds" id="tm-cdk-constructs.TmWebappAppStageProps.property.stackIds"></a>
+
+```typescript
+public readonly stackIds: TmWebappStackIds;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmWebappStackIds">TmWebappStackIds</a>
+- *Default:* see `TmWebappStackIds`
+
+Stack ids.
+
+---
+
+### TmWebappStackIds <a name="TmWebappStackIds" id="tm-cdk-constructs.TmWebappStackIds"></a>
+
+Stack ids of the stage.
+
+They are part of the CloudFormation stack names and
+logical IDs, so a deployed repository must keep its current ids.
+`<Region>` is the PascalCase application region, e.g. `CaCentral1`.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmWebappStackIds.Initializer"></a>
+
+```typescript
+import { TmWebappStackIds } from 'tm-cdk-constructs'
+
+const tmWebappStackIds: TmWebappStackIds = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.backup">backup</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.bastion">bastion</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.cdn">cdn</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.cloudfront">cloudfront</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.ecs">ecs</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.rds">rds</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.redirections">redirections</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.redis">redis</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.s3">s3</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.serviceIamUsers">serviceIamUsers</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.vpc">vpc</a></code> | <code>string</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmWebappStackIds.property.waf">waf</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `backup`<sup>Optional</sup> <a name="backup" id="tm-cdk-constructs.TmWebappStackIds.property.backup"></a>
+
+```typescript
+public readonly backup: string;
+```
+
+- *Type:* string
+- *Default:* 'TmBackup<Region>Stack'
+
+---
+
+##### `bastion`<sup>Optional</sup> <a name="bastion" id="tm-cdk-constructs.TmWebappStackIds.property.bastion"></a>
+
+```typescript
+public readonly bastion: string;
+```
+
+- *Type:* string
+- *Default:* 'TmBastion<Region>Stack'
+
+---
+
+##### `cdn`<sup>Optional</sup> <a name="cdn" id="tm-cdk-constructs.TmWebappStackIds.property.cdn"></a>
+
+```typescript
+public readonly cdn: string;
+```
+
+- *Type:* string
+- *Default:* 'TmCloudfrontCdn<Region>Stack'
+
+---
+
+##### `cloudfront`<sup>Optional</sup> <a name="cloudfront" id="tm-cdk-constructs.TmWebappStackIds.property.cloudfront"></a>
+
+```typescript
+public readonly cloudfront: string;
+```
+
+- *Type:* string
+- *Default:* 'TmCloudfront<Region>Stack'
+
+---
+
+##### `ecs`<sup>Optional</sup> <a name="ecs" id="tm-cdk-constructs.TmWebappStackIds.property.ecs"></a>
+
+```typescript
+public readonly ecs: string;
+```
+
+- *Type:* string
+- *Default:* 'TmEcs<Region>Stack'
+
+---
+
+##### `rds`<sup>Optional</sup> <a name="rds" id="tm-cdk-constructs.TmWebappStackIds.property.rds"></a>
+
+```typescript
+public readonly rds: string;
+```
+
+- *Type:* string
+- *Default:* 'TmRdsAurora<Region>'
+
+---
+
+##### `redirections`<sup>Optional</sup> <a name="redirections" id="tm-cdk-constructs.TmWebappStackIds.property.redirections"></a>
+
+```typescript
+public readonly redirections: string;
+```
+
+- *Type:* string
+- *Default:* 'TmRedirectionsEc2<Region>Stack'
+
+---
+
+##### `redis`<sup>Optional</sup> <a name="redis" id="tm-cdk-constructs.TmWebappStackIds.property.redis"></a>
+
+```typescript
+public readonly redis: string;
+```
+
+- *Type:* string
+- *Default:* 'TmRedis<Region>Stack'
+
+---
+
+##### `s3`<sup>Optional</sup> <a name="s3" id="tm-cdk-constructs.TmWebappStackIds.property.s3"></a>
+
+```typescript
+public readonly s3: string;
+```
+
+- *Type:* string
+- *Default:* 'TmS3<Region>Stack'
+
+---
+
+##### `serviceIamUsers`<sup>Optional</sup> <a name="serviceIamUsers" id="tm-cdk-constructs.TmWebappStackIds.property.serviceIamUsers"></a>
+
+```typescript
+public readonly serviceIamUsers: string;
+```
+
+- *Type:* string
+- *Default:* 'TmServiceIamUsers<Region>Stack'
+
+---
+
+##### `vpc`<sup>Optional</sup> <a name="vpc" id="tm-cdk-constructs.TmWebappStackIds.property.vpc"></a>
+
+```typescript
+public readonly vpc: string;
+```
+
+- *Type:* string
+- *Default:* 'TmVpc<Region>Stack'
+
+---
+
+##### `waf`<sup>Optional</sup> <a name="waf" id="tm-cdk-constructs.TmWebappStackIds.property.waf"></a>
+
+```typescript
+public readonly waf: string;
+```
+
+- *Type:* string
+- *Default:* 'TmWafUsEast1Stack'
+
+---
+
+### VpcSettings <a name="VpcSettings" id="tm-cdk-constructs.VpcSettings"></a>
+
+Network settings.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.VpcSettings.Initializer"></a>
+
+```typescript
+import { VpcSettings } from 'tm-cdk-constructs'
+
+const vpcSettings: VpcSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.VpcSettings.property.cidr">cidr</a></code> | <code>string</code> | CIDR range of the VPC, e.g. `10.3.0.0/16`. |
+| <code><a href="#tm-cdk-constructs.VpcSettings.property.hostedZoneName">hostedZoneName</a></code> | <code>string</code> | Name of the private hosted zone attached to the VPC, e.g. `epq-site-web.internal`. |
+
+---
+
+##### `cidr`<sup>Required</sup> <a name="cidr" id="tm-cdk-constructs.VpcSettings.property.cidr"></a>
+
+```typescript
+public readonly cidr: string;
+```
+
+- *Type:* string
+
+CIDR range of the VPC, e.g. `10.3.0.0/16`.
+
+---
+
+##### `hostedZoneName`<sup>Required</sup> <a name="hostedZoneName" id="tm-cdk-constructs.VpcSettings.property.hostedZoneName"></a>
+
+```typescript
+public readonly hostedZoneName: string;
+```
+
+- *Type:* string
+
+Name of the private hosted zone attached to the VPC, e.g. `epq-site-web.internal`.
+
+---
+
+### WafSettings <a name="WafSettings" id="tm-cdk-constructs.WafSettings"></a>
+
+Baseline WebACL associated with the distributions.
+
+It is created in
+us-east-1, as CloudFront requires.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.WafSettings.Initializer"></a>
+
+```typescript
+import { WafSettings } from 'tm-cdk-constructs'
+
+const wafSettings: WafSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.WafSettings.property.blockedCountryCodes">blockedCountryCodes</a></code> | <code>string[]</code> | Country codes (ISO 3166-1 alpha-2) whose requests are blocked. |
+| <code><a href="#tm-cdk-constructs.WafSettings.property.logging">logging</a></code> | <code>boolean</code> | Sends WebACL logs to CloudWatch Logs (30-day retention). |
+| <code><a href="#tm-cdk-constructs.WafSettings.property.protectCdn">protectCdn</a></code> | <code>boolean</code> | Associates the WebACL with the CDN distribution too. |
+| <code><a href="#tm-cdk-constructs.WafSettings.property.rateLimit">rateLimit</a></code> | <code>number</code> | Maximum requests per client IP in any 5-minute window. |
+
+---
+
+##### `blockedCountryCodes`<sup>Optional</sup> <a name="blockedCountryCodes" id="tm-cdk-constructs.WafSettings.property.blockedCountryCodes"></a>
+
+```typescript
+public readonly blockedCountryCodes: string[];
+```
+
+- *Type:* string[]
+- *Default:* []
+
+Country codes (ISO 3166-1 alpha-2) whose requests are blocked.
+
+---
+
+##### `logging`<sup>Optional</sup> <a name="logging" id="tm-cdk-constructs.WafSettings.property.logging"></a>
+
+```typescript
+public readonly logging: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Sends WebACL logs to CloudWatch Logs (30-day retention).
+
+---
+
+##### `protectCdn`<sup>Optional</sup> <a name="protectCdn" id="tm-cdk-constructs.WafSettings.property.protectCdn"></a>
+
+```typescript
+public readonly protectCdn: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Associates the WebACL with the CDN distribution too.
+
+---
+
+##### `rateLimit`<sup>Optional</sup> <a name="rateLimit" id="tm-cdk-constructs.WafSettings.property.rateLimit"></a>
+
+```typescript
+public readonly rateLimit: number;
+```
+
+- *Type:* number
+- *Default:* 2000
+
+Maximum requests per client IP in any 5-minute window.
+
+Above it, requests
+are blocked.
+
+---
+
+## Classes <a name="Classes" id="Classes"></a>
+
+### TmEnvironmentParameters <a name="TmEnvironmentParameters" id="tm-cdk-constructs.TmEnvironmentParameters"></a>
+
+Selects the environment parameters of the current account.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmEnvironmentParameters.Initializer"></a>
+
+```typescript
+import { TmEnvironmentParameters } from 'tm-cdk-constructs'
+
+new TmEnvironmentParameters()
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+
+---
+
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmEnvironmentParameters.select">select</a></code> | Returns the entry whose `account` matches. |
+
+---
+
+##### `select` <a name="select" id="tm-cdk-constructs.TmEnvironmentParameters.select"></a>
+
+```typescript
+import { TmEnvironmentParameters } from 'tm-cdk-constructs'
+
+TmEnvironmentParameters.select(parameters: EnvironmentParameters[], account?: string)
+```
+
+Returns the entry whose `account` matches.
+
+###### `parameters`<sup>Required</sup> <a name="parameters" id="tm-cdk-constructs.TmEnvironmentParameters.select.parameter.parameters"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.EnvironmentParameters">EnvironmentParameters</a>[]
+
+one entry per AWS account.
+
+---
+
+###### `account`<sup>Optional</sup> <a name="account" id="tm-cdk-constructs.TmEnvironmentParameters.select.parameter.account"></a>
+
+- *Type:* string
+
+the account to select.
+
+---
+
+
+
+### TmParameterNames <a name="TmParameterNames" id="tm-cdk-constructs.TmParameterNames"></a>
+
+Names of the SSM parameters the package creates and reads.
+
+Convention: `/tm/<env>/<component>/<resource>/<attribute>`, lower-kebab-case,
+e.g. `/tm/prod/rds/cluster/writer-endpoint`. `<env>` is the
+`environmentName` of the environment parameters.
+
+Producer stacks write these parameters and consumer stacks read them at
+deploy time, so no stack imports another stack's CloudFormation exports.
+
+#### Initializers <a name="Initializers" id="tm-cdk-constructs.TmParameterNames.Initializer"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+new TmParameterNames()
+```
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+
+---
+
+
+#### Static Functions <a name="Static Functions" id="Static Functions"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.bastionSecurityGroupId">bastionSecurityGroupId</a></code> | Bastion security group ID. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontBasicAuth">cloudfrontBasicAuth</a></code> | Default name of the hand-made parameter holding the base64 `user:password` of the www basic authentication. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontCdnCertificateArn">cloudfrontCdnCertificateArn</a></code> | Default name of the hand-made parameter holding the ACM certificate ARN (us-east-1) of the CDN distribution. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontCdnDistributionId">cloudfrontCdnDistributionId</a></code> | ID of the CDN distribution. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontDistributionIds">cloudfrontDistributionIds</a></code> | Default name of the distribution-ID parameter read by tm_cloudfront and the pipeline invalidation step. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontOriginCustomHeader">cloudfrontOriginCustomHeader</a></code> | Default name of the hand-made parameter holding the secret header value that CloudFront sends to the load balancer (`X-Custom-Header`). |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontWwwCertificateArn">cloudfrontWwwCertificateArn</a></code> | Default name of the hand-made parameter holding the ACM certificate ARN (us-east-1) of a www distribution. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontWwwDistributionId">cloudfrontWwwDistributionId</a></code> | ID of a www distribution. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.ecsLoadBalancerDnsName">ecsLoadBalancerDnsName</a></code> | DNS name of the application load balancer. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.of">of</a></code> | Builds a parameter name that follows the convention. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.rdsClusterArn">rdsClusterArn</a></code> | RDS cluster ARN. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.rdsReaderEndpoint">rdsReaderEndpoint</a></code> | RDS cluster reader endpoint hostname. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.rdsSecurityGroupId">rdsSecurityGroupId</a></code> | RDS cluster security group ID. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.rdsWriterEndpoint">rdsWriterEndpoint</a></code> | RDS cluster writer endpoint hostname. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.redirectionsPublicIp">redirectionsPublicIp</a></code> | Public IP (Elastic IP) of the redirection instance. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.redisPrimaryEndpoint">redisPrimaryEndpoint</a></code> | Redis primary endpoint hostname. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.redisSecurityGroupId">redisSecurityGroupId</a></code> | Redis security group ID. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.s3ContentBucketName">s3ContentBucketName</a></code> | FAL content bucket name. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.s3ErrorBucketName">s3ErrorBucketName</a></code> | CloudFront error page bucket name. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.s3LogBucketName">s3LogBucketName</a></code> | CloudFront access log bucket name. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.serviceUserCredentialsSecretArn">serviceUserCredentialsSecretArn</a></code> | ARN of the Secrets Manager secret holding a service user's access key (`AccessKeyId` and `SecretAccessKey` fields). |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.vpcId">vpcId</a></code> | VPC ID. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.vpcIsolatedSubnetIds">vpcIsolatedSubnetIds</a></code> | Comma-separated isolated subnet IDs, in availability-zone order. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.vpcPrivateSubnetIds">vpcPrivateSubnetIds</a></code> | Comma-separated private (with egress) subnet IDs, in availability-zone order. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.vpcPublicSubnetIds">vpcPublicSubnetIds</a></code> | Comma-separated public subnet IDs, in availability-zone order. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.wafWebAclArn">wafWebAclArn</a></code> | ARN of the CloudFront-scope WebACL, written in the application region. |
+
+---
+
+##### `bastionSecurityGroupId` <a name="bastionSecurityGroupId" id="tm-cdk-constructs.TmParameterNames.bastionSecurityGroupId"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.bastionSecurityGroupId(env: string)
+```
+
+Bastion security group ID.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.bastionSecurityGroupId.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `cloudfrontBasicAuth` <a name="cloudfrontBasicAuth" id="tm-cdk-constructs.TmParameterNames.cloudfrontBasicAuth"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontBasicAuth(env: string)
+```
+
+Default name of the hand-made parameter holding the base64 `user:password` of the www basic authentication.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontBasicAuth.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `cloudfrontCdnCertificateArn` <a name="cloudfrontCdnCertificateArn" id="tm-cdk-constructs.TmParameterNames.cloudfrontCdnCertificateArn"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontCdnCertificateArn(env: string)
+```
+
+Default name of the hand-made parameter holding the ACM certificate ARN (us-east-1) of the CDN distribution.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontCdnCertificateArn.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `cloudfrontCdnDistributionId` <a name="cloudfrontCdnDistributionId" id="tm-cdk-constructs.TmParameterNames.cloudfrontCdnDistributionId"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontCdnDistributionId(env: string)
+```
+
+ID of the CDN distribution.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontCdnDistributionId.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `cloudfrontDistributionIds` <a name="cloudfrontDistributionIds" id="tm-cdk-constructs.TmParameterNames.cloudfrontDistributionIds"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontDistributionIds(env: string)
+```
+
+Default name of the distribution-ID parameter read by tm_cloudfront and the pipeline invalidation step.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontDistributionIds.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `cloudfrontOriginCustomHeader` <a name="cloudfrontOriginCustomHeader" id="tm-cdk-constructs.TmParameterNames.cloudfrontOriginCustomHeader"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontOriginCustomHeader(env: string)
+```
+
+Default name of the hand-made parameter holding the secret header value that CloudFront sends to the load balancer (`X-Custom-Header`).
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontOriginCustomHeader.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `cloudfrontWwwCertificateArn` <a name="cloudfrontWwwCertificateArn" id="tm-cdk-constructs.TmParameterNames.cloudfrontWwwCertificateArn"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontWwwCertificateArn(env: string, index: number)
+```
+
+Default name of the hand-made parameter holding the ACM certificate ARN (us-east-1) of a www distribution.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontWwwCertificateArn.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+###### `index`<sup>Required</sup> <a name="index" id="tm-cdk-constructs.TmParameterNames.cloudfrontWwwCertificateArn.parameter.index"></a>
+
+- *Type:* number
+
+---
+
+##### `cloudfrontWwwDistributionId` <a name="cloudfrontWwwDistributionId" id="tm-cdk-constructs.TmParameterNames.cloudfrontWwwDistributionId"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.cloudfrontWwwDistributionId(env: string, index: number)
+```
+
+ID of a www distribution.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.cloudfrontWwwDistributionId.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+###### `index`<sup>Required</sup> <a name="index" id="tm-cdk-constructs.TmParameterNames.cloudfrontWwwDistributionId.parameter.index"></a>
+
+- *Type:* number
+
+position of the domain in `cloudfront.domains` (0 for the first).
+
+---
+
+##### `ecsLoadBalancerDnsName` <a name="ecsLoadBalancerDnsName" id="tm-cdk-constructs.TmParameterNames.ecsLoadBalancerDnsName"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.ecsLoadBalancerDnsName(env: string)
+```
+
+DNS name of the application load balancer.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.ecsLoadBalancerDnsName.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `of` <a name="of" id="tm-cdk-constructs.TmParameterNames.of"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.of(environmentName: string, component: string, resource: string, attribute: string)
+```
+
+Builds a parameter name that follows the convention.
+
+###### `environmentName`<sup>Required</sup> <a name="environmentName" id="tm-cdk-constructs.TmParameterNames.of.parameter.environmentName"></a>
+
+- *Type:* string
+
+---
+
+###### `component`<sup>Required</sup> <a name="component" id="tm-cdk-constructs.TmParameterNames.of.parameter.component"></a>
+
+- *Type:* string
+
+---
+
+###### `resource`<sup>Required</sup> <a name="resource" id="tm-cdk-constructs.TmParameterNames.of.parameter.resource"></a>
+
+- *Type:* string
+
+---
+
+###### `attribute`<sup>Required</sup> <a name="attribute" id="tm-cdk-constructs.TmParameterNames.of.parameter.attribute"></a>
+
+- *Type:* string
+
+---
+
+##### `rdsClusterArn` <a name="rdsClusterArn" id="tm-cdk-constructs.TmParameterNames.rdsClusterArn"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.rdsClusterArn(env: string)
+```
+
+RDS cluster ARN.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.rdsClusterArn.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `rdsReaderEndpoint` <a name="rdsReaderEndpoint" id="tm-cdk-constructs.TmParameterNames.rdsReaderEndpoint"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.rdsReaderEndpoint(env: string)
+```
+
+RDS cluster reader endpoint hostname.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.rdsReaderEndpoint.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `rdsSecurityGroupId` <a name="rdsSecurityGroupId" id="tm-cdk-constructs.TmParameterNames.rdsSecurityGroupId"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.rdsSecurityGroupId(env: string)
+```
+
+RDS cluster security group ID.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.rdsSecurityGroupId.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `rdsWriterEndpoint` <a name="rdsWriterEndpoint" id="tm-cdk-constructs.TmParameterNames.rdsWriterEndpoint"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.rdsWriterEndpoint(env: string)
+```
+
+RDS cluster writer endpoint hostname.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.rdsWriterEndpoint.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `redirectionsPublicIp` <a name="redirectionsPublicIp" id="tm-cdk-constructs.TmParameterNames.redirectionsPublicIp"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.redirectionsPublicIp(env: string)
+```
+
+Public IP (Elastic IP) of the redirection instance.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.redirectionsPublicIp.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `redisPrimaryEndpoint` <a name="redisPrimaryEndpoint" id="tm-cdk-constructs.TmParameterNames.redisPrimaryEndpoint"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.redisPrimaryEndpoint(env: string)
+```
+
+Redis primary endpoint hostname.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.redisPrimaryEndpoint.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `redisSecurityGroupId` <a name="redisSecurityGroupId" id="tm-cdk-constructs.TmParameterNames.redisSecurityGroupId"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.redisSecurityGroupId(env: string)
+```
+
+Redis security group ID.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.redisSecurityGroupId.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `s3ContentBucketName` <a name="s3ContentBucketName" id="tm-cdk-constructs.TmParameterNames.s3ContentBucketName"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.s3ContentBucketName(env: string)
+```
+
+FAL content bucket name.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.s3ContentBucketName.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `s3ErrorBucketName` <a name="s3ErrorBucketName" id="tm-cdk-constructs.TmParameterNames.s3ErrorBucketName"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.s3ErrorBucketName(env: string)
+```
+
+CloudFront error page bucket name.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.s3ErrorBucketName.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `s3LogBucketName` <a name="s3LogBucketName" id="tm-cdk-constructs.TmParameterNames.s3LogBucketName"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.s3LogBucketName(env: string)
+```
+
+CloudFront access log bucket name.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.s3LogBucketName.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `serviceUserCredentialsSecretArn` <a name="serviceUserCredentialsSecretArn" id="tm-cdk-constructs.TmParameterNames.serviceUserCredentialsSecretArn"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.serviceUserCredentialsSecretArn(env: string, user: string)
+```
+
+ARN of the Secrets Manager secret holding a service user's access key (`AccessKeyId` and `SecretAccessKey` fields).
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.serviceUserCredentialsSecretArn.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+###### `user`<sup>Required</sup> <a name="user" id="tm-cdk-constructs.TmParameterNames.serviceUserCredentialsSecretArn.parameter.user"></a>
+
+- *Type:* string
+
+the user's kebab-case resource name, e.g. `s3-service`.
+
+---
+
+##### `vpcId` <a name="vpcId" id="tm-cdk-constructs.TmParameterNames.vpcId"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.vpcId(env: string)
+```
+
+VPC ID.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.vpcId.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `vpcIsolatedSubnetIds` <a name="vpcIsolatedSubnetIds" id="tm-cdk-constructs.TmParameterNames.vpcIsolatedSubnetIds"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.vpcIsolatedSubnetIds(env: string)
+```
+
+Comma-separated isolated subnet IDs, in availability-zone order.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.vpcIsolatedSubnetIds.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `vpcPrivateSubnetIds` <a name="vpcPrivateSubnetIds" id="tm-cdk-constructs.TmParameterNames.vpcPrivateSubnetIds"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.vpcPrivateSubnetIds(env: string)
+```
+
+Comma-separated private (with egress) subnet IDs, in availability-zone order.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.vpcPrivateSubnetIds.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `vpcPublicSubnetIds` <a name="vpcPublicSubnetIds" id="tm-cdk-constructs.TmParameterNames.vpcPublicSubnetIds"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.vpcPublicSubnetIds(env: string)
+```
+
+Comma-separated public subnet IDs, in availability-zone order.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.vpcPublicSubnetIds.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `wafWebAclArn` <a name="wafWebAclArn" id="tm-cdk-constructs.TmParameterNames.wafWebAclArn"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.wafWebAclArn(env: string)
+```
+
+ARN of the CloudFront-scope WebACL, written in the application region.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.wafWebAclArn.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+
+#### Constants <a name="Constants" id="Constants"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.property.PREFIX">PREFIX</a></code> | <code>string</code> | Prefix of every parameter created by the package. |
+
+---
+
+##### `PREFIX`<sup>Required</sup> <a name="PREFIX" id="tm-cdk-constructs.TmParameterNames.property.PREFIX"></a>
+
+```typescript
+public readonly PREFIX: string;
+```
+
+- *Type:* string
+
+Prefix of every parameter created by the package.
+
+---
 
 ## Protocols <a name="Protocols" id="Protocols"></a>
 
@@ -7454,6 +29669,35 @@ public readonly replicasPerNodeGroup: number;
 
 ---
 
+### ITmAppStageExtension <a name="ITmAppStageExtension" id="tm-cdk-constructs.ITmAppStageExtension"></a>
+
+- *Implemented By:* <a href="#tm-cdk-constructs.ITmAppStageExtension">ITmAppStageExtension</a>
+
+Adds a repository's own stacks to the application stage.
+
+#### Methods <a name="Methods" id="Methods"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.ITmAppStageExtension.extend">extend</a></code> | Called once the package stacks exist, before the stage is added to the pipeline (CDK Pipelines synthesizes the stage at that point). |
+
+---
+
+##### `extend` <a name="extend" id="tm-cdk-constructs.ITmAppStageExtension.extend"></a>
+
+```typescript
+public extend(stage: TmWebappAppStage): void
+```
+
+Called once the package stacks exist, before the stage is added to the pipeline (CDK Pipelines synthesizes the stage at that point).
+
+###### `stage`<sup>Required</sup> <a name="stage" id="tm-cdk-constructs.ITmAppStageExtension.extend.parameter.stage"></a>
+
+- *Type:* <a href="#tm-cdk-constructs.TmWebappAppStage">TmWebappAppStage</a>
+
+---
+
+
 ### ITmEcsDeploymentHookProps <a name="ITmEcsDeploymentHookProps" id="tm-cdk-constructs.ITmEcsDeploymentHookProps"></a>
 
 - *Implemented By:* <a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps">ITmEcsDeploymentHookProps</a>
@@ -7545,6 +29789,133 @@ public readonly taskDefinition: FargateTaskDefinition;
 - *Type:* aws-cdk-lib.aws_ecs.FargateTaskDefinition
 
 The ECS task definition to run.
+
+---
+
+## Enums <a name="Enums" id="Enums"></a>
+
+### ContainerTopology <a name="ContainerTopology" id="tm-cdk-constructs.ContainerTopology"></a>
+
+ECS container layout of the web application.
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.ContainerTopology.SINGLE">SINGLE</a></code> | One `web` container running Apache and PHP (php-apache image). |
+| <code><a href="#tm-cdk-constructs.ContainerTopology.APACHE_PHP_FPM">APACHE_PHP_FPM</a></code> | A `web` container running tm-apache and a `php-fpm` container running tm-php-fpm, both in the same ECS task. |
+| <code><a href="#tm-cdk-constructs.ContainerTopology.NGINX_PHP_FPM">NGINX_PHP_FPM</a></code> | A `web` container running nginx and a `php-fpm` container, both in the same ECS task. |
+
+---
+
+##### `SINGLE` <a name="SINGLE" id="tm-cdk-constructs.ContainerTopology.SINGLE"></a>
+
+One `web` container running Apache and PHP (php-apache image).
+
+---
+
+
+##### `APACHE_PHP_FPM` <a name="APACHE_PHP_FPM" id="tm-cdk-constructs.ContainerTopology.APACHE_PHP_FPM"></a>
+
+A `web` container running tm-apache and a `php-fpm` container running tm-php-fpm, both in the same ECS task.
+
+---
+
+
+##### `NGINX_PHP_FPM` <a name="NGINX_PHP_FPM" id="tm-cdk-constructs.ContainerTopology.NGINX_PHP_FPM"></a>
+
+A `web` container running nginx and a `php-fpm` container, both in the same ECS task.
+
+---
+
+
+### DistributionIdsFormat <a name="DistributionIdsFormat" id="tm-cdk-constructs.DistributionIdsFormat"></a>
+
+Value format of the distribution-ID parameter read by the tm_cloudfront extension (`TM_CLOUDFRONT_DISTRIBUTION_IDS`) and by the pipeline invalidation step.
+
+The format depends on the tm_cloudfront version.
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.DistributionIdsFormat.PLAIN">PLAIN</a></code> | A single distribution ID. |
+| <code><a href="#tm-cdk-constructs.DistributionIdsFormat.JSON_LIST">JSON_LIST</a></code> | A JSON list of distribution IDs. |
+| <code><a href="#tm-cdk-constructs.DistributionIdsFormat.JSON_MAP">JSON_MAP</a></code> | A JSON object mapping each domain to its distribution ID. |
+
+---
+
+##### `PLAIN` <a name="PLAIN" id="tm-cdk-constructs.DistributionIdsFormat.PLAIN"></a>
+
+A single distribution ID.
+
+---
+
+
+##### `JSON_LIST` <a name="JSON_LIST" id="tm-cdk-constructs.DistributionIdsFormat.JSON_LIST"></a>
+
+A JSON list of distribution IDs.
+
+---
+
+
+##### `JSON_MAP` <a name="JSON_MAP" id="tm-cdk-constructs.DistributionIdsFormat.JSON_MAP"></a>
+
+A JSON object mapping each domain to its distribution ID.
+
+---
+
+
+### FalStorage <a name="FalStorage" id="tm-cdk-constructs.FalStorage"></a>
+
+Where TYPO3 stores its FAL files (`fileadmin`).
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.FalStorage.S3">S3</a></code> | A content bucket, read by TYPO3 with the `TM_S3ASSETS_*` variables. |
+| <code><a href="#tm-cdk-constructs.FalStorage.EFS">EFS</a></code> | EFS volumes mounted in the containers. |
+
+---
+
+##### `S3` <a name="S3" id="tm-cdk-constructs.FalStorage.S3"></a>
+
+A content bucket, read by TYPO3 with the `TM_S3ASSETS_*` variables.
+
+---
+
+
+##### `EFS` <a name="EFS" id="tm-cdk-constructs.FalStorage.EFS"></a>
+
+EFS volumes mounted in the containers.
+
+---
+
+
+### ServiceIamUser <a name="ServiceIamUser" id="tm-cdk-constructs.ServiceIamUser"></a>
+
+IAM service users whose access keys are given to TYPO3.
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.ServiceIamUser.S3">S3</a></code> | `s3Service`: read and write access to the FAL content bucket. |
+| <code><a href="#tm-cdk-constructs.ServiceIamUser.CLOUDFRONT">CLOUDFRONT</a></code> | `cloudfrontService`: CloudFront invalidations. |
+
+---
+
+##### `S3` <a name="S3" id="tm-cdk-constructs.ServiceIamUser.S3"></a>
+
+`s3Service`: read and write access to the FAL content bucket.
+
+---
+
+
+##### `CLOUDFRONT` <a name="CLOUDFRONT" id="tm-cdk-constructs.ServiceIamUser.CLOUDFRONT"></a>
+
+`cloudfrontService`: CloudFront invalidations.
 
 ---
 

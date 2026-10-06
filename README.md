@@ -7,6 +7,43 @@ Welcome to Toumoro's AWS Service Wrapper CDK Construct Library! This library is 
   - Best Practices Built-In: Leverage pre-configured settings and defaults based on AWS best practices to ensure reliable and secure deployments.
   - Modular and Extensible: Compose your infrastructure using modular constructs, allowing for flexibility and reusability across projects.
 
+## TYPO3 web application
+
+`TmPipelineStack` deploys a complete TYPO3 site through CDK Pipelines:
+`TmWebappAppStage` assembles the VPC, bastion, Aurora MySQL, Redis, ECS,
+backup stacks and, as configured, S3, service users, a baseline WebACL,
+the www and CDN distributions and a redirection instance. An application
+repository only keeps `bin/<app>.ts`, `environment-parameters.ts` and `cdk.json`:
+
+```ts
+// environment-parameters.ts
+export const environmentParameters: EnvironmentParameters[] = [{
+  account: '123456789012',
+  environmentName: 'prod',
+  vpc: { cidr: '10.3.0.0/16', hostedZoneName: 'example-site-web.internal' },
+  ecs: { secretsFromSsmParameterStore: ['TM_DATABASE_NAME', 'TYPO3_CONTEXT'] },
+  fal: { storage: FalStorage.S3 },
+  serviceIamUsers: [ServiceIamUser.S3, ServiceIamUser.CLOUDFRONT],
+  cloudfront: { domains: ['www.example.com'] },
+  cdn: { domain: 'cdn.example.com' },
+  waf: {},
+}];
+
+// bin/example.ts
+const parameters = TmEnvironmentParameters.select(environmentParameters);
+new TmPipelineStack(app, 'TmPipelineStack', {
+  env: { account: parameters.account, region: parameters.region },
+  parameters,
+});
+```
+
+Stacks never import each other's CloudFormation exports: producers publish
+their identifiers in SSM under `/tm/<env>/<component>/<resource>/<attribute>`
+(`TmParameterNames`) and consumers read them at deploy time. Hand-made
+inputs (certificate ARNs, the CloudFront origin header, application secrets
+under `/applications/<app>/secrets/`) are read from SSM too; see the
+`@default` of each setting in [API.md](API.md).
+
 # Contributing to CDK Construct Toumoro
 [Contributing](CONTRIBUTING.md)
 
