@@ -7309,6 +7309,7 @@ public readonly tagPatchGroup: string;
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.engineVersion">engineVersion</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.globalReplicationGroupId">globalReplicationGroupId</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.multiAzEnabled">multiAzEnabled</a></code> | <code>boolean</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.parameterGroupProperties">parameterGroupProperties</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IRedisClusterProps.property.replicasPerNodeGroup">replicasPerNodeGroup</a></code> | <code>number</code> | *No description.* |
 
 ---
@@ -7430,6 +7431,16 @@ public readonly multiAzEnabled: boolean;
 ```
 
 - *Type:* boolean
+
+---
+
+##### `parameterGroupProperties`<sup>Optional</sup> <a name="parameterGroupProperties" id="tm-cdk-constructs.IRedisClusterProps.property.parameterGroupProperties"></a>
+
+```typescript
+public readonly parameterGroupProperties: {[ key: string ]: string};
+```
+
+- *Type:* {[ key: string ]: string}
 
 ---
 
