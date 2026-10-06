@@ -16,6 +16,7 @@ export interface IRedisClusterProps {
   clusterMode?: string;
   globalReplicationGroupId?: string;
   allowFrom?: ec2.ISecurityGroup;
+  parameterGroupProperties?: { [key: string]: string };
 }
 
 export class TmElasticacheRedisCluster extends Construct {
@@ -40,6 +41,7 @@ export class TmElasticacheRedisCluster extends Construct {
       clusterMode = 'Enabled',
       globalReplicationGroupId,
       allowFromConstructs,
+      parameterGroupProperties,
     } = props;
 
     this.securityGroup = new ec2.SecurityGroup(this, 'RedisSecurityGroup', {
@@ -82,14 +84,17 @@ export class TmElasticacheRedisCluster extends Construct {
       replicationGroupProps.cacheNodeType = cacheNodeType;
     }
 
-    // Optional: Create a parameter group for Valkey 8 if needed
-    if (engine === 'valkey' && engineVersion.startsWith('8')) {
-      const parameterGroup = new elasticache.CfnParameterGroup(this, 'ValkeyParameterGroup', {
-        cacheParameterGroupFamily: 'valkey8',
-        description: `Valkey 8.0 Parameter Group for ${envName}`,
-        properties: {},
+    // Create a custom parameter group for Valkey, deriving the family from the
+    // engine major version (valkey8, valkey9, ...). Any custom parameters
+    // (e.g. maxmemory-policy) are passed through parameterGroupProperties.
+    if (engine === 'valkey') {
+      const majorVersion = engineVersion.split('.')[0];
+      this.parameterGroup = new elasticache.CfnParameterGroup(this, 'ValkeyParameterGroup', {
+        cacheParameterGroupFamily: `valkey${majorVersion}`,
+        description: `Valkey ${engineVersion} Parameter Group for ${envName}`,
+        properties: parameterGroupProperties ?? {},
       });
-      replicationGroupProps.cacheParameterGroupName = parameterGroup.ref;
+      replicationGroupProps.cacheParameterGroupName = this.parameterGroup.ref;
     }
 
     //console.log(replicationGroupProps);
