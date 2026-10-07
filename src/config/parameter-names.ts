@@ -46,6 +46,11 @@ export class TmParameterNames {
     return TmParameterNames.of(env, 'vpc', 'subnets', 'isolated-ids');
   }
 
+  /** Private hosted zone ID attached to the VPC. */
+  public static vpcHostedZoneId(env: string): string {
+    return TmParameterNames.of(env, 'vpc', 'hosted-zone', 'id');
+  }
+
   /** Bastion security group ID. */
   public static bastionSecurityGroupId(env: string): string {
     return TmParameterNames.of(env, 'bastion', 'instance', 'security-group-id');
@@ -79,6 +84,21 @@ export class TmParameterNames {
   /** Redis primary endpoint hostname. */
   public static redisPrimaryEndpoint(env: string): string {
     return TmParameterNames.of(env, 'redis', 'cluster', 'primary-endpoint');
+  }
+
+  /** Solr security group ID. */
+  public static solrSecurityGroupId(env: string): string {
+    return TmParameterNames.of(env, 'solr', 'instance', 'security-group-id');
+  }
+
+  /** Solr writer endpoint hostname. */
+  public static solrWriterEndpoint(env: string): string {
+    return TmParameterNames.of(env, 'solr', 'instance', 'writer-endpoint');
+  }
+
+  /** Solr writer port. */
+  public static solrWriterPort(env: string): string {
+    return TmParameterNames.of(env, 'solr', 'instance', 'writer-port');
   }
 
   /** DNS name of the application load balancer. */

@@ -233,6 +233,24 @@ describe('TmWebappAppStage, options', () => {
     expect(json).toContain('TM_CLOUDFRONT_APISECRET');
   });
 
+  test('solr opt-in creates the instance and wires the Solr variables into the task', () => {
+    const stage = synthStage({ ...greenfield, solr: {} });
+    expect(stage.solrStack?.node.id).toBe('TmSolrCaCentral1Stack');
+
+    const solrTemplate = Template.fromStack(stage.solrStack!);
+    solrTemplate.resourceCountIs('AWS::EC2::Instance', 1);
+    solrTemplate.hasResourceProperties('AWS::SSM::Parameter', { Name: TmParameterNames.solrWriterEndpoint('prod') });
+    solrTemplate.hasResourceProperties('AWS::SSM::Parameter', { Name: TmParameterNames.solrWriterPort('prod'), Value: '8983' });
+
+    const ecsTemplate = Template.fromStack(stage.ecsStack);
+    const taskDefinition = Object.values(ecsTemplate.findResources('AWS::ECS::TaskDefinition'))[0];
+    const fpm = taskDefinition.Properties.ContainerDefinitions[1];
+    const names = fpm.Secrets.map((s: { Name: string }) => s.Name);
+    expect(names).toEqual(expect.arrayContaining(['TM_SOLR_WRITER_HOSTNAME', 'TM_SOLR_WRITER_PORT']));
+    ecsTemplate.hasResourceProperties('AWS::EC2::SecurityGroupIngress', { FromPort: 8983, Description: 'Allow from Fargate Service' });
+    expect(stage.ecsStack.dependencies.map(d => d.node.id)).toEqual(expect.arrayContaining(['TmSolrCaCentral1Stack']));
+  });
+
   test('rejects a variable that is both a repository secret and a stage output', () => {
     expect(() => synthStage({
       ...greenfield,

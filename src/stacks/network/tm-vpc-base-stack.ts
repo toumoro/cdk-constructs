@@ -57,5 +57,6 @@ export class TmVpcBaseStack extends cdk.Stack {
     publishParameter(this, 'PublicSubnetIdsParameter', TmParameterNames.vpcPublicSubnetIds(env), joinIds(this.vpc.publicSubnets));
     publishParameter(this, 'PrivateSubnetIdsParameter', TmParameterNames.vpcPrivateSubnetIds(env), joinIds(this.vpc.privateSubnets));
     publishParameter(this, 'IsolatedSubnetIdsParameter', TmParameterNames.vpcIsolatedSubnetIds(env), joinIds(this.vpc.isolatedSubnets));
+    publishParameter(this, 'HostedZoneIdParameter', TmParameterNames.vpcHostedZoneId(env), this.hostedZone.hostedZoneId);
   }
 }

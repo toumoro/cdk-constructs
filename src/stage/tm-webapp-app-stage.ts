@@ -1,3 +1,4 @@
+import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { ContainerTopology, DistributionIdsFormat, FalStorage, ServiceIamUser } from '../config/enums';
@@ -14,6 +15,7 @@ import { TmRdsAuroraMysqlServerlessStack } from '../stacks/data/tm-rds-aurora-my
 import { TmRedisStack } from '../stacks/data/tm-redis-stack';
 import { TmServiceIamUsersStack } from '../stacks/iam/tm-service-iam-users-stack';
 import { TmVpcBaseStack } from '../stacks/network/tm-vpc-base-stack';
+import { TmSolrStack } from '../stacks/search/tm-solr-stack';
 import { TmWafStack } from '../stacks/security/tm-waf-stack';
 import { TmS3Stack } from '../stacks/storage/tm-s3-stack';
 
@@ -31,6 +33,8 @@ export interface TmWebappStackIds {
   readonly rds?: string;
   /** @default 'TmRedis<Region>Stack' */
   readonly redis?: string;
+  /** @default 'TmSolr<Region>Stack' */
+  readonly solr?: string;
   /** @default 'TmEcs<Region>Stack' */
   readonly ecs?: string;
   /** @default 'TmBackup<Region>Stack' */
@@ -62,6 +66,14 @@ export interface TmWebappAppStageProps extends cdk.StageProps {
    * Docker build context: the application repository checkout.
    */
   readonly buildContextPath: string;
+
+  /**
+   * Docker build context of the Solr image, usually the application's
+   * `docker/solr` directory. Required when `parameters.solr` is set.
+   *
+   * @default - `<buildContextPath>/docker/solr`
+   */
+  readonly solrBuildContextPath?: string;
 
   /**
    * Local directory of error pages (`<code>.html`) served by the www
@@ -99,6 +111,8 @@ export class TmWebappAppStage extends cdk.Stage {
   public readonly rdsStack: TmRdsAuroraMysqlServerlessStack;
   /** Redis stack. */
   public readonly redisStack: TmRedisStack;
+  /** Solr stack, when `solr` is set. */
+  public readonly solrStack?: TmSolrStack;
   /** ECS stack. */
   public readonly ecsStack: TmEcsStack;
   /** Backup stack. */
@@ -170,6 +184,25 @@ export class TmWebappAppStage extends cdk.Stage {
     });
     this.redisStack.addStackDependency(this.bastionStack);
 
+    if (params.solr) {
+      const solrBuildContextPath = props.solrBuildContextPath ?? path.join(props.buildContextPath, 'docker/solr');
+      this.solrStack = new TmSolrStack(this, ids.solr ?? `TmSolr${regionName}Stack`, {
+        env,
+        environmentName,
+        vpcCidr,
+        hostedZoneName: params.vpc.hostedZoneName,
+        buildContextPath: solrBuildContextPath,
+        instanceType: params.solr.instanceType,
+        ebsVolumeSize: params.solr.ebsVolumeSize,
+        solrJavaMem: params.solr.solrJavaMem,
+        solrOpts: params.solr.solrOpts,
+        enabledCores: params.solr.enabledCores,
+        recordName: params.solr.recordName,
+      });
+      this.solrStack.addStackDependency(this.vpcStack);
+      this.solrStack.addStackDependency(this.bastionStack);
+    }
+
     if (falOnS3 || accessLogs || props.errorPagesPath) {
       this.s3Stack = new TmS3Stack(this, ids.s3 ?? `TmS3${regionName}Stack`, {
         env,
@@ -206,6 +239,7 @@ export class TmWebappAppStage extends cdk.Stage {
         ?? TmParameterNames.cloudfrontOriginCustomHeader(environmentName),
       applicationName: params.ecs.applicationName ?? 'tm',
       ...this.ecsVariables(params, region, distributionIds.parameterName),
+      solrSecurityGroupIdParameterName: params.solr ? TmParameterNames.solrSecurityGroupId(environmentName) : undefined,
       falEfsDirectories: falOnS3 ? [] : (params.fal.efsDirectories ?? ['fileadmin']),
       cpu: params.ecs.cpu,
       memoryLimitMiB: params.ecs.memoryLimitMiB,
@@ -219,6 +253,9 @@ export class TmWebappAppStage extends cdk.Stage {
     });
     this.ecsStack.addStackDependency(this.rdsStack);
     this.ecsStack.addStackDependency(this.redisStack);
+    if (this.solrStack) {
+      this.ecsStack.addStackDependency(this.solrStack);
+    }
     if (this.s3Stack) {
       this.ecsStack.addStackDependency(this.s3Stack);
     }
@@ -326,6 +363,11 @@ export class TmWebappAppStage extends cdk.Stage {
       ssmVariables.TM_DATABASE_WRITER_HOSTNAME = TmParameterNames.rdsWriterEndpoint(env);
       ssmVariables.TM_REDIS_HOSTNAME = TmParameterNames.redisPrimaryEndpoint(env);
 
+      if (params.solr) {
+        ssmVariables.TM_SOLR_WRITER_HOSTNAME = TmParameterNames.solrWriterEndpoint(env);
+        ssmVariables.TM_SOLR_WRITER_PORT = TmParameterNames.solrWriterPort(env);
+      }
+
       if (params.fal.storage === FalStorage.S3) {
         ssmVariables.TM_S3ASSETS_BUCKET_NAME = TmParameterNames.s3ContentBucketName(env);
         plainVariables.TM_S3ASSETS_REGION = region;
@@ -351,16 +393,19 @@ export class TmWebappAppStage extends cdk.Stage {
     }
 
     const secretsFromSsmParameterStore = ecs.secretsFromSsmParameterStore ?? [];
+    const generatedSecrets = ecs.generatedSecrets ?? [];
     const wired = [...Object.keys(ssmVariables), ...Object.keys(secretVariables), ...Object.keys(plainVariables)];
-    const duplicates = secretsFromSsmParameterStore.filter(name => wired.includes(name));
+    const handMadeNames = [...secretsFromSsmParameterStore, ...Object.keys(ecs.secretsFromSecretsManager ?? {}), ...generatedSecrets];
+    const duplicates = handMadeNames.filter(name => wired.includes(name));
     if (duplicates.length > 0) {
-      throw new Error(`These variables are produced by the stage, remove them from ecs.secretsFromSsmParameterStore: ${duplicates.join(', ')}.`);
+      throw new Error(`These variables are produced by the stage, remove them from ecs.secretsFromSsmParameterStore / ecs.secretsFromSecretsManager / ecs.generatedSecrets: ${duplicates.join(', ')}.`);
     }
 
     return {
       secretsFromSsmParameterStore,
       additionalSecretsFromParameterStore: { ...ssmVariables, ...ecs.additionalSecretsFromParameterStore },
-      secretsFromSecretsManager: secretVariables,
+      secretsFromSecretsManager: { ...secretVariables, ...ecs.secretsFromSecretsManager },
+      generatedSecrets,
       environment: { ...plainVariables, ...ecs.environment },
     };
   }

@@ -132,6 +132,7 @@ export class TmPipelineStack extends cdk.Stack {
       env: { account: params.account, region: params.region ?? 'ca-central-1' },
       parameters: params,
       buildContextPath: path.resolve(applicationDirectory),
+      solrBuildContextPath: path.resolve(applicationDirectory, 'docker/solr'),
       errorPagesPath: props.errorPagesPath,
       stackIds: props.stackIds,
     });

@@ -1,4 +1,7 @@
 import { ContainerTopology, DistributionIdsFormat, FalStorage, ServiceIamUser } from './enums';
+import { TmSecretField } from '../stacks/compute/tm-ecs-stack';
+
+export { TmSecretField } from '../stacks/compute/tm-ecs-stack';
 
 /**
  * Network settings.
@@ -65,6 +68,53 @@ export interface RedisSettings {
    * @default 0
    */
   readonly replicasPerNodeGroup?: number;
+}
+
+/**
+ * Apache Solr search instance settings.
+ */
+export interface SolrSettings {
+  /**
+   * EC2 instance type of the Solr instance.
+   *
+   * @default 't3.medium'
+   */
+  readonly instanceType?: string;
+
+  /**
+   * Data volume size in GiB (gp3, retained).
+   *
+   * @default 30
+   */
+  readonly ebsVolumeSize?: number;
+
+  /**
+   * Solr Java memory settings (`SOLR_JAVA_MEM`).
+   *
+   * @default '-Xms1g -Xmx1g'
+   */
+  readonly solrJavaMem?: string;
+
+  /**
+   * Solr JVM options (`SOLR_OPTS`).
+   *
+   * @default '-XX:-UseLargePages'
+   */
+  readonly solrOpts?: string;
+
+  /**
+   * Solr cores enabled by the TYPO3 Solr extension, a space-separated list.
+   *
+   * @default 'french english'
+   */
+  readonly enabledCores?: string;
+
+  /**
+   * A record name of the Solr instance in the VPC private hosted zone.
+   *
+   * @default 'solr'
+   */
+  readonly recordName?: string;
 }
 
 /**
@@ -165,6 +215,33 @@ export interface EcsSettings {
    * @default {}
    */
   readonly additionalSecretsFromParameterStore?: { [variable: string]: string };
+
+  /**
+   * Variables read from Secrets Manager secret fields, as
+   * `{ VARIABLE: { secretArnParameterName, field } }`. Several variables can
+   * point at the same `secretArnParameterName` to read different JSON fields of
+   * a single secret, so one Secrets Manager secret can hold every application
+   * secret at once.
+   *
+   * `secretArnParameterName` is an SSM `String` parameter holding the secret's
+   * complete ARN (with the 6-character suffix). The containers read the fields
+   * directly from Secrets Manager.
+   *
+   * @default {}
+   */
+  readonly secretsFromSecretsManager?: { [variable: string]: TmSecretField };
+
+  /**
+   * Variables whose value CDK generates once and stores in Secrets Manager,
+   * never in the template nor in this file. One secret is created per name, and
+   * its ARN is published to SSM at
+   * `/applications/<applicationName>/generated/<NAME>-arn`. Use it for machine
+   * values no human sets (e.g. a TYPO3 encryption key or install-tool
+   * password).
+   *
+   * @default []
+   */
+  readonly generatedSecrets?: string[];
 
   /**
    * Plain environment variables passed to the containers.
@@ -473,6 +550,14 @@ export interface EnvironmentParameters {
    * @default - defaults of `RedisSettings`
    */
   readonly redis?: RedisSettings;
+
+  /**
+   * Apache Solr search instance. Opt-in: without this field, no Solr stack is
+   * created.
+   *
+   * @default - no Solr instance
+   */
+  readonly solr?: SolrSettings;
 
   /**
    * ECS service settings.

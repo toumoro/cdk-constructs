@@ -75,6 +75,14 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly originCustomHeaderParameterName: string;
 
   /**
+   * SSM parameter holding the Solr security group ID. When set, the task is
+   * allowed to reach the Solr instance on port 8983.
+   *
+   * @default - no Solr instance
+   */
+  readonly solrSecurityGroupIdParameterName?: string;
+
+  /**
    * Application name used in the secrets path `/applications/<name>/secrets/`.
    */
   readonly applicationName: string;
@@ -99,6 +107,17 @@ export interface TmEcsStackProps extends cdk.StackProps {
    * @default {}
    */
   readonly secretsFromSecretsManager?: { [variable: string]: TmSecretField };
+
+  /**
+   * Variables whose value CDK generates once and stores in Secrets Manager,
+   * never in the template. One secret is created per name; its complete ARN is
+   * published to SSM at `/applications/<applicationName>/generated/<NAME>-arn`.
+   * Use it for machine values no human sets (a TYPO3 encryption key, an
+   * install-tool password).
+   *
+   * @default []
+   */
+  readonly generatedSecrets?: string[];
 
   /**
    * Plain environment variables.
@@ -278,6 +297,10 @@ export class TmEcsStack extends cdk.Stack {
     const serviceSecurityGroup = this.service.service.connections.securityGroups[0];
     rdsSecurityGroup.addIngressRule(serviceSecurityGroup, ec2.Port.tcp(3306), 'Allow from Fargate Service');
     redisSecurityGroup.addIngressRule(serviceSecurityGroup, ec2.Port.tcp(6379), 'Allow from Fargate Service');
+    if (props.solrSecurityGroupIdParameterName) {
+      const solrSecurityGroup = importSecurityGroup(this, 'SolrSecurityGroup', props.solrSecurityGroupIdParameterName);
+      solrSecurityGroup.addIngressRule(serviceSecurityGroup, ec2.Port.tcp(8983), 'Allow from Fargate Service');
+    }
     this.service.efsFileSystems.forEach(fileSystem => fileSystem.connections.allowDefaultPortFrom(bastionSecurityGroup, 'Allow from bastion'));
 
     this.loadbalancer = this.service.loadBalancer;
@@ -356,6 +379,23 @@ export class TmEcsStack extends cdk.Stack {
       importedSecrets[parameterName] ??= secretsmanager.Secret.fromSecretCompleteArn(
         this, `${variable}Secret`, readParameter(this, parameterName));
       secrets[variable] = ecs.Secret.fromSecretsManager(importedSecrets[parameterName], secretField.field);
+    }
+
+    for (const name of props.generatedSecrets ?? []) {
+      // CDK generates the value once, into Secrets Manager; it never appears in
+      // the template. Punctuation is excluded so the value is safe as a plain
+      // environment variable (no quoting surprises for the application).
+      const generated = new secretsmanager.Secret(this, `${name}Generated`, {
+        secretName: `/applications/${props.applicationName}/generated/${name}`,
+        generateSecretString: {
+          passwordLength: 64,
+          excludePunctuation: true,
+          includeSpace: false,
+        },
+      });
+      secrets[name] = ecs.Secret.fromSecretsManager(generated);
+      publishParameter(this, `${name}GeneratedArnParameter`,
+        `/applications/${props.applicationName}/generated/${name}-arn`, generated.secretArn);
     }
 
     return secrets;
