@@ -16,7 +16,7 @@ import {
   TmPhpFpmContainerOptions,
   TmSharedVolume,
 } from '../../containers/ecs/ecs-base-pattern';
-import { importSecurityGroup, importVpc, publishParameter, readParameter } from '../common/references';
+import { importSecurityGroup, importVpc, originCustomHeaderValue, publishParameter, readParameter } from '../common/references';
 
 /**
  * A field of a Secrets Manager secret passed to the containers.
@@ -73,6 +73,18 @@ export interface TmEcsStackProps extends cdk.StackProps {
    * SSM parameter holding the secret header value sent by CloudFront.
    */
   readonly originCustomHeaderParameterName: string;
+
+  /**
+   * Generates the CloudFront origin custom-header value instead of reading it
+   * from a pre-seeded SSM parameter. When true, this stack derives a stable,
+   * concrete literal (identical to the one `TmCloudfrontStack` uses, since both
+   * derive it the same way) and publishes it to
+   * `originCustomHeaderParameterName`, so no human seeds the parameter. When
+   * false, the value is read from the parameter (which a human must seed).
+   *
+   * @default false
+   */
+  readonly generateOriginCustomHeader?: boolean;
 
   /**
    * SSM parameter holding the Solr security group ID. When set, the task is
@@ -237,6 +249,19 @@ export class TmEcsStack extends cdk.Stack {
 
     const secrets = this.buildSecrets(props);
 
+    // The secret header CloudFront sends and the ALB only-accept condition.
+    // Generated: a stable concrete literal (used directly in the ALB listener
+    // condition, which cannot take an unresolved reference) that this stack
+    // also publishes to the shared parameter for TmCloudfrontStack to read.
+    // Both stacks derive the identical value, so the ALB and CloudFront always
+    // agree. Imported: read the pre-seeded parameter, as before.
+    const originCustomHeader = props.generateOriginCustomHeader
+      ? originCustomHeaderValue(this.account, env)
+      : readParameter(this, props.originCustomHeaderParameterName);
+    if (props.generateOriginCustomHeader) {
+      publishParameter(this, 'OriginCustomHeaderParameter', props.originCustomHeaderParameterName, originCustomHeader);
+    }
+
     const documentRoot = topology === ContainerTopology.NGINX_PHP_FPM ? '/app/html' : '/var/www/public';
     const efsVolumes: IIefsVolumes[] = [
       { name: 'assets', path: `${documentRoot}/typo3temp/assets` },
@@ -261,7 +286,7 @@ export class TmEcsStack extends cdk.Stack {
       listenerPort: 80,
       protocol: elbv2.ApplicationProtocol.HTTP,
       targetProtocol: elbv2.ApplicationProtocol.HTTP,
-      customHttpHeaderValue: readParameter(this, props.originCustomHeaderParameterName),
+      customHttpHeaderValue: originCustomHeader,
       secrets,
       buildContextPath: props.buildContextPath,
       buildDockerfile: props.webDockerfile,

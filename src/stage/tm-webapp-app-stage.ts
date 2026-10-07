@@ -6,6 +6,7 @@ import { EnvironmentParameters } from '../config/environment-parameters';
 import { TmParameterNames } from '../config/parameter-names';
 import { TmBackupStack } from '../stacks/backup/tm-backup-stack';
 import { TmDistributionIdsOptions } from '../stacks/cdn/distribution-ids-parameter';
+import { TmCertificateRequest, TmCertificateStack } from '../stacks/cdn/tm-certificate-stack';
 import { TmCloudfrontCdnStack } from '../stacks/cdn/tm-cloudfront-cdn-stack';
 import { TmCloudfrontStack } from '../stacks/cdn/tm-cloudfront-stack';
 import { TmBastionStack } from '../stacks/compute/tm-bastion-stack';
@@ -45,6 +46,8 @@ export interface TmWebappStackIds {
   readonly serviceIamUsers?: string;
   /** @default 'TmWafUsEast1Stack' */
   readonly waf?: string;
+  /** @default 'TmCertificateUsEast1Stack' */
+  readonly certificate?: string;
   /** @default 'TmCloudfront<Region>Stack' */
   readonly cloudfront?: string;
   /** @default 'TmCloudfrontCdn<Region>Stack' */
@@ -123,6 +126,8 @@ export class TmWebappAppStage extends cdk.Stage {
   public readonly serviceIamUsersStack?: TmServiceIamUsersStack;
   /** WebACL stack (us-east-1), when `waf` is set. */
   public readonly wafStack?: TmWafStack;
+  /** Certificate stack (us-east-1), when a distribution opts into `createCertificate`. */
+  public readonly certificateStack?: TmCertificateStack;
   /** www distributions stack, when `cloudfront` is set. */
   public readonly cloudfrontStack?: TmCloudfrontStack;
   /** CDN distribution stack, when `cdn` is set. */
@@ -237,6 +242,7 @@ export class TmWebappAppStage extends cdk.Stage {
       ...this.ecsImages(params),
       originCustomHeaderParameterName: params.cloudfront?.originCustomHeaderParameterName
         ?? TmParameterNames.cloudfrontOriginCustomHeader(environmentName),
+      generateOriginCustomHeader: params.cloudfront?.generateOriginCustomHeader,
       applicationName: params.ecs.applicationName ?? 'tm',
       ...this.ecsVariables(params, region, distributionIds.parameterName),
       solrSecurityGroupIdParameterName: params.solr ? TmParameterNames.solrSecurityGroupId(environmentName) : undefined,
@@ -274,6 +280,36 @@ export class TmWebappAppStage extends cdk.Stage {
       });
     }
 
+    // ACM certificates for the distributions that opt into `createCertificate`.
+    // Created in us-east-1 (CloudFront requires it) and their ARNs published to
+    // the same SSM parameters (application region) the CloudFront stacks read,
+    // so the created path and the import-by-ARN path converge.
+    const certificateRequests: TmCertificateRequest[] = [];
+    if (params.cloudfront?.createCertificate) {
+      params.cloudfront.domains.forEach((domain, index) => {
+        certificateRequests.push({
+          domainName: domain,
+          subjectAlternativeNames: params.cloudfront!.additionalDomains?.[domain],
+          parameterName: TmParameterNames.cloudfrontWwwCertificateArn(environmentName, index),
+          idInfix: index === 0 ? 'Www' : `Www${index + 1}`,
+        });
+      });
+    }
+    if (params.cdn?.createCertificate) {
+      certificateRequests.push({
+        domainName: params.cdn.domain,
+        parameterName: TmParameterNames.cloudfrontCdnCertificateArn(environmentName),
+        idInfix: 'Cdn',
+      });
+    }
+    if (certificateRequests.length > 0) {
+      this.certificateStack = new TmCertificateStack(this, ids.certificate ?? 'TmCertificateUsEast1Stack', {
+        env: { account: params.account, region: 'us-east-1' },
+        parameterRegion: region,
+        certificates: certificateRequests,
+      });
+    }
+
     if (params.cloudfront) {
       const cloudfront = params.cloudfront;
       this.cloudfrontStack = new TmCloudfrontStack(this, ids.cloudfront ?? `TmCloudfront${regionName}Stack`, {
@@ -292,7 +328,7 @@ export class TmWebappAppStage extends cdk.Stage {
         distributionIds: params.cdn ? undefined : distributionIds,
       });
       this.cloudfrontStack.addStackDependency(this.ecsStack);
-      this.addOptionalDependencies(this.cloudfrontStack, this.s3Stack, this.wafStack);
+      this.addOptionalDependencies(this.cloudfrontStack, this.s3Stack, this.wafStack, this.certificateStack);
     }
 
     if (params.cdn) {
@@ -307,7 +343,7 @@ export class TmWebappAppStage extends cdk.Stage {
         wwwDomains: (params.cloudfront?.domains ?? []).map(domain =>
           [domain, ...(params.cloudfront?.additionalDomains?.[domain] ?? [])]),
       });
-      this.addOptionalDependencies(this.cdnStack, this.s3Stack, this.wafStack, this.cloudfrontStack);
+      this.addOptionalDependencies(this.cdnStack, this.s3Stack, this.wafStack, this.cloudfrontStack, this.certificateStack);
     }
 
     if (params.redirections) {

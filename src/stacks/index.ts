@@ -1,5 +1,6 @@
 export * from './backup/tm-backup-stack';
 export * from './cdn/distribution-ids-parameter';
+export * from './cdn/tm-certificate-stack';
 export * from './cdn/tm-cloudfront-cdn-stack';
 export * from './cdn/tm-cloudfront-stack';
 export * from './compute/tm-bastion-stack';

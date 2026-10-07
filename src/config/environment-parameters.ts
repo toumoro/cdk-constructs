@@ -333,6 +333,28 @@ export interface CloudfrontSettings {
   readonly certificateArns?: { [domain: string]: string };
 
   /**
+   * Creates each distribution's ACM certificate (us-east-1) with manual DNS
+   * validation, instead of requiring a pre-made certificate ARN. The created
+   * ARN is published to the same SSM parameter the distribution reads, so the
+   * import-by-ARN path (`certificateArns` or the hand-seeded parameter) and the
+   * created path converge. The validation CNAME must exist in the DNS provider
+   * (Cloudflare) once; the stage creates the certificates in a us-east-1 stack.
+   *
+   * @default false
+   */
+  readonly createCertificate?: boolean;
+
+  /**
+   * Generates the CloudFront origin custom-header value instead of requiring a
+   * pre-seeded SSM parameter. CDK derives a stable, concrete value and the ECS
+   * stack publishes it to the shared parameter both stacks read, so the ALB and
+   * CloudFront always agree and no human seeds it.
+   *
+   * @default false
+   */
+  readonly generateOriginCustomHeader?: boolean;
+
+  /**
    * Protects the site with HTTP basic authentication.
    *
    * @default false
@@ -393,6 +415,17 @@ export interface CdnSettings {
    * @default - read from the SSM parameter `TmParameterNames.cloudfrontCdnCertificateArn`
    */
   readonly certificateArn?: string;
+
+  /**
+   * Creates the CDN distribution's ACM certificate (us-east-1) with manual DNS
+   * validation, instead of requiring a pre-made certificate ARN. The created
+   * ARN is published to the same SSM parameter the distribution reads. The
+   * validation CNAME must exist in the DNS provider (Cloudflare) once; the
+   * stage creates the certificate in a us-east-1 stack.
+   *
+   * @default false
+   */
+  readonly createCertificate?: boolean;
 }
 
 /**

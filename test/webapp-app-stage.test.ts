@@ -264,6 +264,143 @@ describe('TmWebappAppStage, options', () => {
   });
 });
 
+describe('TmWebappAppStage, created certificates (createCertificate opt-in)', () => {
+  test('creates a us-east-1 ACM certificate per www domain and the CDN domain, with DNS validation', () => {
+    const stage = synthStage({
+      ...greenfield,
+      cloudfront: {
+        domains: ['www.example.com', 'www2.example.com'],
+        additionalDomains: { 'www.example.com': ['example.com'] },
+        createCertificate: true,
+      },
+      cdn: { domain: 'cdn.example.com', createCertificate: true },
+    });
+
+    expect(stage.certificateStack?.node.id).toBe('TmCertificateUsEast1Stack');
+    expect(stage.certificateStack?.region).toBe('us-east-1');
+
+    const template = Template.fromStack(stage.certificateStack!);
+    // One certificate per www domain (SANs on the first) + the CDN domain.
+    template.resourceCountIs('AWS::CertificateManager::Certificate', 3);
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'www.example.com',
+      SubjectAlternativeNames: ['example.com'],
+      ValidationMethod: 'DNS',
+    });
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'www2.example.com',
+      ValidationMethod: 'DNS',
+    });
+    template.hasResourceProperties('AWS::CertificateManager::Certificate', {
+      DomainName: 'cdn.example.com',
+      ValidationMethod: 'DNS',
+    });
+    // Certificates are retained like the distributions.
+    template.hasResource('AWS::CertificateManager::Certificate', { DeletionPolicy: 'Retain' });
+
+    // Each ARN is published (cross-region custom resource) to the SSM parameter
+    // the matching CloudFront stack reads, in the application region.
+    const writers = Object.values(template.findResources('Custom::AWS'))
+      .map(r => JSON.stringify(r.Properties.Create));
+    const joined = writers.join('\n');
+    expect(joined).toContain('PutParameterCommand');
+    expect(joined).toContain(TmParameterNames.cloudfrontWwwCertificateArn('prod', 0));
+    expect(joined).toContain(TmParameterNames.cloudfrontWwwCertificateArn('prod', 1));
+    expect(joined).toContain(TmParameterNames.cloudfrontCdnCertificateArn('prod'));
+    expect(joined).toContain('\\"region\\":\\"ca-central-1\\"');
+
+    // The CloudFront/CDN stacks wait for the certificate stack so the ARN
+    // parameter exists before they read it.
+    expect(stage.cloudfrontStack!.dependencies.map(d => d.node.id)).toEqual(
+      expect.arrayContaining(['TmCertificateUsEast1Stack']));
+    expect(stage.cdnStack!.dependencies.map(d => d.node.id)).toEqual(
+      expect.arrayContaining(['TmCertificateUsEast1Stack']));
+
+    // The CloudFront stacks keep importing by ARN read from the shared SSM
+    // parameter (created and imported paths converge).
+    const www = JSON.stringify(Template.fromStack(stage.cloudfrontStack!).toJSON());
+    expect(www).toContain('tmprodcloudfrontwwwcertificatearn');
+    const cdn = JSON.stringify(Template.fromStack(stage.cdnStack!).toJSON());
+    expect(cdn).toContain('tmprodcloudfrontcdncertificatearn');
+  });
+
+  test('default (no createCertificate) creates no certificate stack and imports by ARN', () => {
+    const stage = synthStage(greenfield);
+    expect(stage.certificateStack).toBeUndefined();
+    // The www stack still imports the certificate from the shared SSM parameter.
+    const www = JSON.stringify(Template.fromStack(stage.cloudfrontStack!).toJSON());
+    expect(www).toContain('tmprodcloudfrontwwwcertificatearn');
+    expect(www).not.toContain('AWS::CertificateManager::Certificate');
+  });
+});
+
+describe('TmWebappAppStage, generated origin custom header (generateOriginCustomHeader opt-in)', () => {
+  test('publishes one stable value and uses the identical literal in the ALB condition and the CloudFront header', () => {
+    const stage = synthStage({
+      ...greenfield,
+      cloudfront: { domains: ['www.example.com'], generateOriginCustomHeader: true },
+    });
+
+    const parameterName = TmParameterNames.cloudfrontOriginCustomHeader('prod');
+
+    // ECS publishes the generated literal to the shared parameter.
+    const ecsTemplate = Template.fromStack(stage.ecsStack);
+    const publishedParameter = Object.values(ecsTemplate.findResources('AWS::SSM::Parameter'))
+      .find(r => r.Properties.Name === parameterName);
+    expect(publishedParameter).toBeDefined();
+    const generatedValue: string = publishedParameter!.Properties.Value;
+    expect(typeof generatedValue).toBe('string');
+    expect(generatedValue).toMatch(/^[0-9a-f]{48}$/);
+
+    // The ALB listener condition carries that exact literal (not an unresolved
+    // reference), so the load balancer only accepts CloudFront's requests.
+    ecsTemplate.hasResourceProperties('AWS::ElasticLoadBalancingV2::ListenerRule', {
+      Conditions: Match.arrayWith([
+        Match.objectLike({
+          Field: 'http-header',
+          HttpHeaderConfig: Match.objectLike({
+            HttpHeaderName: 'X-Custom-Header',
+            Values: [generatedValue],
+          }),
+        }),
+      ]),
+    });
+
+    // CloudFront reads the same published parameter (dynamic SSM reference), so
+    // both consumers resolve to the identical value at deploy time.
+    const www = JSON.stringify(Template.fromStack(stage.cloudfrontStack!).toJSON());
+    expect(www).toContain('tmprodcloudfrontorigincustomheader');
+  });
+
+  test('the generated value is deterministic across synths (no churn)', () => {
+    const value = (p: EnvironmentParameters) => {
+      const stage = synthStage(p);
+      const template = Template.fromStack(stage.ecsStack);
+      const parameter = Object.values(template.findResources('AWS::SSM::Parameter'))
+        .find(r => r.Properties.Name === TmParameterNames.cloudfrontOriginCustomHeader('prod'));
+      return parameter!.Properties.Value as string;
+    };
+    const settings: EnvironmentParameters = {
+      ...greenfield,
+      cloudfront: { domains: ['www.example.com'], generateOriginCustomHeader: true },
+    };
+    expect(value(settings)).toBe(value(settings));
+  });
+
+  test('default (no generateOriginCustomHeader) reads the pre-seeded parameter and publishes none', () => {
+    const stage = synthStage(greenfield);
+    const parameterName = TmParameterNames.cloudfrontOriginCustomHeader('prod');
+    const template = Template.fromStack(stage.ecsStack);
+    // No SSM parameter named for the custom header is written by the ECS stack.
+    const published = Object.values(template.findResources('AWS::SSM::Parameter'))
+      .find(r => r.Properties.Name === parameterName);
+    expect(published).toBeUndefined();
+    // The ALB condition is the unresolved SSM reference, as before.
+    const json = JSON.stringify(template.toJSON());
+    expect(json).toContain('tmprodcloudfrontorigincustomheader');
+  });
+});
+
 describe('TmPipelineStack', () => {
   test('deploys the stage then invalidates the distributions', () => {
     const app = new cdk.App({ context: context() });
