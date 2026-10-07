@@ -1,4 +1,4 @@
-import { ContainerTopology, DistributionIdsFormat, FalStorage, ServiceIamUser } from './enums';
+import { ContainerTopology, DistributionIdsFormat, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
 import { TmSecretField } from '../stacks/compute/tm-ecs-stack';
 
 export { TmSecretField } from '../stacks/compute/tm-ecs-stack';
@@ -498,9 +498,74 @@ export interface PipelineSettings {
   /**
    * SSM parameter holding the branch both repositories are deployed from.
    *
+   * Only read for the CodeCommit source.
+   *
    * @default '/pipeline/parameters/branchName'
    */
   readonly branchNameParameterName?: string;
+
+  /**
+   * Where the pipeline reads its source from.
+   *
+   * `CODECOMMIT` keeps the original behaviour: the infrastructure and
+   * application CodeCommit repositories, on the branch read from
+   * `branchNameParameterName`.
+   *
+   * `S3` instead creates two versioned S3 buckets (one for the infrastructure
+   * source, one for the application), an IAM role GitHub Actions assumes over
+   * OIDC to upload `source.zip` into them, and EventBridge rules that start the
+   * pipeline on every upload. The remaining `S3`-only fields configure the OIDC
+   * trust. The OIDC provider itself must already exist in the account.
+   *
+   * @default PipelineSourceType.CODECOMMIT
+   */
+  readonly sourceType?: PipelineSourceType;
+
+  /**
+   * `S3` source only: GitHub `owner/repo` of the infrastructure repository,
+   * used in the OIDC trust subject so only its CI can upload the infrastructure
+   * source. Required when `sourceType` is `S3`.
+   *
+   * @default - required for the S3 source
+   */
+  readonly infrastructureGithubRepo?: string;
+
+  /**
+   * `S3` source only: GitHub `owner/repo` of the application repository, used in
+   * the OIDC trust subject so only its CI can upload the application source.
+   * Required when `sourceType` is `S3`.
+   *
+   * @default - required for the S3 source
+   */
+  readonly applicationGithubRepo?: string;
+
+  /**
+   * `S3` source only: the git branch CI uploads from, allowed to assume the
+   * OIDC upload role (`refs/heads/<sourceBranch>` in the trust subject).
+   *
+   * Only read when `sourceEnvironment` is unset: a workflow job scoped to a
+   * GitHub Environment mints an `environment:<name>` subject, not a branch one.
+   *
+   * @default 'prod'
+   */
+  readonly sourceBranch?: string;
+
+  /**
+   * `S3` source only: the name of the GitHub Environment whose OIDC token may
+   * assume the upload role. When set, the trust subject matches
+   * `repo:<owner/repo>:environment:<name>` for both repositories instead of the
+   * branch form `repo:<owner/repo>:ref:refs/heads/<sourceBranch>`.
+   *
+   * A GitHub Actions job that declares `environment: <name>` mints an OIDC
+   * token whose `sub` claim is `repo:<owner/repo>:environment:<name>`, so this
+   * must be set (and match the GitHub Environment name) whenever the upload
+   * workflow runs under an environment — otherwise AssumeRole is denied. Set it
+   * to put the GitHub variables inside that environment rather than at the
+   * repository scope.
+   *
+   * @default - unset; the trust uses the branch form with `sourceBranch`
+   */
+  readonly sourceEnvironment?: string;
 }
 
 /**

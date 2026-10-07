@@ -1,11 +1,15 @@
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import * as codecommit from 'aws-cdk-lib/aws-codecommit';
+import { S3Trigger } from 'aws-cdk-lib/aws-codepipeline-actions';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as pipelines from 'aws-cdk-lib/pipelines';
 import { Construct, IConstruct } from 'constructs';
-import { DistributionIdsFormat } from '../../config/enums';
-import { EnvironmentParameters } from '../../config/environment-parameters';
+import { DistributionIdsFormat, PipelineSourceType } from '../../config/enums';
+import { EnvironmentParameters, PipelineSettings } from '../../config/environment-parameters';
 import { TmParameterNames } from '../../config/parameter-names';
 import { TmWebappAppStage, TmWebappStackIds } from '../../stage/tm-webapp-app-stage';
 
@@ -99,21 +103,37 @@ export class TmPipelineStack extends cdk.Stack {
     const removalPolicy = toRemovalPolicy(this.node.tryGetContext('removalPolicy') ?? 'RETAIN');
     cdk.Aspects.of(this).add(new ApplyRemovalPolicyAspect(removalPolicy));
 
-    const repository = codecommit.Repository.fromRepositoryName(
-      this, 'Infrastructure', pipelineSettings.infrastructureRepositoryName ?? 'infrastructure');
-    const additionalRepository = codecommit.Repository.fromRepositoryName(
-      this, 'Application', pipelineSettings.applicationRepositoryName ?? 'application');
-    const branchName = cdk.aws_ssm.StringParameter.valueForStringParameter(
-      this, pipelineSettings.branchNameParameterName ?? '/pipeline/parameters/branchName');
+    const sourceType = pipelineSettings.sourceType ?? PipelineSourceType.CODECOMMIT;
+
+    // The S3 source needs its buckets before the synth step; keep them so the
+    // EventBridge rules (added after buildPipeline) can reference them.
+    let s3Source: S3PipelineSource | undefined;
+    let synthInput: pipelines.IFileSetProducer;
+    let synthAdditionalInputs: Record<string, pipelines.IFileSetProducer>;
+
+    if (sourceType === PipelineSourceType.S3) {
+      s3Source = this.s3Source(pipelineSettings, applicationDirectory, removalPolicy);
+      synthInput = s3Source.infraInput;
+      synthAdditionalInputs = s3Source.additionalInputs;
+    } else {
+      const repository = codecommit.Repository.fromRepositoryName(
+        this, 'Infrastructure', pipelineSettings.infrastructureRepositoryName ?? 'infrastructure');
+      const additionalRepository = codecommit.Repository.fromRepositoryName(
+        this, 'Application', pipelineSettings.applicationRepositoryName ?? 'application');
+      const branchName = cdk.aws_ssm.StringParameter.valueForStringParameter(
+        this, pipelineSettings.branchNameParameterName ?? '/pipeline/parameters/branchName');
+      synthInput = pipelines.CodePipelineSource.codeCommit(repository, branchName);
+      synthAdditionalInputs = {
+        [applicationDirectory]: pipelines.CodePipelineSource.codeCommit(additionalRepository, branchName),
+      };
+    }
 
     this.pipeline = new pipelines.CodePipeline(this, 'TmPipelineStack', {
       crossAccountKeys: true,
       pipelineName: 'TmPipelineStack',
       synth: new pipelines.CodeBuildStep('Synth', {
-        input: pipelines.CodePipelineSource.codeCommit(repository, branchName),
-        additionalInputs: {
-          [applicationDirectory]: pipelines.CodePipelineSource.codeCommit(additionalRepository, branchName),
-        },
+        input: synthInput,
+        additionalInputs: synthAdditionalInputs,
         installCommands: ['npm ci', 'npm install -g aws-cdk'],
         // Context lookups (AZs, AMIs) must come from the committed cdk.context.json:
         // a lookup here would not be saved and could change on every run.
@@ -148,6 +168,161 @@ export class TmPipelineStack extends cdk.Stack {
     // configured (e.g. cdk-nag suppressions) like this one.
     this.pipeline.buildPipeline();
     this.crossRegionSupportStacks = Object.values(this.pipeline.pipeline.crossRegionSupport).map(support => support.stack);
+
+    // The S3 source has no polling: an EventBridge rule per bucket starts the
+    // pipeline when CI uploads source.zip. Added after buildPipeline() so the
+    // underlying CodePipeline exists.
+    if (s3Source) {
+      this.addS3SourceTriggers(s3Source);
+    }
+  }
+
+  /**
+   * Creates the S3 source for the pipeline: two versioned, EventBridge-enabled,
+   * SSL-enforced buckets (one for the infrastructure source, one for the
+   * application), an IAM role GitHub Actions assumes over OIDC to upload
+   * `source.zip` into them, and the `CfnOutput`s the consumer reads to set its
+   * GitHub variables. Returns the synth-step inputs and the handles the
+   * EventBridge triggers need.
+   *
+   * The GitHub OIDC provider is assumed to already exist in the account (its
+   * ARN is referenced, not created).
+   *
+   * The OIDC trust subject follows `pipelineSettings.sourceEnvironment`: when
+   * set, both repositories are trusted on `environment:<name>` (what a GitHub
+   * job with `environment: <name>` mints); otherwise on the branch form
+   * `ref:refs/heads/<sourceBranch>`.
+   */
+  private s3Source(
+    pipelineSettings: PipelineSettings,
+    applicationDirectory: string,
+    removalPolicy: cdk.RemovalPolicy,
+  ): S3PipelineSource {
+    const infrastructureGithubRepo = pipelineSettings.infrastructureGithubRepo;
+    const applicationGithubRepo = pipelineSettings.applicationGithubRepo;
+    if (!infrastructureGithubRepo || !applicationGithubRepo) {
+      throw new Error(
+        "pipeline.sourceType 'S3' requires pipeline.infrastructureGithubRepo and pipeline.applicationGithubRepo "
+        + "(the GitHub 'owner/repo' of each source repository, used in the OIDC trust subject).");
+    }
+    const sourceBranch = pipelineSettings.sourceBranch ?? 'prod';
+    const sourceEnvironment = pipelineSettings.sourceEnvironment;
+
+    const infraSourceBucket = this.sourceBucket('InfraSourceBucket', removalPolicy);
+    const appSourceBucket = this.sourceBucket('AppSourceBucket', removalPolicy);
+
+    // Reference the pre-existing GitHub OIDC provider by ARN (do not create one).
+    const githubOidcProviderArn = `arn:aws:iam::${cdk.Aws.ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com`;
+
+    // The OIDC token's `sub` claim depends on how the workflow runs. A job
+    // scoped to a GitHub Environment (`environment: <name>`) mints
+    // `repo:<owner/repo>:environment:<name>`; a plain job on a branch mints
+    // `repo:<owner/repo>:ref:refs/heads/<branch>`. The trust must match the one
+    // the workflow actually produces, so pick the subject form from
+    // `sourceEnvironment`.
+    const subjectFor = (repo: string): string =>
+      sourceEnvironment
+        ? `repo:${repo}:environment:${sourceEnvironment}`
+        : `repo:${repo}:ref:refs/heads/${sourceBranch}`;
+
+    const githubActionsRole = new iam.Role(this, 'GitHubActionsPipelineUploadRole', {
+      assumedBy: new iam.FederatedPrincipal(
+        githubOidcProviderArn,
+        {
+          StringEquals: {
+            'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+          },
+          StringLike: {
+            'token.actions.githubusercontent.com:sub': [
+              subjectFor(infrastructureGithubRepo),
+              subjectFor(applicationGithubRepo),
+            ],
+          },
+        },
+        'sts:AssumeRoleWithWebIdentity',
+      ),
+    });
+
+    infraSourceBucket.grantPut(githubActionsRole);
+    appSourceBucket.grantPut(githubActionsRole);
+
+    const variableLocation = sourceEnvironment
+      ? `in the GitHub Environment named '${sourceEnvironment}' of`
+      : 'in';
+    new cdk.CfnOutput(this, 'GitHubActionsPipelineRoleArn', {
+      value: githubActionsRole.roleArn,
+      description: `IAM Role ARN for pipeline S3 upload (set as the TM_PIPELINE_AWS_OIDC_ROLE_ARN GitHub variable ${variableLocation} both source repositories)`,
+    });
+    new cdk.CfnOutput(this, 'InfraSourceBucketName', {
+      value: infraSourceBucket.bucketName,
+      description: `S3 bucket for the infrastructure source (set as the S3_SOURCE_BUCKET GitHub variable ${variableLocation} the infrastructure repository)`,
+    });
+    new cdk.CfnOutput(this, 'AppSourceBucketName', {
+      value: appSourceBucket.bucketName,
+      description: `S3 bucket for the application source (set as the S3_SOURCE_BUCKET GitHub variable ${variableLocation} the application repository)`,
+    });
+
+    return {
+      infraSourceBucket,
+      appSourceBucket,
+      infraInput: pipelines.CodePipelineSource.s3(infraSourceBucket, 'source.zip', { trigger: S3Trigger.NONE }),
+      additionalInputs: {
+        [applicationDirectory]: pipelines.CodePipelineSource.s3(appSourceBucket, 'source.zip', { trigger: S3Trigger.NONE }),
+      },
+    };
+  }
+
+  /** A versioned, EventBridge-enabled, SSL-enforced, private source bucket. */
+  private sourceBucket(id: string, removalPolicy: cdk.RemovalPolicy): s3.Bucket {
+    return new s3.Bucket(this, id, {
+      versioned: true,
+      eventBridgeEnabled: true,
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      enforceSSL: true,
+      removalPolicy,
+      autoDeleteObjects: removalPolicy === cdk.RemovalPolicy.DESTROY,
+    });
+  }
+
+  /**
+   * One EventBridge rule per source bucket, starting the pipeline when CI
+   * uploads `source.zip`. Called after `buildPipeline()`, so the underlying
+   * CodePipeline (and its ARN) exists.
+   */
+  private addS3SourceTriggers(source: S3PipelineSource): void {
+    const pipelineArn = this.pipeline.pipeline.pipelineArn;
+
+    const eventBridgeRole = new iam.Role(this, 'EventBridgePipelineRole', {
+      assumedBy: new iam.ServicePrincipal('events.amazonaws.com'),
+      inlinePolicies: {
+        StartPipeline: new iam.PolicyDocument({
+          statements: [
+            new iam.PolicyStatement({
+              actions: ['codepipeline:StartPipelineExecution'],
+              resources: [pipelineArn],
+            }),
+          ],
+        }),
+      },
+    });
+
+    for (const [id, bucket] of [
+      ['InfraSourceS3EventRule', source.infraSourceBucket],
+      ['AppSourceS3EventRule', source.appSourceBucket],
+    ] as [string, s3.Bucket][]) {
+      new events.Rule(this, id, {
+        eventPattern: {
+          source: ['aws.s3'],
+          detailType: ['Object Created'],
+          detail: {
+            bucket: { name: [bucket.bucketName] },
+            object: { key: [{ prefix: 'source.zip' }] },
+          },
+        },
+        targets: [new targets.CodePipeline(this.pipeline.pipeline, { eventRole: eventBridgeRole })],
+      });
+    }
   }
 
   /**
@@ -182,6 +357,17 @@ export class TmPipelineStack extends cdk.Stack {
       ],
     });
   }
+}
+
+/**
+ * Internal handles produced when building the S3 pipeline source, passed from
+ * `s3Source()` to the EventBridge-trigger setup after `buildPipeline()`.
+ */
+interface S3PipelineSource {
+  readonly infraSourceBucket: s3.Bucket;
+  readonly appSourceBucket: s3.Bucket;
+  readonly infraInput: pipelines.IFileSetProducer;
+  readonly additionalInputs: Record<string, pipelines.IFileSetProducer>;
 }
 
 class ApplyRemovalPolicyAspect implements cdk.IAspect {

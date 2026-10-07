@@ -65,3 +65,23 @@ export enum ServiceIamUser {
    */
   CLOUDFRONT = 'CLOUDFRONT',
 }
+
+/**
+ * Where `TmPipelineStack` reads its infrastructure and application source from.
+ *
+ * A string-literal union (`'codecommit' | 's3'`) cannot be used here: jsii does
+ * not support TypeScript literal unions in the public API, so the selector is
+ * an enum.
+ */
+export enum PipelineSourceType {
+  /**
+   * CodeCommit repositories, polled through CodeStar connections. The library's
+   * original and default behaviour.
+   */
+  CODECOMMIT = 'CODECOMMIT',
+  /**
+   * Versioned S3 buckets fed by GitHub Actions over OIDC, each change detected
+   * by an EventBridge rule. No CodeCommit mirror needed.
+   */
+  S3 = 'S3',
+}

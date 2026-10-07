@@ -5,6 +5,7 @@ import {
   ContainerTopology,
   EnvironmentParameters,
   FalStorage,
+  PipelineSourceType,
   ServiceIamUser,
   TmEnvironmentParameters,
   TmParameterNames,
@@ -295,6 +296,176 @@ describe('TmPipelineStack', () => {
     const json = JSON.stringify(Template.fromStack(pipeline).toJSON());
     expect(json).toContain('AppStage-TmOwnCaCentral1Stack');
     expect(pipeline.crossRegionSupportStacks).toEqual([]);
+  });
+
+  test('default source is CodeCommit and creates no S3 source buckets', () => {
+    const app = new cdk.App({ context: context() });
+    const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: greenfield,
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    });
+    const template = Template.fromStack(pipeline);
+    // The pipeline source is CodeCommit, not S3.
+    template.hasResourceProperties('AWS::CodePipeline::Pipeline', {
+      Stages: Match.arrayWith([
+        Match.objectLike({
+          Name: 'Source',
+          Actions: Match.arrayWith([
+            Match.objectLike({ ActionTypeId: Match.objectLike({ Provider: 'CodeCommit' }) }),
+          ]),
+        }),
+      ]),
+    });
+    // No OIDC upload role and no stack outputs on the CodeCommit path.
+    const json = JSON.stringify(template.toJSON());
+    expect(json).not.toContain('token.actions.githubusercontent.com');
+    expect(Object.keys(template.findOutputs('*'))).toEqual([]);
+    // No S3-source EventBridge rule (matching source.zip object-created).
+    expect(json).not.toContain('source.zip');
+  });
+
+  test('S3 source creates the buckets, OIDC role, EventBridge triggers and outputs', () => {
+    const app = new cdk.App({ context: context() });
+    const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: {
+        ...greenfield,
+        pipeline: {
+          sourceType: PipelineSourceType.S3,
+          infrastructureGithubRepo: 'toumoro/example-infra',
+          applicationGithubRepo: 'toumoro/example-app',
+          sourceBranch: 'prod',
+        },
+      },
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    });
+    const template = Template.fromStack(pipeline);
+
+    // (a) two versioned source buckets, each with EventBridge notifications
+    // enabled (rendered as the S3BucketNotifications custom resource). The
+    // pipeline's own artifact bucket is not versioned, so this is exactly 2.
+    const sourceBuckets = template.findResources('AWS::S3::Bucket', {
+      Properties: Match.objectLike({ VersioningConfiguration: { Status: 'Enabled' } }),
+    });
+    expect(Object.keys(sourceBuckets)).toHaveLength(2);
+    template.resourceCountIs('Custom::S3BucketNotifications', 2);
+
+    // (b) OIDC role: GitHub federated principal, both repos + branch in the sub.
+    template.hasResourceProperties('AWS::IAM::Role', {
+      AssumeRolePolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: 'sts:AssumeRoleWithWebIdentity',
+            Condition: {
+              StringEquals: { 'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com' },
+              StringLike: {
+                'token.actions.githubusercontent.com:sub': [
+                  'repo:toumoro/example-infra:ref:refs/heads/prod',
+                  'repo:toumoro/example-app:ref:refs/heads/prod',
+                ],
+              },
+            },
+            Principal: {
+              Federated: Match.objectLike({
+                'Fn::Join': Match.arrayWith([
+                  Match.arrayWith([Match.stringLikeRegexp('oidc-provider/token.actions.githubusercontent.com')]),
+                ]),
+              }),
+            },
+          }),
+        ]),
+      },
+    });
+
+    // (c) one EventBridge rule per source bucket, matching the source.zip upload.
+    const sourceRules = template.findResources('AWS::Events::Rule', {
+      Properties: Match.objectLike({
+        EventPattern: Match.objectLike({
+          'source': ['aws.s3'],
+          'detail-type': ['Object Created'],
+          'detail': { object: { key: [{ prefix: 'source.zip' }] } },
+        }),
+      }),
+    });
+    expect(Object.keys(sourceRules)).toHaveLength(2);
+
+    // (d) outputs the consumer reads for its GitHub variables.
+    const outputs = template.findOutputs('*');
+    expect(Object.keys(outputs)).toEqual(
+      expect.arrayContaining(['GitHubActionsPipelineRoleArn', 'InfraSourceBucketName', 'AppSourceBucketName']));
+
+    // The pipeline source is S3, not CodeCommit.
+    const json = JSON.stringify(template.toJSON());
+    expect(json).not.toContain('"Provider":"CodeCommit"');
+  });
+
+  test('S3 source without the GitHub repos throws', () => {
+    const app = new cdk.App({ context: context() });
+    expect(() => new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: { ...greenfield, pipeline: { sourceType: PipelineSourceType.S3 } },
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    })).toThrow(/infrastructureGithubRepo/);
+  });
+
+  test('S3 source without sourceEnvironment trusts the branch subject (branch-mode regression)', () => {
+    const app = new cdk.App({ context: context() });
+    const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: {
+        ...greenfield,
+        pipeline: {
+          sourceType: PipelineSourceType.S3,
+          infrastructureGithubRepo: 'toumoro/example-infra',
+          applicationGithubRepo: 'toumoro/example-app',
+          sourceBranch: 'prod',
+          // no sourceEnvironment
+        },
+      },
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    });
+    const template = Template.fromStack(pipeline);
+    const role = Object.values(template.findResources('AWS::IAM::Role')).find(r =>
+      JSON.stringify(r).includes('token.actions.githubusercontent.com:sub'))!;
+    const subs = role.Properties.AssumeRolePolicyDocument.Statement
+      .flatMap((s: any) => s.Condition?.StringLike?.['token.actions.githubusercontent.com:sub'] ?? []);
+    expect(subs).toEqual([
+      'repo:toumoro/example-infra:ref:refs/heads/prod',
+      'repo:toumoro/example-app:ref:refs/heads/prod',
+    ]);
+    // Branch mode never emits the environment subject.
+    expect(JSON.stringify(subs)).not.toContain(':environment:');
+  });
+
+  test('S3 source with sourceEnvironment trusts the environment subject for both repos', () => {
+    const app = new cdk.App({ context: context() });
+    const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: {
+        ...greenfield,
+        pipeline: {
+          sourceType: PipelineSourceType.S3,
+          infrastructureGithubRepo: 'toumoro/example-infra',
+          applicationGithubRepo: 'toumoro/example-app',
+          sourceBranch: 'prod',
+          sourceEnvironment: 'prod',
+        },
+      },
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    });
+    const template = Template.fromStack(pipeline);
+    const role = Object.values(template.findResources('AWS::IAM::Role')).find(r =>
+      JSON.stringify(r).includes('token.actions.githubusercontent.com:sub'))!;
+    const subs = role.Properties.AssumeRolePolicyDocument.Statement
+      .flatMap((s: any) => s.Condition?.StringLike?.['token.actions.githubusercontent.com:sub'] ?? []);
+    expect(subs).toEqual([
+      'repo:toumoro/example-infra:environment:prod',
+      'repo:toumoro/example-app:environment:prod',
+    ]);
+    // When the workflow runs under an environment, the branch subject must NOT
+    // be trusted (the token never carries it).
+    expect(JSON.stringify(subs)).not.toContain(':ref:refs/heads/');
   });
 });
 
