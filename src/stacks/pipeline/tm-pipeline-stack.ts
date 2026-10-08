@@ -251,7 +251,7 @@ export class TmPipelineStack extends cdk.Stack {
       : 'in';
     new cdk.CfnOutput(this, 'GitHubActionsPipelineRoleArn', {
       value: githubActionsRole.roleArn,
-      description: `IAM Role ARN for pipeline S3 upload (set as the TM_PIPELINE_AWS_OIDC_ROLE_ARN GitHub variable ${variableLocation} both source repositories)`,
+      description: `IAM Role ARN for pipeline S3 upload (set as the AWS_OIDC_ROLE_ARN GitHub variable ${variableLocation} both source repositories)`,
     });
     new cdk.CfnOutput(this, 'InfraSourceBucketName', {
       value: infraSourceBucket.bucketName,
