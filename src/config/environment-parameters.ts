@@ -31,6 +31,32 @@ export interface BastionSettings {
 }
 
 /**
+ * Database bootstrap settings (opt-in).
+ */
+export interface RdsBootstrapSettings {
+  /**
+   * Enables the bootstrap: a VPC Lambda creates the application database and
+   * user, sets the user's password from the CDK-generated secret, and imports
+   * the dump (`db/latest.sql`) from the bootstrap-assets bucket. Idempotent,
+   * and a no-op on stack delete (data retained). Off by default, so other
+   * consumers are untouched.
+   *
+   * The dump is REQUIRED when enabled: a greenfield TYPO3 against an empty
+   * schema fails every request and the ALB health check never passes, so a
+   * missing dump makes the Lambda fail fast with a clear message rather than a
+   * ten-minute health-check timeout.
+   */
+  readonly enabled: boolean;
+
+  /**
+   * Key of the dump object in the bootstrap-assets bucket.
+   *
+   * @default 'db/latest.sql'
+   */
+  readonly dumpKey?: string;
+}
+
+/**
  * Aurora MySQL settings.
  */
 export interface RdsSettings {
@@ -48,6 +74,14 @@ export interface RdsSettings {
    * @default true
    */
   readonly performanceInsights?: boolean;
+
+  /**
+   * Database bootstrap. Opt-in: without it (default) nothing is created, so
+   * consumers that don't need it (e.g. JARO) are untouched.
+   *
+   * @default - no bootstrap
+   */
+  readonly bootstrap?: RdsBootstrapSettings;
 }
 
 /**

@@ -280,6 +280,9 @@
       "steps": [
         {
           "spawn": "docgen"
+        },
+        {
+          "exec": "rm -rf lib/stacks/data/bootstrap-lambda && mkdir -p lib/stacks/data && cp -r src/stacks/data/bootstrap-lambda lib/stacks/data/bootstrap-lambda && find lib/stacks/data/bootstrap-lambda -name __pycache__ -type d -prune -exec rm -rf {} +"
         }
       ]
     },
@@ -317,8 +320,7 @@
         {
           "exec": "git diff --ignore-space-at-eol --exit-code"
         }
-      ],
-      "condition": "git log --oneline -1 | grep -v \"chore(release):\" > /dev/null"
+      ]
     },
     "test": {
       "name": "test",

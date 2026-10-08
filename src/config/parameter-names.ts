@@ -122,6 +122,30 @@ export class TmParameterNames {
   }
 
   /**
+   * Name of the pipeline-level bootstrap-assets bucket, holding the database
+   * dump (`db/latest.sql`) and any future seed asset. Published by
+   * `TmBootstrapAssetsStack` and read by the RDS bootstrap construct.
+   */
+  public static bootstrapAssetsBucketName(env: string): string {
+    return TmParameterNames.of(env, 'bootstrap', 'assets-bucket', 'name');
+  }
+
+  /**
+   * SSM parameter holding the complete ARN of a CDK-generated application
+   * secret. The generated-secrets path (`TmEcsStack.buildSecrets`) publishes
+   * every generated secret's ARN here, under the application namespace rather
+   * than the `/tm/...` one. It is the single source of truth both ECS and the
+   * RDS bootstrap read for a shared generated secret such as
+   * `TM_DATABASE_PASSWORD`.
+   *
+   * @param applicationName the ECS `applicationName` (secrets path segment)
+   * @param name the variable name, e.g. `TM_DATABASE_PASSWORD`
+   */
+  public static generatedSecretArn(applicationName: string, name: string): string {
+    return `/applications/${applicationName}/generated/${name}-arn`;
+  }
+
+  /**
    * ARN of the Secrets Manager secret holding a service user's access key
    * (`AccessKeyId` and `SecretAccessKey` fields).
    *

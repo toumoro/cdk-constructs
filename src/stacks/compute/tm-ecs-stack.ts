@@ -28,9 +28,12 @@ export interface TmSecretField {
   readonly secretArnParameterName: string;
 
   /**
-   * JSON field of the secret.
+   * JSON field of the secret. Omit it to read the whole secret value (for a
+   * single-value secret, e.g. a CDK-generated password stored as a raw string).
+   *
+   * @default - the whole secret value
    */
-  readonly field: string;
+  readonly field?: string;
 }
 
 /**
@@ -403,7 +406,11 @@ export class TmEcsStack extends cdk.Stack {
       const parameterName = secretField.secretArnParameterName;
       importedSecrets[parameterName] ??= secretsmanager.Secret.fromSecretCompleteArn(
         this, `${variable}Secret`, readParameter(this, parameterName));
-      secrets[variable] = ecs.Secret.fromSecretsManager(importedSecrets[parameterName], secretField.field);
+      // With a field: read that JSON field. Without: read the whole secret
+      // value (a single-value secret, e.g. a CDK-generated password).
+      secrets[variable] = secretField.field
+        ? ecs.Secret.fromSecretsManager(importedSecrets[parameterName], secretField.field)
+        : ecs.Secret.fromSecretsManager(importedSecrets[parameterName]);
     }
 
     for (const name of props.generatedSecrets ?? []) {
@@ -420,7 +427,7 @@ export class TmEcsStack extends cdk.Stack {
       });
       secrets[name] = ecs.Secret.fromSecretsManager(generated);
       publishParameter(this, `${name}GeneratedArnParameter`,
-        `/applications/${props.applicationName}/generated/${name}-arn`, generated.secretArn);
+        TmParameterNames.generatedSecretArn(props.applicationName, name), generated.secretArn);
     }
 
     return secrets;

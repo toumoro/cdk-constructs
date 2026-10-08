@@ -44,6 +44,52 @@ inputs (certificate ARNs, the CloudFront origin header, application secrets
 under `/applications/<app>/secrets/`) are read from SSM too; see the
 `@default` of each setting in [API.md](API.md).
 
+### Database bootstrap (opt-in)
+
+A greenfield TYPO3 needs its schema before the ALB health check can pass. The
+bootstrap feature automates that:
+
+- `TmBootstrapAssetsStack` is a pipeline-level, versioned, RETAIN S3 bucket for
+  bootstrap assets. The database dump lives at `db/latest.sql`. Instantiate it
+  in `bin/<app>.ts` alongside `TmPipelineStack` so it deploys first — that is
+  what gives you a window to upload the dump before the pipeline runs the stage.
+- `rds.bootstrap = { enabled: true }` turns on a VPC-attached Lambda (Python +
+  `pymysql`, bundled offline) in the RDS stack. It connects as the cluster admin
+  (`cluster.secret`), creates the application database and user, sets the user's
+  password from a **CDK-generated** secret, and imports `db/latest.sql`. It is
+  idempotent (an empty-DB sentinel skips re-import) and a no-op on stack delete
+  (data retained). Off by default, so other consumers (e.g. JARO) are untouched.
+
+**Deploy order (hard requirement):**
+
+1. Deploy the bootstrap-assets bucket stack first.
+2. Upload the dump to `s3://<bucket>/db/latest.sql`.
+3. Let the pipeline run the stage: the RDS stack imports the dump.
+
+**The dump is required when bootstrap is enabled.** If it is missing, the Lambda
+fails fast with a clear message (`bootstrap enabled but db/latest.sql not found
+in bucket <name> — upload it before deploying`) rather than letting the stack
+hang on a ten-minute ALB health-check timeout.
+
+**Generated application password.** With bootstrap on, `TM_DATABASE_PASSWORD` is
+no longer a human secret. The RDS stack generates it, publishes its ARN to
+`/applications/<app>/generated/TM_DATABASE_PASSWORD-arn`, and both the bootstrap
+Lambda and the ECS task read that **same ARN** (single source of truth). Remove
+`TM_DATABASE_PASSWORD` from `ecs.secretsFromSecretsManager` and from the human
+secret-seeding script — the stage rejects the synth if it is in both places.
+
+**Lambda size/time ceiling.** The import streams from S3 (it never loads the
+whole dump in memory), but the Lambda is bounded by the 15-minute timeout and
+the `/tmp` 512 MB–10 GB limit. For a very large dump, run the import manually
+from the bastion instead (it reaches the cluster on 3306) and let the sentinel
+skip the Lambda import.
+
+**VPC.** The Lambda needs Secrets Manager and S3. `TmVpcBase` only adds an S3
+**gateway** endpoint, so the Lambda runs in the **private-with-egress** subnets
+(reaching Secrets Manager and STS through the existing NAT, S3 through the
+gateway endpoint). An isolated-subnet Lambda would instead require Secrets
+Manager + STS interface endpoints (~$22/mo), which the VPC does not create.
+
 # Contributing to CDK Construct Toumoro
 [Contributing](CONTRIBUTING.md)
 

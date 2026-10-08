@@ -10,6 +10,7 @@ export * from './data/tm-rds-aurora-mysql-serverless-stack';
 export * from './data/tm-redis-stack';
 export * from './iam/tm-service-iam-users-stack';
 export * from './network/tm-vpc-base-stack';
+export * from './pipeline/tm-bootstrap-assets-stack';
 export * from './pipeline/tm-pipeline-stack';
 export * from './search/tm-solr-stack';
 export * from './security/tm-waf-stack';

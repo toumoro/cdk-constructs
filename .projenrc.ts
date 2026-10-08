@@ -37,4 +37,15 @@ const project = new awscdk.AwsCdkConstructLibrary({
 
 project.addPackageIgnore('examples');
 
+// L'actif de la Lambda d'amorçage (handler Python + pymysql vendu) n'est pas du
+// TypeScript : jsii/tsc ne le copie pas vers lib/. On le recopie après la
+// compilation pour que le paquet publié (lib/) contienne l'actif que le
+// construct charge via `path.join(__dirname, 'bootstrap-lambda')`.
+project.postCompileTask.exec(
+  'rm -rf lib/stacks/data/bootstrap-lambda && ' +
+  'mkdir -p lib/stacks/data && ' +
+  'cp -r src/stacks/data/bootstrap-lambda lib/stacks/data/bootstrap-lambda && ' +
+  'find lib/stacks/data/bootstrap-lambda -name __pycache__ -type d -prune -exec rm -rf {} +',
+);
+
 project.synth();
