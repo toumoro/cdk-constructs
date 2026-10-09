@@ -605,7 +605,7 @@ describe('TmPipelineStack', () => {
     expect(JSON.stringify(subs)).not.toContain(':ref:refs/heads/');
   });
 
-  test('S3 source with org/repo IDs trusts the immutable-ID subject', () => {
+  test('S3 source with org/repo IDs trusts both the name and immutable-ID subjects', () => {
     const app = new cdk.App({ context: context() });
     const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
       env: { account: ACCOUNT, region: 'ca-central-1' },
@@ -629,15 +629,15 @@ describe('TmPipelineStack', () => {
       JSON.stringify(r).includes('token.actions.githubusercontent.com:sub'))!;
     const subs = role.Properties.AssumeRolePolicyDocument.Statement
       .flatMap((s: any) => s.Condition?.StringLike?.['token.actions.githubusercontent.com:sub'] ?? []);
-    // The IDs are woven into both the owner and repo segments, matching the
-    // subject GitHub mints when "Use repository and organization IDs in the
-    // OIDC subject claim" is enabled at the org.
+    // Both forms are trusted per repo, because the immutable-ID setting is
+    // per-repository: a repo may mint either form, and this must keep working
+    // if the setting is toggled on one repo and not the other.
     expect(subs).toEqual([
+      'repo:toumoro/example-infra:environment:prod',
       'repo:toumoro@31484438/example-infra@1400546627:environment:prod',
+      'repo:toumoro/example-app:environment:prod',
       'repo:toumoro@31484438/example-app@1192814898:environment:prod',
     ]);
-    // The plain name-based subject must NOT be trusted in ID mode.
-    expect(JSON.stringify(subs)).not.toContain('repo:toumoro/example-infra:');
   });
 });
 

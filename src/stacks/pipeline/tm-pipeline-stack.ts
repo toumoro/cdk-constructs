@@ -217,33 +217,33 @@ export class TmPipelineStack extends cdk.Stack {
     // Reference the pre-existing GitHub OIDC provider by ARN (do not create one).
     const githubOidcProviderArn = `arn:aws:iam::${cdk.Aws.ACCOUNT_ID}:oidc-provider/token.actions.githubusercontent.com`;
 
-    // The OIDC token's `sub` claim depends on how the workflow runs. A job
-    // scoped to a GitHub Environment (`environment: <name>`) mints
-    // `repo:<owner/repo>:environment:<name>`; a plain job on a branch mints
-    // `repo:<owner/repo>:ref:refs/heads/<branch>`. The trust must match the one
-    // the workflow actually produces, so pick the subject form from
-    // `sourceEnvironment`.
-    //
-    // When the org enables "Use repository and organization IDs in the OIDC
-    // subject claim", GitHub embeds numeric IDs INTO the owner and repo
-    // segments: `repo:<owner>@<orgId>/<repo>@<repoId>:...`. If the three ID
-    // fields are set we build that immutable form; otherwise we keep the
-    // name-based form. The IDs are an all-or-nothing set per repo.
-    const idSubjectsEnabled =
+    // When an org (or an individual repository) enables "Use repository and
+    // organization IDs in the OIDC subject claim", GitHub embeds numeric IDs
+    // INTO the owner and repo segments: `repo:<owner>@<orgId>/<repo>@<repoId>:`.
+    // This setting is per-REPOSITORY, so two source repos can mint different
+    // forms (verified: the infra repo sends the ID form while the app repo
+    // sends the name form). To be correct regardless of each repo's setting —
+    // and to survive it being toggled later — we trust BOTH the name-based and
+    // the ID-based subject for every repo when the IDs are supplied.
+    const idSubjectsAvailable =
       !!githubOrgId && !!infrastructureGithubRepoId && !!applicationGithubRepoId;
 
-    // `repo` is 'owner/repo'; `repoId` is that repository's numeric id. When ID
-    // subjects are enabled we rewrite 'owner/repo' into 'owner@<orgId>/repo@<repoId>'.
-    const subjectFor = (repo: string, repoId?: string): string => {
-      const identity = idSubjectsEnabled
-        ? (() => {
-          const [owner, name] = repo.split('/');
-          return `${owner}@${githubOrgId}/${name}@${repoId}`;
-        })()
-        : repo;
-      return sourceEnvironment
-        ? `repo:${identity}:environment:${sourceEnvironment}`
-        : `repo:${identity}:ref:refs/heads/${sourceBranch}`;
+    // The suffix is the same for both forms: a GitHub Environment job mints
+    // `...:environment:<name>`, a plain branch job `...:ref:refs/heads/<branch>`.
+    const suffix = sourceEnvironment
+      ? `:environment:${sourceEnvironment}`
+      : `:ref:refs/heads/${sourceBranch}`;
+
+    // Returns every subject a repo may legitimately mint: the name-based form
+    // always, plus the immutable-ID form when IDs are known. `repo` is
+    // 'owner/repo'; `repoId` is that repository's numeric id.
+    const subjectsFor = (repo: string, repoId?: string): string[] => {
+      const subjects = [`repo:${repo}${suffix}`];
+      if (idSubjectsAvailable && repoId) {
+        const [owner, name] = repo.split('/');
+        subjects.push(`repo:${owner}@${githubOrgId}/${name}@${repoId}${suffix}`);
+      }
+      return subjects;
     };
 
     const githubActionsRole = new iam.Role(this, 'GitHubActionsPipelineUploadRole', {
@@ -255,8 +255,8 @@ export class TmPipelineStack extends cdk.Stack {
           },
           StringLike: {
             'token.actions.githubusercontent.com:sub': [
-              subjectFor(infrastructureGithubRepo, infrastructureGithubRepoId),
-              subjectFor(applicationGithubRepo, applicationGithubRepoId),
+              ...subjectsFor(infrastructureGithubRepo, infrastructureGithubRepoId),
+              ...subjectsFor(applicationGithubRepo, applicationGithubRepoId),
             ],
           },
         },

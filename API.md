@@ -22990,12 +22990,12 @@ public readonly applicationGithubRepoId: string;
 ```
 
 - *Type:* string
-- *Default:* unset; the name-based subject is used
+- *Default:* unset; only the name-based subject is trusted
 
 `S3` source only: numeric repository ID of the application repository.
 
 Used
-with `githubOrgId` to build the immutable-ID OIDC trust subject. See
+with `githubOrgId` to also trust the immutable-ID OIDC trust subject. See
 `githubOrgId`.
 
 ---
@@ -23035,21 +23035,23 @@ public readonly githubOrgId: string;
 ```
 
 - *Type:* string
-- *Default:* unset; the name-based subject is used
+- *Default:* unset; only the name-based subject is trusted
 
 `S3` source only: the GitHub organization's numeric ID.
 
 Set this together
-with `infrastructureGithubRepoId` and `applicationGithubRepoId` when the
-org has "Use repository and organization IDs in the OIDC subject claim"
-enabled. GitHub then mints an immutable-ID subject
+with `infrastructureGithubRepoId` and `applicationGithubRepoId` when a
+repository has "Use repository and organization IDs in the OIDC subject
+claim" enabled. GitHub then mints an immutable-ID subject
 `repo:<owner>@<orgId>/<repo>@<repoId>:environment:<name>` instead of the
-name-based `repo:<owner/repo>:...`, and the trust policy must match that
-exact form or AssumeRole is denied.
+name-based `repo:<owner/repo>:...`.
 
-All three ID fields must be set together; if any is missing the trust falls
-back to the name-based subject built from `infrastructureGithubRepo` /
-`applicationGithubRepo`.
+This setting is per-REPOSITORY, so the two source repos may mint different
+forms. When the IDs are set the trust policy trusts BOTH the name-based and
+the ID-based subject for every repo, so it is correct whichever form each
+repo produces and keeps working if the setting is toggled later. All three
+ID fields must be set together; if any is missing only the name-based
+subject is trusted.
 
 ---
 
@@ -23075,12 +23077,12 @@ public readonly infrastructureGithubRepoId: string;
 ```
 
 - *Type:* string
-- *Default:* unset; the name-based subject is used
+- *Default:* unset; only the name-based subject is trusted
 
 `S3` source only: numeric repository ID of the infrastructure repository.
 
-Used with `githubOrgId` to build the immutable-ID OIDC trust subject. See
-`githubOrgId`.
+Used with `githubOrgId` to also trust the immutable-ID OIDC trust subject.
+See `githubOrgId`.
 
 ---
 
