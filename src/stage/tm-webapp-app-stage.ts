@@ -257,6 +257,7 @@ export class TmWebappAppStage extends cdk.Stage {
       targetMemoryUtilizationPercent: params.ecs.targetMemoryUtilizationPercent,
       scheduledTasksCommand: params.ecs.scheduledTasksCommand,
       deploymentHookCommand: params.ecs.deploymentHookCommand,
+      fixEfsAssetsOwnership: params.ecs.fixEfsAssetsOwnership,
     });
     this.ecsStack.addStackDependency(this.rdsStack);
     this.ecsStack.addStackDependency(this.redisStack);
@@ -405,6 +406,8 @@ export class TmWebappAppStage extends cdk.Stage {
       containerTopology,
       webDockerfile: params.ecs.webDockerfile ?? defaults.web,
       phpFpmDockerfile: containerTopology === ContainerTopology.SINGLE ? undefined : (params.ecs.phpFpmDockerfile ?? defaults.fpm),
+      webBuildTarget: params.ecs.webBuildTarget,
+      phpFpmBuildTarget: containerTopology === ContainerTopology.SINGLE ? undefined : params.ecs.phpFpmBuildTarget,
     };
   }
 

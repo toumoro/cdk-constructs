@@ -44,6 +44,13 @@ export interface TmPhpFpmContainerOptions {
   readonly buildContainerArgs?: { [key: string]: string };
 
   /**
+   * The Docker build target stage.
+   *
+   * @default - the Dockerfile's last stage
+   */
+  readonly buildTarget?: string;
+
+  /**
    * The container name.
    *
    * @default 'php-fpm'
@@ -161,6 +168,12 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * The build container args.
   */
   readonly buildContainerArgs?: { [key: string]: string };
+  /**
+  * The Docker build target stage of the web container.
+  *
+  * @default - the Dockerfile's last stage
+  */
+  readonly buildTarget?: string;
   /*
   * The secrets to pass to the container.
   */
@@ -321,6 +334,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       //file: 'docker/Dockerfile',
       directory: props.buildContextPath,
       file: props.buildDockerfile,
+      target: props.buildTarget,
       buildArgs: props.buildContainerArgs,
       followSymlinks: cdk.SymlinkFollowMode.ALWAYS,
     });
@@ -373,6 +387,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
       const fpmImageAsset = new ecr_assets.DockerImageAsset(this, 'PhpFpmImage', {
         directory: fpm.buildContextPath,
         file: fpm.buildDockerfile,
+        target: fpm.buildTarget,
         buildArgs: fpm.buildContainerArgs,
         followSymlinks: cdk.SymlinkFollowMode.ALWAYS,
       });

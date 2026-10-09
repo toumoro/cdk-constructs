@@ -180,6 +180,33 @@ export interface EcsSettings {
   readonly phpFpmDockerfile?: string;
 
   /**
+   * Docker build target stage of the `web` container. Set it to build a
+   * specific stage of the Dockerfile (new stages can be added later).
+   *
+   * @default - the Dockerfile's last stage
+   */
+  readonly webBuildTarget?: string;
+
+  /**
+   * Docker build target stage of the `php-fpm` container. Ignored with the
+   * SINGLE topology.
+   *
+   * @default - the Dockerfile's last stage
+   */
+  readonly phpFpmBuildTarget?: string;
+
+  /**
+   * Prepends a `chown` of the EFS `typo3temp/assets` mount (to uid/gid 33,
+   * www-data) to the post-deploy hook command. ECS creates the mount's
+   * intermediate directories as root, so www-data cannot write under them;
+   * this fixes the ownership once per deploy (idempotent). Off by default so
+   * the deployment-hook command of existing environments is unchanged.
+   *
+   * @default false
+   */
+  readonly fixEfsAssetsOwnership?: boolean;
+
+  /**
    * Task CPU units. With two containers, the web container gets a quarter.
    *
    * @default 1024

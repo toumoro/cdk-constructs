@@ -127,6 +127,25 @@ describe('TmWebappAppStage, greenfield settings', () => {
     const hook = Object.values(template.findResources('AWS::Lambda::Function')).find(r =>
       JSON.stringify(r).includes('ECS deployment hook triggered'));
     expect(JSON.stringify(hook)).toContain("const containerName = 'php-fpm'");
+    // By default (fixEfsAssetsOwnership off) the hook command is unchanged:
+    // the plain deployment-hook script, no chown wrapper.
+    const hookCode = JSON.stringify(hook);
+    expect(hookCode).toContain('/usr/local/bin/deployment-hook.sh');
+    expect(hookCode).not.toContain('chown');
+  });
+
+  test('fixEfsAssetsOwnership prepends a chown of the EFS assets mount to the hook', () => {
+    const stageWithChown = synthStage({
+      ...greenfield,
+      ecs: { ...greenfield.ecs, fixEfsAssetsOwnership: true },
+    });
+    const template = Template.fromStack(stageWithChown.ecsStack);
+    const hook = Object.values(template.findResources('AWS::Lambda::Function')).find(r =>
+      JSON.stringify(r).includes('ECS deployment hook triggered'));
+    const hookCode = JSON.stringify(hook);
+    expect(hookCode).toContain('chown -R 33:33 /var/www/public/typo3temp/assets');
+    expect(hookCode).toContain('/usr/local/bin/deployment-hook.sh');
+    expect(hookCode).toContain('/bin/sh');
   });
 
   test('passes the stage outputs to the containers', () => {

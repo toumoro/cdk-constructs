@@ -73,6 +73,29 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly phpFpmDockerfile?: string;
 
   /**
+   * Docker build target stage of the `web` container.
+   *
+   * @default - the Dockerfile's last stage
+   */
+  readonly webBuildTarget?: string;
+
+  /**
+   * Docker build target stage of the `php-fpm` container.
+   *
+   * @default - the Dockerfile's last stage
+   */
+  readonly phpFpmBuildTarget?: string;
+
+  /**
+   * Prepends a `chown` of the EFS `typo3temp/assets` mount (uid/gid 33) to the
+   * post-deploy hook command. Off by default so the hook command of existing
+   * environments is unchanged.
+   *
+   * @default false
+   */
+  readonly fixEfsAssetsOwnership?: boolean;
+
+  /**
    * SSM parameter holding the secret header value sent by CloudFront.
    */
   readonly originCustomHeaderParameterName: string;
@@ -276,6 +299,22 @@ export class TmEcsStack extends cdk.Stack {
     const twoContainers = topology !== ContainerTopology.SINGLE;
     const commandContainer = twoContainers ? 'php-fpm' : 'web';
 
+    // The one-off post-deploy task runs on a container that mounts the EFS
+    // `assets` volume. ECS creates the mount's intermediate directories as
+    // root, so www-data (uid/gid 33) cannot write under them. When
+    // `fixEfsAssetsOwnership` is set, the hook fixes the ownership of the EFS
+    // mount (idempotent) before running the repository's deployment hook. Off
+    // by default, so the hook command of existing environments is unchanged.
+    const assetsPath = `${documentRoot}/typo3temp/assets`;
+    const deploymentHookCommand = props.deploymentHookCommand ?? ['/usr/local/bin/deployment-hook.sh'];
+    const deploymentHookWithChown = props.fixEfsAssetsOwnership
+      ? [
+        '/bin/sh',
+        '-c',
+        `chown -R 33:33 ${assetsPath} && exec ${deploymentHookCommand.map(shellQuote).join(' ')}`,
+      ]
+      : deploymentHookCommand;
+
     const patternsProps: TmApplicationLoadBalancedFargateServiceProps = {
       vpc,
       cpu,
@@ -293,12 +332,13 @@ export class TmEcsStack extends cdk.Stack {
       secrets,
       buildContextPath: props.buildContextPath,
       buildDockerfile: props.webDockerfile,
+      buildTarget: props.webBuildTarget,
       scheduledTasksCommand: props.scheduledTasksCommand ?? '/usr/local/bin/run-scheduler.sh',
       scheduledTaskContainerName: commandContainer,
       efsVolumes,
       ecsDeploymentHookProps: {
         containerName: commandContainer,
-        command: props.deploymentHookCommand ?? ['/usr/local/bin/deployment-hook.sh'],
+        command: deploymentHookWithChown,
       },
       ...(twoContainers ? this.phpFpmProps(props, cpu, memoryLimitMiB) : {}),
     };
@@ -354,6 +394,7 @@ export class TmEcsStack extends cdk.Stack {
     const phpFpmContainer: TmPhpFpmContainerOptions = {
       buildContextPath: props.buildContextPath,
       buildDockerfile: props.phpFpmDockerfile,
+      buildTarget: props.phpFpmBuildTarget,
       cpu: cpu - webCpu,
       memoryLimitMiB: fpmMemoryLimitMiB,
       environment: {
@@ -432,4 +473,15 @@ export class TmEcsStack extends cdk.Stack {
 
     return secrets;
   }
+}
+
+/**
+ * Single-quotes a shell argument so the deployment hook command survives being
+ * wrapped in `sh -c`. A command with no shell metacharacters is left as is.
+ */
+function shellQuote(argument: string): string {
+  if (/^[A-Za-z0-9_./-]+$/.test(argument)) {
+    return argument;
+  }
+  return `'${argument.replace(/'/g, "'\\''")}'`;
 }

@@ -22327,16 +22327,19 @@ const ecsSettings: EcsSettings = { ... }
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.deploymentHookCommand">deploymentHookCommand</a></code> | <code>string[]</code> | Command run in a one-off task after each deployment. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables passed to the containers. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.fixEfsAssetsOwnership">fixEfsAssetsOwnership</a></code> | <code>boolean</code> | Prepends a `chown` of the EFS `typo3temp/assets` mount (to uid/gid 33, www-data) to the post-deploy hook command. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.generatedSecrets">generatedSecrets</a></code> | <code>string[]</code> | Variables whose value CDK generates once and stores in Secrets Manager, never in the template nor in this file. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | Autoscaling upper bound. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Task memory in MiB. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | Autoscaling lower bound. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.phpFpmBuildTarget">phpFpmBuildTarget</a></code> | <code>string</code> | Docker build target stage of the `php-fpm` container. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.phpFpmDockerfile">phpFpmDockerfile</a></code> | <code>string</code> | Dockerfile of the `php-fpm` container, relative to the build context. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | Command of the scheduled task (every minute). |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.secretsFromSecretsManager">secretsFromSecretsManager</a></code> | <code>{[ key: string ]: <a href="#tm-cdk-constructs.TmSecretField">TmSecretField</a>}</code> | Variables read from Secrets Manager secret fields, as `{ VARIABLE: { secretArnParameterName, field } }`. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.secretsFromSsmParameterStore">secretsFromSsmParameterStore</a></code> | <code>string[]</code> | Hand-made SecureString parameters passed to the containers, by variable name. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the autoscaling policy. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.webBuildTarget">webBuildTarget</a></code> | <code>string</code> | Docker build target stage of the `web` container. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.webDockerfile">webDockerfile</a></code> | <code>string</code> | Dockerfile of the `web` container, relative to the build context. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.wireStageOutputs">wireStageOutputs</a></code> | <code>boolean</code> | Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the `TM_S3ASSETS_*` variables when FAL is on S3. |
 
@@ -22453,6 +22456,24 @@ Plain environment variables passed to the containers.
 
 ---
 
+##### `fixEfsAssetsOwnership`<sup>Optional</sup> <a name="fixEfsAssetsOwnership" id="tm-cdk-constructs.EcsSettings.property.fixEfsAssetsOwnership"></a>
+
+```typescript
+public readonly fixEfsAssetsOwnership: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Prepends a `chown` of the EFS `typo3temp/assets` mount (to uid/gid 33, www-data) to the post-deploy hook command.
+
+ECS creates the mount's
+intermediate directories as root, so www-data cannot write under them;
+this fixes the ownership once per deploy (idempotent). Off by default so
+the deployment-hook command of existing environments is unchanged.
+
+---
+
 ##### `generatedSecrets`<sup>Optional</sup> <a name="generatedSecrets" id="tm-cdk-constructs.EcsSettings.property.generatedSecrets"></a>
 
 ```typescript
@@ -22510,6 +22531,22 @@ public readonly minTaskCount: number;
 - *Default:* 1
 
 Autoscaling lower bound.
+
+---
+
+##### `phpFpmBuildTarget`<sup>Optional</sup> <a name="phpFpmBuildTarget" id="tm-cdk-constructs.EcsSettings.property.phpFpmBuildTarget"></a>
+
+```typescript
+public readonly phpFpmBuildTarget: string;
+```
+
+- *Type:* string
+- *Default:* the Dockerfile's last stage
+
+Docker build target stage of the `php-fpm` container.
+
+Ignored with the
+SINGLE topology.
 
 ---
 
@@ -22601,6 +22638,22 @@ public readonly targetMemoryUtilizationPercent: number;
 - *Default:* 30
 
 Target memory utilization of the autoscaling policy.
+
+---
+
+##### `webBuildTarget`<sup>Optional</sup> <a name="webBuildTarget" id="tm-cdk-constructs.EcsSettings.property.webBuildTarget"></a>
+
+```typescript
+public readonly webBuildTarget: string;
+```
+
+- *Type:* string
+- *Default:* the Dockerfile's last stage
+
+Docker build target stage of the `web` container.
+
+Set it to build a
+specific stage of the Dockerfile (new stages can be added later).
 
 ---
 
@@ -23556,6 +23609,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildTarget">buildTarget</a></code> | <code>string</code> | The Docker build target stage of the web container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerCommand">containerCommand</a></code> | <code>string[]</code> | Command of the web container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerEntryPoint">containerEntryPoint</a></code> | <code>string[]</code> | Entry point of the web container. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
@@ -24256,6 +24310,19 @@ public readonly buildContainerArgs: {[ key: string ]: string};
 ```
 
 - *Type:* {[ key: string ]: string}
+
+---
+
+##### `buildTarget`<sup>Optional</sup> <a name="buildTarget" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.buildTarget"></a>
+
+```typescript
+public readonly buildTarget: string;
+```
+
+- *Type:* string
+- *Default:* the Dockerfile's last stage
+
+The Docker build target stage of the web container.
 
 ---
 
@@ -26762,11 +26829,13 @@ const tmEcsStackProps: TmEcsStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.falEfsDirectories">falEfsDirectories</a></code> | <code>string[]</code> | FAL directories stored on EFS, relative to the document root. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.fixEfsAssetsOwnership">fixEfsAssetsOwnership</a></code> | <code>boolean</code> | Prepends a `chown` of the EFS `typo3temp/assets` mount (uid/gid 33) to the post-deploy hook command. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.generatedSecrets">generatedSecrets</a></code> | <code>string[]</code> | Variables whose value CDK generates once and stores in Secrets Manager, never in the template. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of reading it from a pre-seeded SSM parameter. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | Autoscaling upper bound. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Task memory in MiB. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | Autoscaling lower bound. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.phpFpmBuildTarget">phpFpmBuildTarget</a></code> | <code>string</code> | Docker build target stage of the `php-fpm` container. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.phpFpmDockerfile">phpFpmDockerfile</a></code> | <code>string</code> | Dockerfile of the `php-fpm` container. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | Command of the scheduled task (every minute). |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.secretsFromSecretsManager">secretsFromSecretsManager</a></code> | <code>{[ key: string ]: <a href="#tm-cdk-constructs.TmSecretField">TmSecretField</a>}</code> | Variables read from Secrets Manager secret fields. |
@@ -26774,6 +26843,7 @@ const tmEcsStackProps: TmEcsStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.solrSecurityGroupIdParameterName">solrSecurityGroupIdParameterName</a></code> | <code>string</code> | SSM parameter holding the Solr security group ID. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the autoscaling policy. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.webBuildTarget">webBuildTarget</a></code> | <code>string</code> | Docker build target stage of the `web` container. |
 
 ---
 
@@ -27183,6 +27253,22 @@ FAL directories stored on EFS, relative to the document root.
 
 ---
 
+##### `fixEfsAssetsOwnership`<sup>Optional</sup> <a name="fixEfsAssetsOwnership" id="tm-cdk-constructs.TmEcsStackProps.property.fixEfsAssetsOwnership"></a>
+
+```typescript
+public readonly fixEfsAssetsOwnership: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Prepends a `chown` of the EFS `typo3temp/assets` mount (uid/gid 33) to the post-deploy hook command.
+
+Off by default so the hook command of existing
+environments is unchanged.
+
+---
+
 ##### `generatedSecrets`<sup>Optional</sup> <a name="generatedSecrets" id="tm-cdk-constructs.TmEcsStackProps.property.generatedSecrets"></a>
 
 ```typescript
@@ -27256,6 +27342,19 @@ public readonly minTaskCount: number;
 - *Default:* 1
 
 Autoscaling lower bound.
+
+---
+
+##### `phpFpmBuildTarget`<sup>Optional</sup> <a name="phpFpmBuildTarget" id="tm-cdk-constructs.TmEcsStackProps.property.phpFpmBuildTarget"></a>
+
+```typescript
+public readonly phpFpmBuildTarget: string;
+```
+
+- *Type:* string
+- *Default:* the Dockerfile's last stage
+
+Docker build target stage of the `php-fpm` container.
 
 ---
 
@@ -27355,6 +27454,19 @@ Target memory utilization of the autoscaling policy.
 
 ---
 
+##### `webBuildTarget`<sup>Optional</sup> <a name="webBuildTarget" id="tm-cdk-constructs.TmEcsStackProps.property.webBuildTarget"></a>
+
+```typescript
+public readonly webBuildTarget: string;
+```
+
+- *Type:* string
+- *Default:* the Dockerfile's last stage
+
+Docker build target stage of the `web` container.
+
+---
+
 ### TmPhpFpmContainerOptions <a name="TmPhpFpmContainerOptions" id="tm-cdk-constructs.TmPhpFpmContainerOptions"></a>
 
 A php-fpm container added to the task, next to the web container.
@@ -27374,6 +27486,7 @@ const tmPhpFpmContainerOptions: TmPhpFpmContainerOptions = { ... }
 | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildContextPath">buildContextPath</a></code> | <code>string</code> | The build context path. |
 | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildDockerfile">buildDockerfile</a></code> | <code>string</code> | The build dockerfile, relative to the build context. |
 | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildContainerArgs">buildContainerArgs</a></code> | <code>{[ key: string ]: string}</code> | The build container args. |
+| <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildTarget">buildTarget</a></code> | <code>string</code> | The Docker build target stage. |
 | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.containerName">containerName</a></code> | <code>string</code> | The container name. |
 | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.containerPort">containerPort</a></code> | <code>number</code> | The port php-fpm listens on. |
 | <code><a href="#tm-cdk-constructs.TmPhpFpmContainerOptions.property.cpu">cpu</a></code> | <code>number</code> | CPU units reserved for the container. |
@@ -27416,6 +27529,19 @@ public readonly buildContainerArgs: {[ key: string ]: string};
 - *Default:* no build args
 
 The build container args.
+
+---
+
+##### `buildTarget`<sup>Optional</sup> <a name="buildTarget" id="tm-cdk-constructs.TmPhpFpmContainerOptions.property.buildTarget"></a>
+
+```typescript
+public readonly buildTarget: string;
+```
+
+- *Type:* string
+- *Default:* the Dockerfile's last stage
+
+The Docker build target stage.
 
 ---
 
