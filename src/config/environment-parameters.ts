@@ -633,6 +633,41 @@ export interface PipelineSettings {
    * @default - unset; the trust uses the branch form with `sourceBranch`
    */
   readonly sourceEnvironment?: string;
+
+  /**
+   * `S3` source only: the GitHub organization's numeric ID. Set this together
+   * with `infrastructureGithubRepoId` and `applicationGithubRepoId` when the
+   * org has "Use repository and organization IDs in the OIDC subject claim"
+   * enabled. GitHub then mints an immutable-ID subject
+   * `repo:<owner>@<orgId>/<repo>@<repoId>:environment:<name>` instead of the
+   * name-based `repo:<owner/repo>:...`, and the trust policy must match that
+   * exact form or AssumeRole is denied.
+   *
+   * All three ID fields must be set together; if any is missing the trust falls
+   * back to the name-based subject built from `infrastructureGithubRepo` /
+   * `applicationGithubRepo`.
+   *
+   * @default - unset; the name-based subject is used
+   */
+  readonly githubOrgId?: string;
+
+  /**
+   * `S3` source only: numeric repository ID of the infrastructure repository.
+   * Used with `githubOrgId` to build the immutable-ID OIDC trust subject. See
+   * `githubOrgId`.
+   *
+   * @default - unset; the name-based subject is used
+   */
+  readonly infrastructureGithubRepoId?: string;
+
+  /**
+   * `S3` source only: numeric repository ID of the application repository. Used
+   * with `githubOrgId` to build the immutable-ID OIDC trust subject. See
+   * `githubOrgId`.
+   *
+   * @default - unset; the name-based subject is used
+   */
+  readonly applicationGithubRepoId?: string;
 }
 
 /**

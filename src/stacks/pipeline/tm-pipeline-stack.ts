@@ -207,6 +207,9 @@ export class TmPipelineStack extends cdk.Stack {
     }
     const sourceBranch = pipelineSettings.sourceBranch ?? 'prod';
     const sourceEnvironment = pipelineSettings.sourceEnvironment;
+    const githubOrgId = pipelineSettings.githubOrgId;
+    const infrastructureGithubRepoId = pipelineSettings.infrastructureGithubRepoId;
+    const applicationGithubRepoId = pipelineSettings.applicationGithubRepoId;
 
     const infraSourceBucket = this.sourceBucket('InfraSourceBucket', removalPolicy);
     const appSourceBucket = this.sourceBucket('AppSourceBucket', removalPolicy);
@@ -220,10 +223,28 @@ export class TmPipelineStack extends cdk.Stack {
     // `repo:<owner/repo>:ref:refs/heads/<branch>`. The trust must match the one
     // the workflow actually produces, so pick the subject form from
     // `sourceEnvironment`.
-    const subjectFor = (repo: string): string =>
-      sourceEnvironment
-        ? `repo:${repo}:environment:${sourceEnvironment}`
-        : `repo:${repo}:ref:refs/heads/${sourceBranch}`;
+    //
+    // When the org enables "Use repository and organization IDs in the OIDC
+    // subject claim", GitHub embeds numeric IDs INTO the owner and repo
+    // segments: `repo:<owner>@<orgId>/<repo>@<repoId>:...`. If the three ID
+    // fields are set we build that immutable form; otherwise we keep the
+    // name-based form. The IDs are an all-or-nothing set per repo.
+    const idSubjectsEnabled =
+      !!githubOrgId && !!infrastructureGithubRepoId && !!applicationGithubRepoId;
+
+    // `repo` is 'owner/repo'; `repoId` is that repository's numeric id. When ID
+    // subjects are enabled we rewrite 'owner/repo' into 'owner@<orgId>/repo@<repoId>'.
+    const subjectFor = (repo: string, repoId?: string): string => {
+      const identity = idSubjectsEnabled
+        ? (() => {
+          const [owner, name] = repo.split('/');
+          return `${owner}@${githubOrgId}/${name}@${repoId}`;
+        })()
+        : repo;
+      return sourceEnvironment
+        ? `repo:${identity}:environment:${sourceEnvironment}`
+        : `repo:${identity}:ref:refs/heads/${sourceBranch}`;
+    };
 
     const githubActionsRole = new iam.Role(this, 'GitHubActionsPipelineUploadRole', {
       assumedBy: new iam.FederatedPrincipal(
@@ -234,8 +255,8 @@ export class TmPipelineStack extends cdk.Stack {
           },
           StringLike: {
             'token.actions.githubusercontent.com:sub': [
-              subjectFor(infrastructureGithubRepo),
-              subjectFor(applicationGithubRepo),
+              subjectFor(infrastructureGithubRepo, infrastructureGithubRepoId),
+              subjectFor(applicationGithubRepo, applicationGithubRepoId),
             ],
           },
         },

@@ -604,6 +604,41 @@ describe('TmPipelineStack', () => {
     // be trusted (the token never carries it).
     expect(JSON.stringify(subs)).not.toContain(':ref:refs/heads/');
   });
+
+  test('S3 source with org/repo IDs trusts the immutable-ID subject', () => {
+    const app = new cdk.App({ context: context() });
+    const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: {
+        ...greenfield,
+        pipeline: {
+          sourceType: PipelineSourceType.S3,
+          infrastructureGithubRepo: 'toumoro/example-infra',
+          applicationGithubRepo: 'toumoro/example-app',
+          sourceBranch: 'prod',
+          sourceEnvironment: 'prod',
+          githubOrgId: '31484438',
+          infrastructureGithubRepoId: '1400546627',
+          applicationGithubRepoId: '1192814898',
+        },
+      },
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    });
+    const template = Template.fromStack(pipeline);
+    const role = Object.values(template.findResources('AWS::IAM::Role')).find(r =>
+      JSON.stringify(r).includes('token.actions.githubusercontent.com:sub'))!;
+    const subs = role.Properties.AssumeRolePolicyDocument.Statement
+      .flatMap((s: any) => s.Condition?.StringLike?.['token.actions.githubusercontent.com:sub'] ?? []);
+    // The IDs are woven into both the owner and repo segments, matching the
+    // subject GitHub mints when "Use repository and organization IDs in the
+    // OIDC subject claim" is enabled at the org.
+    expect(subs).toEqual([
+      'repo:toumoro@31484438/example-infra@1400546627:environment:prod',
+      'repo:toumoro@31484438/example-app@1192814898:environment:prod',
+    ]);
+    // The plain name-based subject must NOT be trusted in ID mode.
+    expect(JSON.stringify(subs)).not.toContain('repo:toumoro/example-infra:');
+  });
 });
 
 describe('TmEnvironmentParameters.select', () => {

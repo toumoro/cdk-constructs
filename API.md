@@ -22955,9 +22955,12 @@ const pipelineSettings: PipelineSettings = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.applicationGithubRepo">applicationGithubRepo</a></code> | <code>string</code> | `S3` source only: GitHub `owner/repo` of the application repository, used in the OIDC trust subject so only its CI can upload the application source. |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.applicationGithubRepoId">applicationGithubRepoId</a></code> | <code>string</code> | `S3` source only: numeric repository ID of the application repository. |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.applicationRepositoryName">applicationRepositoryName</a></code> | <code>string</code> | CodeCommit repository holding the application, cloned into the build context. |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.branchNameParameterName">branchNameParameterName</a></code> | <code>string</code> | SSM parameter holding the branch both repositories are deployed from. |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.githubOrgId">githubOrgId</a></code> | <code>string</code> | `S3` source only: the GitHub organization's numeric ID. |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.infrastructureGithubRepo">infrastructureGithubRepo</a></code> | <code>string</code> | `S3` source only: GitHub `owner/repo` of the infrastructure repository, used in the OIDC trust subject so only its CI can upload the infrastructure source. |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.infrastructureGithubRepoId">infrastructureGithubRepoId</a></code> | <code>string</code> | `S3` source only: numeric repository ID of the infrastructure repository. |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.infrastructureRepositoryName">infrastructureRepositoryName</a></code> | <code>string</code> | CodeCommit repository holding the infrastructure code. |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.sourceBranch">sourceBranch</a></code> | <code>string</code> | `S3` source only: the git branch CI uploads from, allowed to assume the OIDC upload role (`refs/heads/<sourceBranch>` in the trust subject). |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.sourceEnvironment">sourceEnvironment</a></code> | <code>string</code> | `S3` source only: the name of the GitHub Environment whose OIDC token may assume the upload role. |
@@ -22977,6 +22980,23 @@ public readonly applicationGithubRepo: string;
 `S3` source only: GitHub `owner/repo` of the application repository, used in the OIDC trust subject so only its CI can upload the application source.
 
 Required when `sourceType` is `S3`.
+
+---
+
+##### `applicationGithubRepoId`<sup>Optional</sup> <a name="applicationGithubRepoId" id="tm-cdk-constructs.PipelineSettings.property.applicationGithubRepoId"></a>
+
+```typescript
+public readonly applicationGithubRepoId: string;
+```
+
+- *Type:* string
+- *Default:* unset; the name-based subject is used
+
+`S3` source only: numeric repository ID of the application repository.
+
+Used
+with `githubOrgId` to build the immutable-ID OIDC trust subject. See
+`githubOrgId`.
 
 ---
 
@@ -23008,6 +23028,31 @@ Only read for the CodeCommit source.
 
 ---
 
+##### `githubOrgId`<sup>Optional</sup> <a name="githubOrgId" id="tm-cdk-constructs.PipelineSettings.property.githubOrgId"></a>
+
+```typescript
+public readonly githubOrgId: string;
+```
+
+- *Type:* string
+- *Default:* unset; the name-based subject is used
+
+`S3` source only: the GitHub organization's numeric ID.
+
+Set this together
+with `infrastructureGithubRepoId` and `applicationGithubRepoId` when the
+org has "Use repository and organization IDs in the OIDC subject claim"
+enabled. GitHub then mints an immutable-ID subject
+`repo:<owner>@<orgId>/<repo>@<repoId>:environment:<name>` instead of the
+name-based `repo:<owner/repo>:...`, and the trust policy must match that
+exact form or AssumeRole is denied.
+
+All three ID fields must be set together; if any is missing the trust falls
+back to the name-based subject built from `infrastructureGithubRepo` /
+`applicationGithubRepo`.
+
+---
+
 ##### `infrastructureGithubRepo`<sup>Optional</sup> <a name="infrastructureGithubRepo" id="tm-cdk-constructs.PipelineSettings.property.infrastructureGithubRepo"></a>
 
 ```typescript
@@ -23020,6 +23065,22 @@ public readonly infrastructureGithubRepo: string;
 `S3` source only: GitHub `owner/repo` of the infrastructure repository, used in the OIDC trust subject so only its CI can upload the infrastructure source.
 
 Required when `sourceType` is `S3`.
+
+---
+
+##### `infrastructureGithubRepoId`<sup>Optional</sup> <a name="infrastructureGithubRepoId" id="tm-cdk-constructs.PipelineSettings.property.infrastructureGithubRepoId"></a>
+
+```typescript
+public readonly infrastructureGithubRepoId: string;
+```
+
+- *Type:* string
+- *Default:* unset; the name-based subject is used
+
+`S3` source only: numeric repository ID of the infrastructure repository.
+
+Used with `githubOrgId` to build the immutable-ID OIDC trust subject. See
+`githubOrgId`.
 
 ---
 
