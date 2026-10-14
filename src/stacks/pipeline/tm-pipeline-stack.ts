@@ -131,6 +131,10 @@ export class TmPipelineStack extends cdk.Stack {
     this.pipeline = new pipelines.CodePipeline(this, 'TmPipelineStack', {
       crossAccountKeys: true,
       pipelineName: 'TmPipelineStack',
+      // Deploy stacks with a single CloudFormation action instead of the
+      // default two-action Prepare (CreateChangeSet) + Deploy (ExecuteChangeSet)
+      // pair. This drops the extra "Prepare" step from every stage.
+      useChangeSets: false,
       synth: new pipelines.CodeBuildStep('Synth', {
         input: synthInput,
         additionalInputs: synthAdditionalInputs,
