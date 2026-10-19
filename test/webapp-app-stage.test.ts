@@ -482,7 +482,7 @@ describe('TmWebappAppStage, CloudFront VPC origin (vpcOrigin opt-in)', () => {
     const template = Template.fromStack(stage.cloudfrontStack!);
     template.hasResourceProperties('AWS::CloudFront::VpcOrigin', {
       VpcOriginEndpointConfig: Match.objectLike({
-        Name: 'tm-prod-www',
+        Name: Match.stringLikeRegexp('ServiceVpcOrigin'),
         Arn: { Ref: Match.stringLikeRegexp('tmprodecsvpcoriginloadbalancerarn') },
         HTTPSPort: 443,
         OriginProtocolPolicy: 'https-only',
@@ -583,6 +583,25 @@ describe('TmWebappAppStage, no-downtime migration to the VPC origin (vpcOriginBr
     expect(JSON.stringify(arn.Properties.Value)).not.toContain('VpcOriginBridge');
     // One certificate shared by both HTTPS listeners.
     ecs.resourceCountIs('AWS::CertificateManager::Certificate', 1);
+  });
+
+  test('step 1 to step 2 creates a new VPC origin instead of modifying the one in use', () => {
+    const vpcOrigins = (cloudfront: object) => {
+      const stage = synthStage({ ...greenfield, cloudfront: { ...withDomains, ...cloudfront } });
+      return Template.fromStack(stage.cloudfrontStack!).findResources('AWS::CloudFront::VpcOrigin');
+    };
+    const step1 = vpcOrigins({ vpcOriginBridge: true });
+    const step2 = vpcOrigins({ vpcOrigin: true, vpcOriginBridge: true });
+    const step3 = vpcOrigins({ vpcOrigin: true });
+    // CloudFront refuses to update a VPC origin associated with a distribution (409).
+    expect(Object.keys(step1)).toEqual([expect.stringMatching(/^BridgeVpcOrigin/)]);
+    expect(Object.keys(step2)).toEqual([expect.stringMatching(/^ServiceVpcOrigin/)]);
+    expect(step3).toEqual(step2);
+    const name = (resources: Record<string, any>) => Object.values(resources)[0].Properties.VpcOriginEndpointConfig.Name;
+    expect(name(step1)).not.toEqual(name(step2));
+    // Generated from the construct path: no collision between stages of one account.
+    expect(name(step2)).toMatch(/^AppStage/);
+    expect(name(step2).length).toBeLessThanOrEqual(64);
   });
 
   test('step 3: vpcOrigin alone removes the bridge', () => {

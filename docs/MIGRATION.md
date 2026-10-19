@@ -323,7 +323,7 @@ Expected `cdk diff` on the ECS stack (verified on epq):
 - `[+]` SSM `/tm/<env>/ecs/vpc-origin/load-balancer-arn` and
   `.../load-balancer-dns-name` → the bridge.
 
-Expected diff on the CloudFront stack: `[+] AWS::CloudFront::VpcOrigin`, and
+Expected diff on the CloudFront stack: `[+] BridgeVpcOrigin…` (`AWS::CloudFront::VpcOrigin`), and
 the distribution's origin loses `CustomOriginConfig` for `VpcOriginConfig`
 (in place). The old `ecs/load-balancer/dns-name` parameter is no longer read.
 
@@ -356,8 +356,16 @@ Expected diff on the ECS stack:
 - the public subnet parameters are no longer imported.
 
 CloudFormation creates the new load balancer before deleting the old one, and
-the bridge serves during the whole update. The CloudFront stack then repoints
-the VPC origin at the new ARN. Verify as in run 1; the public load balancer is
+the bridge serves during the whole update.
+
+Expected diff on the CloudFront stack: `[+] ServiceVpcOrigin…`,
+`[-] BridgeVpcOrigin…`, and the distribution's `VpcOriginId` changes in place.
+CloudFront refuses to modify a VPC origin that a distribution uses (`409 The
+specified VPC origin is currently associated with one or more distributions`),
+so the stack creates a second VPC origin on the service load balancer, moves
+the distribution to it, and deletes the bridge's VPC origin in the cleanup
+phase. Expect the stack to take a while: CloudFormation waits for the new VPC
+origin, then for the distribution, to be deployed. Verify as in run 1; the public load balancer is
 gone (`describe-load-balancers` lists two internal ones).
 
 ### 2.6 Run 3 — bridge down
@@ -391,6 +399,12 @@ because the pipeline deploys the ECS stack **before** the CloudFront stack:
 
 - **Cost of the migration:** one extra application load balancer for the
   duration of runs 1 to 3 (about 20 USD/month pro rata).
+- **A VPC origin cannot change while in use.** Each endpoint has its own
+  resource (`BridgeVpcOrigin`, `ServiceVpcOrigin`) with a name generated from
+  the construct path, unique per stage and account. Anything else that would
+  modify the VPC origin in place (its endpoint ARN, port or TLS protocols, for
+  example if the service load balancer is replaced for another reason) fails
+  with the same 409: give the VPC origin a new construct ID in that change.
 - **VPC origin ENIs** are created by CloudFront in the load balancer's subnets
   and carry VPC addresses, hence the "443 from the VPC CIDR" ingress rather
   than the origin-facing prefix list.

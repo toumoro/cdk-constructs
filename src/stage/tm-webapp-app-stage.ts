@@ -339,6 +339,7 @@ export class TmWebappAppStage extends cdk.Stage {
           ?? TmParameterNames.cloudfrontOriginCustomHeader(environmentName),
         // The bridge is a VPC origin endpoint too.
         vpcOrigin: cloudfront.vpcOrigin || cloudfront.vpcOriginBridge,
+        vpcOriginViaBridge: !cloudfront.vpcOrigin && cloudfront.vpcOriginBridge,
         basicAuth: cloudfront.basicAuth,
         basicAuthParameterName: cloudfront.basicAuthParameterName,
         webAcl: this.wafStack !== undefined,

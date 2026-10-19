@@ -54,6 +54,19 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
   readonly vpcOrigin?: boolean;
 
   /**
+   * The `vpc-origin` SSM parameters point at the migration bridge rather than
+   * the service load balancer (`vpcOriginBridge` without `vpcOrigin`).
+   *
+   * CloudFront refuses to modify a VPC origin while a distribution uses it, so
+   * each endpoint gets its own VPC origin resource: moving from the bridge to
+   * the service load balancer creates the new VPC origin, repoints the
+   * distribution, then deletes the old one.
+   *
+   * @default false
+   */
+  readonly vpcOriginViaBridge?: boolean;
+
+  /**
    * Protects the site with HTTP basic authentication.
    *
    * @default false
@@ -118,14 +131,15 @@ export class TmCloudfrontStack extends cdk.Stack {
     };
     const loadBalancerOrigin: cloudfront.IOrigin = props.vpcOrigin
       ? VpcOrigin.withVpcOrigin(
-        new cloudfront.VpcOrigin(this, 'LoadBalancerVpcOrigin', {
+        // One resource per endpoint (see vpcOriginViaBridge); the name is
+        // generated from the construct path, unique per stage and account.
+        new cloudfront.VpcOrigin(this, props.vpcOriginViaBridge ? 'BridgeVpcOrigin' : 'ServiceVpcOrigin', {
           // The endpoint is built from the published ARN and DNS name, so the
           // load balancer itself is not imported (that would need its
           // security group too, for nothing).
           endpoint: new LoadBalancerEndpoint(
             readParameter(this, TmParameterNames.ecsVpcOriginLoadBalancerArn(env)),
             readParameter(this, TmParameterNames.ecsVpcOriginLoadBalancerDnsName(env))),
-          vpcOriginName: `tm-${env}-www`,
           protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
           httpsPort: 443,
           originSslProtocols: [cloudfront.OriginSslPolicy.TLS_V1_2],
