@@ -23,7 +23,8 @@ export enum ContainerTopology {
  */
 export enum FalStorage {
   /**
-   * A content bucket, read by TYPO3 with the `TM_S3ASSETS_*` variables.
+   * A content bucket, read by TYPO3 through the extension selected by
+   * `FalSettings.s3Driver` (the `TM_S3ASSETS_*` variables by default).
    */
   S3 = 'S3',
   /**
@@ -84,4 +85,28 @@ export enum PipelineSourceType {
    * by an EventBridge rule. No CodeCommit mirror needed.
    */
   S3 = 'S3',
+}
+
+/**
+ * TYPO3 extension reading the FAL content bucket. Selects the variable names
+ * the stage passes to the containers.
+ */
+export enum FalS3Driver {
+  /**
+   * tm_s3assets (deprecated): `TM_S3ASSETS_BUCKET_NAME`, `TM_S3ASSETS_REGION`,
+   * `TM_S3ASSETS_DOMAIN` (the CDN domain), and with the S3 service user
+   * `TM_S3ASSETS_ACCESS_KEY_ID` / `TM_S3ASSETS_SECRET_KEY`.
+   */
+  TM_S3ASSETS = 'tm_s3assets',
+
+  /**
+   * aus_driver_amazon_s3: `TM_AUS_DRIVER_AMAZON_S3_BUCKET`,
+   * `TM_AUS_DRIVER_AMAZON_S3_REGION`, `TM_AUS_DRIVER_AMAZON_S3_PUBLIC_BASE_URL`
+   * (the CDN domain, without protocol), and with the S3 service user
+   * `TM_AUS_DRIVER_AMAZON_S3_KEY` / `TM_AUS_DRIVER_AMAZON_S3_SECRET`. Without
+   * the service user the key variables are not set and the driver falls back
+   * to the AWS SDK default credential chain, i.e. the ECS task role, which the
+   * stage then grants read/write on the content bucket.
+   */
+  AUS_DRIVER_AMAZON_S3 = 'aus_driver_amazon_s3',
 }

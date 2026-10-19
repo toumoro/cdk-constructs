@@ -106,6 +106,19 @@ export class TmParameterNames {
     return TmParameterNames.of(env, 'ecs', 'load-balancer', 'dns-name');
   }
 
+  /**
+   * ARN of the load balancer CloudFront reaches through its VPC origin: the
+   * bridge while it is the endpoint, otherwise the service's own.
+   */
+  public static ecsVpcOriginLoadBalancerArn(env: string): string {
+    return TmParameterNames.of(env, 'ecs', 'vpc-origin', 'load-balancer-arn');
+  }
+
+  /** DNS name of the load balancer behind the VPC origin (see `ecsVpcOriginLoadBalancerArn`). */
+  public static ecsVpcOriginLoadBalancerDnsName(env: string): string {
+    return TmParameterNames.of(env, 'ecs', 'vpc-origin', 'load-balancer-dns-name');
+  }
+
   /** FAL content bucket name. */
   public static s3ContentBucketName(env: string): string {
     return TmParameterNames.of(env, 's3', 'content-bucket', 'name');

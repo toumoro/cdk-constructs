@@ -1,4 +1,4 @@
-import { ContainerTopology, DistributionIdsFormat, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
+import { ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
 import { TmSecretField } from '../stacks/compute/tm-ecs-stack';
 
 export { TmSecretField } from '../stacks/compute/tm-ecs-stack';
@@ -102,6 +102,22 @@ export interface RedisSettings {
    * @default 0
    */
   readonly replicasPerNodeGroup?: number;
+
+  /**
+   * Cache engine, `redis` or `valkey`. ElastiCache upgrades a Redis OSS
+   * replication group to Valkey in place.
+   *
+   * @default 'redis'
+   */
+  readonly engine?: string;
+
+  /**
+   * Engine version, e.g. `7.1` for Redis OSS or `9.1` for Valkey. With
+   * `valkey`, a parameter group of the matching family (`valkey9`) is created.
+   *
+   * @default '7.1'
+   */
+  readonly engineVersion?: string;
 }
 
 /**
@@ -256,6 +272,24 @@ export interface EcsSettings {
   readonly targetMemoryUtilizationPercent?: number;
 
   /**
+   * Drops the memory target-tracking policy and scales on CPU only. A PHP-FPM
+   * task's memory utilization barely depends on the load, so a memory target
+   * either never triggers or scales out to `maxTaskCount` and stays there.
+   *
+   * @default false - both policies, as before
+   */
+  readonly disableMemoryScaling?: boolean;
+
+  /**
+   * Runs the tasks (service, deployment hook) in the private subnets with
+   * egress, without a public IP: only the load balancer is reachable. Turning
+   * it on is a rolling update of the service (no downtime).
+   *
+   * @default false - public subnets with a public IP, as before
+   */
+  readonly tasksInPrivateSubnets?: boolean;
+
+  /**
    * Application name used in the secrets path `/applications/<name>/secrets/`.
    *
    * @default 'tm'
@@ -313,8 +347,8 @@ export interface EcsSettings {
 
   /**
    * Passes the values produced by the other stacks of the stage to the
-   * containers: database and Redis endpoints, and the `TM_S3ASSETS_*`
-   * variables when FAL is on S3.
+   * containers: database and Redis endpoints, and the S3 FAL variables
+   * (`FalSettings.s3Driver`) when FAL is on S3.
    *
    * @default true
    */
@@ -365,6 +399,14 @@ export interface FalSettings {
    * @default ['fileadmin']
    */
   readonly efsDirectories?: string[];
+
+  /**
+   * With `FalStorage.S3`, the TYPO3 extension reading the content bucket. It
+   * selects the variable names passed to the containers (see `FalS3Driver`).
+   *
+   * @default FalS3Driver.TM_S3ASSETS
+   */
+  readonly s3Driver?: FalS3Driver;
 }
 
 /**
@@ -404,6 +446,44 @@ export interface CloudfrontSettings {
    * @default false
    */
   readonly createCertificate?: boolean;
+
+  /**
+   * Connects the distributions to the load balancer through a CloudFront VPC
+   * origin over HTTPS (port 443) instead of a public load balancer over HTTP.
+   *
+   * When true, the ECS stack creates an INTERNAL load balancer in the private
+   * subnets, with an HTTPS listener and an ACM certificate (DNS validation,
+   * same CNAME as the us-east-1 certificate of the same domain) covering the
+   * www domains, publishes its ARN in SSM, and the CloudFront stack reaches it
+   * through a VPC origin: the load balancer has no public address at all. The
+   * secret origin header is still required by the listener.
+   *
+   * A load balancer cannot change scheme in place: on a deployed environment,
+   * flipping this alone REPLACES it and CloudFront only follows at the next
+   * stack, hence an outage. Use `vpcOriginBridge` for the no-downtime path.
+   *
+   * @default false - public load balancer, HTTP origin on port 80
+   */
+  readonly vpcOrigin?: boolean;
+
+  /**
+   * Adds a second, INTERNAL HTTPS load balancer ("bridge") to the same
+   * service, and makes it the VPC origin endpoint while `vpcOrigin` is false.
+   * It is the no-downtime migration path from the public load balancer, in
+   * three pipeline runs, each one keeping a serving load balancer throughout:
+   *
+   * 1. `vpcOriginBridge: true` (`vpcOrigin` false): the bridge is created and
+   *    CloudFront switches to a VPC origin on it; the public load balancer
+   *    keeps serving until CloudFront's new configuration is live. Combine
+   *    with `ecs.tasksInPrivateSubnets: true` (rolling update).
+   * 2. `vpcOrigin: true`, `vpcOriginBridge: true`: the service's own load
+   *    balancer is replaced by an internal one and CloudFront repoints to it,
+   *    while the bridge carries the traffic.
+   * 3. `vpcOrigin: true` alone: the bridge is removed.
+   *
+   * @default false
+   */
+  readonly vpcOriginBridge?: boolean;
 
   /**
    * Generates the CloudFront origin custom-header value instead of requiring a
@@ -614,6 +694,16 @@ export interface PipelineSettings {
    * @default PipelineSourceType.CODECOMMIT
    */
   readonly sourceType?: PipelineSourceType;
+
+  /**
+   * Runs the synth with the repository's own CDK CLI (`npx cdk`, the
+   * `aws-cdk` devDependency installed by `npm ci`) instead of a global
+   * `npm install -g aws-cdk` of whatever version is current that day. The
+   * repository must list `aws-cdk` in its devDependencies.
+   *
+   * @default false - global install, as before
+   */
+  readonly useRepositoryCdkCli?: boolean;
 
   /**
    * `S3` source only: GitHub `owner/repo` of the infrastructure repository,

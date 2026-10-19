@@ -29,6 +29,11 @@ export interface ITmEcsDeploymentHookProps {
    */
   securityGroups: ec2.ISecurityGroup[];
   /**
+   * Whether the task gets a public IP (required in a public subnet without NAT).
+   * @default true
+   */
+  assignPublicIp?: boolean;
+  /**
    * The name of the container in the task definition.
    */
   containerName: string;
@@ -79,7 +84,7 @@ export class TmEcsDeploymentHook extends Construct {
                 awsvpcConfiguration: {
                   subnets: subnets,
                   securityGroups: securityGroups,
-                  assignPublicIp: 'ENABLED'
+                  assignPublicIp: '${(props.assignPublicIp ?? true) ? 'ENABLED' : 'DISABLED'}'
                 }
               },
               overrides: {

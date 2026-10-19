@@ -197,14 +197,30 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   * Deployment Hook Props
   */
   readonly ecsDeploymentHookProps?: IIEcsDeploymentHookProps;
-  /*
-  * targetCpuUtilizationPercent
-  */
+  /**
+   * Target CPU utilization of the built-in target-tracking scaling policy.
+   *
+   * @default 30
+   */
   readonly targetCpuUtilizationPercent?: number;
-  /*
-  * targetMemoryUtilizationPercent
-  */
+
+  /**
+   * Target memory utilization of the built-in target-tracking scaling policy.
+   *
+   * @default 30
+   */
   readonly targetMemoryUtilizationPercent?: number;
+
+  /**
+   * Skips the built-in memory target-tracking policy and keeps the CPU one.
+   * A PHP-FPM task's memory utilization is roughly constant whatever the
+   * load, so a memory target either never triggers or scales out to
+   * `maxTaskCount` and stays there. Off by default: existing consumers keep
+   * both policies.
+   *
+   * @default false
+   */
+  readonly disableMemoryScaling?: boolean;
 
   /**
    * The load balancing algorithm the target group uses to route requests to its
@@ -250,7 +266,8 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
    * By default this construct enables target-tracking auto scaling on both CPU
    * and memory utilization (targets from `targetCpuUtilizationPercent` /
    * `targetMemoryUtilizationPercent`, 60-second scale-in/scale-out cooldowns,
-   * capacity from `minTaskCount` / `maxTaskCount`).
+   * capacity from `minTaskCount` / `maxTaskCount`). See
+   * `disableMemoryScaling` to keep only the CPU policy.
    *
    * Set this to `true` to skip those default policies entirely and take full
    * control of scaling yourself. The construct still creates the
@@ -342,6 +359,9 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
     //const defautProps: TmApplicationLoadBalancedFargateServiceProps = {
     const defautProps: ecsPatterns.ApplicationLoadBalancedFargateServiceProps = {
       vpc: props.vpc,
+      // Public tasks by default (fleet behaviour). Pass `taskSubnets` and
+      // `assignPublicIp: false` to run them in the private subnets; the
+      // deployment hook task follows the same placement.
       assignPublicIp: true,
       enableExecuteCommand: true,
       memoryLimitMiB: 2048,
@@ -518,12 +538,15 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         scaleOutCooldown: cdk.Duration.seconds(60),
       });
 
-      // Scale based on Memory utilization
-      scaling.scaleOnMemoryUtilization('MemoryScaling', {
-        targetUtilizationPercent: mergedProps.targetMemoryUtilizationPercent || 30,
-        scaleInCooldown: cdk.Duration.seconds(60),
-        scaleOutCooldown: cdk.Duration.seconds(60),
-      });
+      // Scale based on Memory utilization, unless opted out (PHP-FPM memory
+      // use barely follows the load).
+      if (!mergedProps.disableMemoryScaling) {
+        scaling.scaleOnMemoryUtilization('MemoryScaling', {
+          targetUtilizationPercent: mergedProps.targetMemoryUtilizationPercent || 30,
+          scaleInCooldown: cdk.Duration.seconds(60),
+          scaleOutCooldown: cdk.Duration.seconds(60),
+        });
+      }
     }
 
 
@@ -550,7 +573,8 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         role: scheduledTaskRole,
         taskCount: 1,
         securityGroups: this.service.connections.securityGroups,
-        //subnetSelection: this.cluster.vpc.publicSubnets
+        // Like the service tasks: private subnets, no public IP.
+        subnetSelection: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       });
 
       const rule = new events.Rule(this, 'SchedulerRule', {
@@ -568,10 +592,13 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
 
     // Add deployment hook if provided
     if (mergedProps.ecsDeploymentHookProps) {
+      // Same placement as the service tasks.
+      const taskSubnets = mergedProps.vpc!.selectSubnets(mergedProps.taskSubnets).subnets;
       new TmEcsDeploymentHook(this, 'EcsDeploymentHook', {
         taskDefinition: this.taskDefinition,
         cluster: this.cluster,
-        subnets: mergedProps.vpc!.publicSubnets,
+        subnets: taskSubnets,
+        assignPublicIp: mergedProps.assignPublicIp ?? true,
         securityGroups: this.service.connections.securityGroups,
         containerName: mergedProps.ecsDeploymentHookProps.containerName,
         command: mergedProps.ecsDeploymentHookProps.command,

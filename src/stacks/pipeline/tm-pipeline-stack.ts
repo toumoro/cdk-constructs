@@ -138,10 +138,13 @@ export class TmPipelineStack extends cdk.Stack {
       synth: new pipelines.CodeBuildStep('Synth', {
         input: synthInput,
         additionalInputs: synthAdditionalInputs,
-        installCommands: ['npm ci', 'npm install -g aws-cdk'],
+        // With `useRepositoryCdkCli`, the CLI is the repository's `aws-cdk`
+        // devDependency (installed by `npm ci`), so the synth uses the pinned
+        // version. Otherwise a global install of the current version, as before.
+        installCommands: pipelineSettings.useRepositoryCdkCli ? ['npm ci'] : ['npm ci', 'npm install -g aws-cdk'],
         // Context lookups (AZs, AMIs) must come from the committed cdk.context.json:
         // a lookup here would not be saved and could change on every run.
-        commands: ['cdk synth --no-lookups'],
+        commands: [`${pipelineSettings.useRepositoryCdkCli ? 'npx cdk' : 'cdk'} synth --no-lookups`],
         primaryOutputDirectory: './cdk.out',
         rolePolicyStatements: [
           new iam.PolicyStatement({

@@ -37,6 +37,51 @@ new TmPipelineStack(app, 'TmPipelineStack', {
 });
 ```
 
+### Opt-in network, scaling and pipeline options
+
+Every option below is off by default: an existing consumer deploys exactly
+what it deployed before.
+
+- `ecs.tasksInPrivateSubnets: true` runs the Fargate tasks and the post-deploy
+  hook task in the **private subnets with egress** (NAT), without a public IP.
+  Turning it on is a rolling update of the service (no downtime).
+- `ecs.disableMemoryScaling: true` drops the memory target-tracking policy and
+  scales on **CPU only**. A PHP-FPM task's memory utilization barely depends
+  on the load, so a memory target either never fires or scales out to
+  `maxTaskCount` and stays there.
+- `cloudfront.vpcOrigin: true` makes the service load balancer **internal**,
+  with an HTTPS 443 listener and an ACM certificate (DNS validation) for the
+  www domains, and connects the distributions to it through a **CloudFront VPC
+  origin**. A load balancer cannot change scheme in place, so on a deployed
+  environment use the no-downtime path below rather than flipping this alone.
+- `cloudfront.vpcOriginBridge: true` adds a second, internal HTTPS load
+  balancer ("bridge") to the same service and makes it the VPC origin endpoint
+  while `vpcOrigin` is false. **No-downtime migration**, one flag change per
+  pipeline run, a serving load balancer at every moment:
+  1. `vpcOriginBridge: true` (with `ecs.tasksInPrivateSubnets: true`): the
+     bridge is created and CloudFront switches to a VPC origin on it; the
+     public load balancer keeps serving until the new CloudFront configuration
+     is live.
+  2. `vpcOrigin: true`, `vpcOriginBridge: true`: the service load balancer is
+     replaced by an internal one and CloudFront repoints to it, while the
+     bridge carries the traffic.
+  3. `vpcOrigin: true` alone: the bridge is removed.
+- `redis.engine` / `redis.engineVersion` select Redis OSS (default `redis`
+  `7.1`) or Valkey (e.g. `valkey` `9.1`, with a parameter group of the
+  matching family). ElastiCache upgrades Redis OSS to Valkey in place.
+- `fal.s3Driver` selects the TYPO3 extension reading the content bucket and
+  therefore the variable names: `TM_S3ASSETS_*` (default, tm_s3assets,
+  deprecated) or `TM_AUS_DRIVER_AMAZON_S3_*` (aus_driver_amazon_s3). With the
+  latter and no `ServiceIamUser.S3`, no key is passed: the driver uses the
+  ECS task role, which the stage grants read/write on the bucket.
+- `pipeline.useRepositoryCdkCli: true` synthesizes with the repository's own
+  `aws-cdk` devDependency (`npx cdk`) instead of a global install of the
+  current version.
+- The Solr instance role is scoped to what the tm-ansible playbook needs:
+  SSM, pulling its image from ECR, describing volumes and instances, and
+  attaching the volume tagged `solrdata` to the instance tagged
+  `solrinstance`. No `AmazonEC2FullAccess`.
+
 Stacks never import each other's CloudFormation exports: producers publish
 their identifiers in SSM under `/tm/<env>/<component>/<resource>/<attribute>`
 (`TmParameterNames`) and consumers read them at deploy time. Hand-made
@@ -57,7 +102,7 @@ bootstrap feature automates that:
   `pymysql`, bundled offline) in the RDS stack. It connects as the cluster admin
   (`cluster.secret`), creates the application database and user, sets the user's
   password from a **CDK-generated** secret, and imports `db/latest.sql`. It is
-  idempotent (an empty-DB sentinel skips re-import) and a no-op on stack delete
+  idempotent (a sentinel table skips re-import) and a no-op on stack delete
   (data retained). Off by default, so other consumers (e.g. JARO) are untouched.
 
 **Deploy order (hard requirement):**
@@ -77,6 +122,18 @@ no longer a human secret. The RDS stack generates it, publishes its ARN to
 Lambda and the ECS task read that **same ARN** (single source of truth). Remove
 `TM_DATABASE_PASSWORD` from `ecs.secretsFromSecretsManager` and from the human
 secret-seeding script — the stage rejects the synth if it is in both places.
+
+**Import.** The dump is read as a stream and split by a tokenizer that
+understands quoted strings (backslash escapes, doubled quotes), `--`/`#` and
+`/* */` comments, MySQL `/*! */` conditional comments (executed) and
+`DELIMITER`; statements are sent as the dump's exact bytes, so binary data is
+untouched. Nothing is skipped silently: the few refused statements (`SET
+@@GLOBAL`, `SQL_LOG_BIN`, `CREATE DATABASE`, `USE`) are logged one by one.
+After the import the Lambda checks that **every table the dump creates
+exists** and fails otherwise, listing the missing tables; the CloudFormation
+result and the log carry the statement counts. Tables the dump does not
+contain are, as before, created by the deployment hook
+(`typo3 database:updateschema`).
 
 **Lambda size/time ceiling.** The import streams from S3 (it never loads the
 whole dump in memory), but the Lambda is bounded by the 15-minute timeout and

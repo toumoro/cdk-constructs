@@ -153,6 +153,10 @@ export class TmSolrEc2 extends ec2.Instance {
     /*
         * Allow Solr instance to access the ssm parameters store.
         */
+    // `ssmPathPrefix` starts with a slash and the parameter ARN takes a single
+    // one (`parameter/Solr/...`): strip it, or the resource never matches.
+    const stack = cdk.Stack.of(scope);
+    const ssmPathArnPrefix = `arn:${stack.partition}:ssm:${stack.region}:${stack.account}:parameter/${ssmPathPrefix.replace(/^\/+/, '')}`;
     this.addToRolePolicy(new iam.PolicyStatement({
       actions: [
         'ssm:GetParameter',
@@ -161,7 +165,12 @@ export class TmSolrEc2 extends ec2.Instance {
         'ssm:DescribeParameters',
         'ssm:DeleteParameter',
       ],
-      resources: [`arn:${cdk.Stack.of(scope).partition}:ssm:${cdk.Stack.of(scope).region}:${cdk.Stack.of(scope).account}:parameter/${ssmPathPrefix}/*`],
+      resources: [ssmPathArnPrefix, `${ssmPathArnPrefix}/*`],
+    }));
+    // The Ansible playbook reads the prefix itself (`/Ansible/prefix/ssm`).
+    this.addToRolePolicy(new iam.PolicyStatement({
+      actions: ['ssm:GetParameter', 'ssm:GetParameters'],
+      resources: [`arn:${stack.partition}:ssm:${stack.region}:${stack.account}:parameter/Ansible/prefix/ssm`],
     }));
     /*
         * Add the Docker image asset repository to the role permissions.
@@ -175,9 +184,39 @@ export class TmSolrEc2 extends ec2.Instance {
     this.role.addManagedPolicy(
       iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'),
     );
-    this.role.addManagedPolicy(
-      iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonEC2FullAccess'), // Or a custom policy with limited scope
-    );
+
+    /*
+        * The tm-ansible playbook (solr-ec2-deploy.yml, aws/auto-attach-ec2-ebs.yml)
+        * finds the data volume by its `solrdata` tag, attaches it to the instance
+        * it runs on and waits for the attachment. That needs the Describe calls
+        * (no resource-level permissions) and Attach/Detach on exactly two
+        * resources: a volume tagged `solrdata` and an instance tagged
+        * `solrinstance` (both tags are set below). Nothing else from EC2.
+        */
+    this.addToRolePolicy(new iam.PolicyStatement({
+      sid: 'DescribeVolumesAndInstances',
+      actions: [
+        'ec2:DescribeInstances',
+        'ec2:DescribeInstanceAttribute',
+        'ec2:DescribeVolumes',
+        'ec2:DescribeVolumeStatus',
+        'ec2:DescribeVolumeAttribute',
+        'ec2:DescribeTags',
+      ],
+      resources: ['*'],
+    }));
+    this.addToRolePolicy(new iam.PolicyStatement({
+      sid: 'AttachOwnDataVolume',
+      actions: ['ec2:AttachVolume', 'ec2:DetachVolume'],
+      resources: [`arn:${stack.partition}:ec2:${stack.region}:${stack.account}:volume/*`],
+      conditions: { StringEquals: { 'ec2:ResourceTag/solrdata': 'true' } },
+    }));
+    this.addToRolePolicy(new iam.PolicyStatement({
+      sid: 'AttachToSelf',
+      actions: ['ec2:AttachVolume', 'ec2:DetachVolume', 'ec2:ModifyInstanceAttribute'],
+      resources: [`arn:${stack.partition}:ec2:${stack.region}:${stack.account}:instance/*`],
+      conditions: { StringEquals: { 'ec2:ResourceTag/solrinstance': 'true' } },
+    }));
 
     /*
         * Create volume for Solr data.

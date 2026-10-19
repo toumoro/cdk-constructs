@@ -4,6 +4,7 @@ import { Match, Template } from 'aws-cdk-lib/assertions';
 import {
   ContainerTopology,
   EnvironmentParameters,
+  FalS3Driver,
   FalStorage,
   PipelineSourceType,
   ServiceIamUser,
@@ -420,6 +421,287 @@ describe('TmWebappAppStage, generated origin custom header (generateOriginCustom
   });
 });
 
+describe('TmWebappAppStage, CloudFront VPC origin (vpcOrigin opt-in)', () => {
+  const stage = synthStage({
+    ...greenfield,
+    cloudfront: {
+      domains: ['www.example.com'],
+      additionalDomains: { 'www.example.com': ['example.com'] },
+      vpcOrigin: true,
+    },
+  });
+
+  test('the load balancer is internal, in the private subnets, with an HTTPS listener and a certificate for the www domains', () => {
+    const template = Template.fromStack(stage.ecsStack);
+    template.hasResourceProperties('AWS::ElasticLoadBalancingV2::LoadBalancer', {
+      Scheme: 'internal',
+      Subnets: Match.arrayWith([Match.objectLike({ 'Fn::Select': [0, { 'Fn::Split': [',', { Ref: Match.stringLikeRegexp('tmprodvpcsubnetsprivateids') }] }] })]),
+    });
+    template.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', {
+      Port: 443,
+      Protocol: 'HTTPS',
+      SslPolicy: 'ELBSecurityPolicy-TLS13-1-2-2021-06',
+      Certificates: [{ CertificateArn: { Ref: Match.stringLikeRegexp('LoadBalancerCertificate') } }],
+    });
+    template.hasResource('AWS::CertificateManager::Certificate', {
+      DeletionPolicy: 'Retain',
+      Properties: { DomainName: 'www.example.com', SubjectAlternativeNames: ['example.com'], ValidationMethod: 'DNS' },
+    });
+    // No public listener on 80.
+    template.resourceCountIs('AWS::ElasticLoadBalancingV2::Listener', 1);
+  });
+
+  test('with private tasks too, the public subnets are not imported at all', () => {
+    const privateStage = synthStage({
+      ...greenfield,
+      ecs: { ...greenfield.ecs, tasksInPrivateSubnets: true },
+      cloudfront: { domains: ['www.example.com'], vpcOrigin: true },
+    });
+    expect(JSON.stringify(Template.fromStack(privateStage.ecsStack).toJSON())).not.toContain('tmprodvpcsubnetspublicids');
+  });
+
+  test('the load balancer only accepts HTTPS from the VPC and still requires the origin header', () => {
+    const template = Template.fromStack(stage.ecsStack);
+    template.hasResourceProperties('AWS::EC2::SecurityGroup', {
+      GroupDescription: 'ALB Security Group',
+      SecurityGroupIngress: [Match.objectLike({ CidrIp: '10.3.0.0/16', FromPort: 443, ToPort: 443 })],
+    });
+    expect(JSON.stringify(template.toJSON())).not.toContain('cloudfront.origin-facing');
+    template.hasResourceProperties('AWS::ElasticLoadBalancingV2::ListenerRule', {
+      Conditions: Match.arrayWith([Match.objectLike({ Field: 'http-header' })]),
+    });
+  });
+
+  test('publishes the load balancer ARN and DNS name for the CloudFront stack, which builds a VPC origin over HTTPS', () => {
+    const ecsTemplate = Template.fromStack(stage.ecsStack);
+    ecsTemplate.hasResourceProperties('AWS::SSM::Parameter', { Name: TmParameterNames.ecsVpcOriginLoadBalancerArn('prod') });
+    ecsTemplate.hasResourceProperties('AWS::SSM::Parameter', { Name: TmParameterNames.ecsVpcOriginLoadBalancerDnsName('prod') });
+    // No bridge unless asked.
+    ecsTemplate.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 1);
+
+    const template = Template.fromStack(stage.cloudfrontStack!);
+    template.hasResourceProperties('AWS::CloudFront::VpcOrigin', {
+      VpcOriginEndpointConfig: Match.objectLike({
+        Name: 'tm-prod-www',
+        Arn: { Ref: Match.stringLikeRegexp('tmprodecsvpcoriginloadbalancerarn') },
+        HTTPSPort: 443,
+        OriginProtocolPolicy: 'https-only',
+        OriginSSLProtocols: ['TLSv1.2'],
+      }),
+    });
+    template.hasResourceProperties('AWS::CloudFront::Distribution', {
+      DistributionConfig: Match.objectLike({
+        Origins: [Match.objectLike({
+          VpcOriginConfig: Match.objectLike({ VpcOriginId: Match.anyValue() }),
+          OriginCustomHeaders: [Match.objectLike({ HeaderName: 'X-Custom-Header' })],
+        })],
+      }),
+    });
+    const json = JSON.stringify(template.toJSON());
+    expect(json).not.toContain('CustomOriginConfig');
+    // The load balancer is not imported: only its ARN and DNS name are read.
+    expect(json).not.toContain('security-group-id');
+  });
+
+  test('default (no vpcOrigin) keeps the public HTTP load balancer and the HTTP origin', () => {
+    const base = synthStage(greenfield);
+    const ecsTemplate = Template.fromStack(base.ecsStack);
+    ecsTemplate.hasResourceProperties('AWS::ElasticLoadBalancingV2::LoadBalancer', { Scheme: 'internet-facing' });
+    ecsTemplate.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', { Port: 80, Protocol: 'HTTP' });
+    ecsTemplate.resourceCountIs('AWS::CertificateManager::Certificate', 0);
+    expect(JSON.stringify(ecsTemplate.toJSON())).toContain('cloudfront.origin-facing');
+    // Tasks stay public by default (fleet behaviour).
+    ecsTemplate.hasResourceProperties('AWS::ECS::Service', {
+      NetworkConfiguration: { AwsvpcConfiguration: Match.objectLike({ AssignPublicIp: 'ENABLED' }) },
+    });
+    ecsTemplate.resourceCountIs('AWS::ApplicationAutoScaling::ScalingPolicy', 2);
+    const www = Template.fromStack(base.cloudfrontStack!);
+    www.resourceCountIs('AWS::CloudFront::VpcOrigin', 0);
+    www.hasResourceProperties('AWS::CloudFront::Distribution', {
+      DistributionConfig: Match.objectLike({
+        Origins: [Match.objectLike({ CustomOriginConfig: Match.objectLike({ OriginProtocolPolicy: 'http-only' }) })],
+      }),
+    });
+  });
+});
+
+describe('TmWebappAppStage, no-downtime migration to the VPC origin (vpcOriginBridge)', () => {
+  const withDomains = { domains: ['www.example.com'], additionalDomains: { 'www.example.com': ['example.com'] } };
+
+  test('step 1: the public load balancer stays, a bridge is added and becomes the VPC origin endpoint', () => {
+    const stage = synthStage({
+      ...greenfield,
+      ecs: { ...greenfield.ecs, tasksInPrivateSubnets: true, disableMemoryScaling: true },
+      cloudfront: { ...withDomains, vpcOriginBridge: true },
+    });
+    const ecs = Template.fromStack(stage.ecsStack);
+    // Both load balancers: the pattern's public one, unchanged, and the internal bridge.
+    ecs.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 2);
+    ecs.hasResourceProperties('AWS::ElasticLoadBalancingV2::LoadBalancer', { Scheme: 'internet-facing' });
+    ecs.hasResourceProperties('AWS::ElasticLoadBalancingV2::LoadBalancer', {
+      Scheme: 'internal',
+      SecurityGroups: [{ 'Fn::GetAtt': [Match.stringLikeRegexp('VpcOriginBridgeSecurityGroup'), 'GroupId'] }],
+    });
+    ecs.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', { Port: 80, Protocol: 'HTTP' });
+    ecs.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', {
+      Port: 443,
+      Protocol: 'HTTPS',
+      Certificates: [{ CertificateArn: { Ref: Match.stringLikeRegexp('LoadBalancerCertificate') } }],
+      LoadBalancerArn: { Ref: Match.stringLikeRegexp('VpcOriginBridge') },
+    });
+    // The service registers in both target groups; the bridge rule needs the header too.
+    ecs.resourceCountIs('AWS::ElasticLoadBalancingV2::TargetGroup', 2);
+    const service = Object.values(ecs.findResources('AWS::ECS::Service'))[0];
+    expect(service.Properties.LoadBalancers).toHaveLength(2);
+    expect(service.Properties.NetworkConfiguration.AwsvpcConfiguration.AssignPublicIp).toBe('DISABLED');
+    const rules = Object.values(ecs.findResources('AWS::ElasticLoadBalancingV2::ListenerRule'));
+    expect(rules).toHaveLength(2);
+    rules.forEach(rule => expect(JSON.stringify(rule)).toContain('X-Custom-Header'));
+    ecs.resourceCountIs('AWS::ApplicationAutoScaling::ScalingPolicy', 1);
+    // The VPC origin parameters point at the bridge.
+    const parameters = Object.values(ecs.findResources('AWS::SSM::Parameter'));
+    const arn = parameters.find(r => r.Properties.Name === TmParameterNames.ecsVpcOriginLoadBalancerArn('prod'))!;
+    expect(JSON.stringify(arn.Properties.Value)).toContain('VpcOriginBridge');
+    const dns = parameters.find(r => r.Properties.Name === TmParameterNames.ecsVpcOriginLoadBalancerDnsName('prod'))!;
+    expect(JSON.stringify(dns.Properties.Value)).toContain('VpcOriginBridge');
+    // CloudFront already uses the VPC origin.
+    Template.fromStack(stage.cloudfrontStack!).resourceCountIs('AWS::CloudFront::VpcOrigin', 1);
+  });
+
+  test('step 2: the service load balancer becomes internal and the VPC origin endpoint while the bridge stays', () => {
+    const stage = synthStage({
+      ...greenfield,
+      ecs: { ...greenfield.ecs, tasksInPrivateSubnets: true },
+      cloudfront: { ...withDomains, vpcOrigin: true, vpcOriginBridge: true },
+    });
+    const ecs = Template.fromStack(stage.ecsStack);
+    ecs.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 2);
+    expect(JSON.stringify(ecs.toJSON())).not.toContain('internet-facing');
+    const parameters = Object.values(ecs.findResources('AWS::SSM::Parameter'));
+    const arn = parameters.find(r => r.Properties.Name === TmParameterNames.ecsVpcOriginLoadBalancerArn('prod'))!;
+    expect(JSON.stringify(arn.Properties.Value)).toContain('servicePatternLB');
+    expect(JSON.stringify(arn.Properties.Value)).not.toContain('VpcOriginBridge');
+    // One certificate shared by both HTTPS listeners.
+    ecs.resourceCountIs('AWS::CertificateManager::Certificate', 1);
+  });
+
+  test('step 3: vpcOrigin alone removes the bridge', () => {
+    const stage = synthStage({ ...greenfield, cloudfront: { ...withDomains, vpcOrigin: true } });
+    const ecs = Template.fromStack(stage.ecsStack);
+    ecs.resourceCountIs('AWS::ElasticLoadBalancingV2::LoadBalancer', 1);
+    expect(JSON.stringify(ecs.toJSON())).not.toContain('VpcOriginBridge');
+  });
+});
+
+describe('TmWebappAppStage, FAL S3 driver', () => {
+  test('aus_driver_amazon_s3 with the S3 service user passes the TM_AUS_DRIVER_AMAZON_S3_* variables and keys', () => {
+    const stage = synthStage({ ...greenfield, fal: { storage: FalStorage.S3, s3Driver: FalS3Driver.AUS_DRIVER_AMAZON_S3 } });
+    const template = Template.fromStack(stage.ecsStack);
+    const taskDefinition = Object.values(template.findResources('AWS::ECS::TaskDefinition'))[0];
+    const fpm = taskDefinition.Properties.ContainerDefinitions[1];
+    const secrets = fpm.Secrets.map((s: { Name: string }) => s.Name);
+    expect(secrets).toEqual(expect.arrayContaining([
+      'TM_AUS_DRIVER_AMAZON_S3_BUCKET', 'TM_AUS_DRIVER_AMAZON_S3_KEY', 'TM_AUS_DRIVER_AMAZON_S3_SECRET',
+    ]));
+    expect(fpm.Environment).toEqual(expect.arrayContaining([
+      { Name: 'TM_AUS_DRIVER_AMAZON_S3_REGION', Value: 'ca-central-1' },
+      { Name: 'TM_AUS_DRIVER_AMAZON_S3_PUBLIC_BASE_URL', Value: 'cdn.example.com' },
+    ]));
+    expect(JSON.stringify(template.toJSON())).not.toContain('TM_S3ASSETS');
+    // With the service user, the task role gets no bucket grant.
+    expect(JSON.stringify(template.toJSON())).not.toContain('s3:PutObject');
+  });
+
+  test('aus_driver_amazon_s3 without the S3 service user grants the task role the content bucket and passes no keys', () => {
+    const stage = synthStage({
+      ...greenfield,
+      fal: { storage: FalStorage.S3, s3Driver: FalS3Driver.AUS_DRIVER_AMAZON_S3 },
+      serviceIamUsers: [ServiceIamUser.CLOUDFRONT],
+    });
+    const template = Template.fromStack(stage.ecsStack);
+    const json = JSON.stringify(template.toJSON());
+    expect(json).not.toContain('TM_AUS_DRIVER_AMAZON_S3_KEY');
+    expect(json).toContain('TM_AUS_DRIVER_AMAZON_S3_BUCKET');
+    template.hasResourceProperties('AWS::IAM::Policy', {
+      PolicyDocument: Match.objectLike({
+        Statement: Match.arrayWith([Match.objectLike({
+          Action: Match.arrayWith(['s3:GetObject*', 's3:DeleteObject*', 's3:PutObject']),
+          Resource: Match.arrayWith([Match.objectLike({ 'Fn::Join': Match.anyValue() })]),
+        })]),
+      }),
+      Roles: [{ Ref: Match.stringLikeRegexp('TaskDef.*TaskRole') }],
+    });
+  });
+
+  test('tm_s3assets stays the default', () => {
+    const json = JSON.stringify(Template.fromStack(synthStage(greenfield).ecsStack).toJSON());
+    expect(json).toContain('TM_S3ASSETS_BUCKET_NAME');
+    expect(json).not.toContain('TM_AUS_DRIVER');
+  });
+});
+
+describe('TmWebappAppStage, Redis engine', () => {
+  test('valkey creates a parameter group of the matching family', () => {
+    const stage = synthStage({ ...greenfield, redis: { cacheNodeType: 'cache.t4g.micro', engine: 'valkey', engineVersion: '9.1' } });
+    const template = Template.fromStack(stage.redisStack);
+    template.hasResourceProperties('AWS::ElastiCache::ReplicationGroup', {
+      Engine: 'valkey',
+      EngineVersion: '9.1',
+      CacheNodeType: 'cache.t4g.micro',
+      CacheParameterGroupName: { Ref: Match.stringLikeRegexp('ValkeyParameterGroup') },
+    });
+    template.hasResourceProperties('AWS::ElastiCache::ParameterGroup', { CacheParameterGroupFamily: 'valkey9' });
+  });
+
+  test('default stays Redis OSS 7.1', () => {
+    Template.fromStack(synthStage(greenfield).redisStack).hasResourceProperties('AWS::ElastiCache::ReplicationGroup', {
+      Engine: 'redis',
+      EngineVersion: '7.1',
+    });
+  });
+});
+
+describe('TmSolrStack, instance role', () => {
+  const stage = synthStage({ ...greenfield, solr: {} });
+  const template = Template.fromStack(stage.solrStack!);
+
+  test('is managed by SSM and can attach only its own tagged data volume, no AmazonEC2FullAccess', () => {
+    const json = JSON.stringify(template.toJSON());
+    expect(json).not.toContain('AmazonEC2FullAccess');
+    expect(json).toContain('AmazonSSMManagedInstanceCore');
+    template.hasResourceProperties('AWS::IAM::Policy', {
+      PolicyDocument: Match.objectLike({
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Sid: 'DescribeVolumesAndInstances',
+            Action: Match.arrayWith(['ec2:DescribeInstances', 'ec2:DescribeVolumes']),
+            Resource: '*',
+          }),
+          Match.objectLike({
+            Sid: 'AttachOwnDataVolume',
+            Action: ['ec2:AttachVolume', 'ec2:DetachVolume'],
+            Condition: { StringEquals: { 'ec2:ResourceTag/solrdata': 'true' } },
+          }),
+          Match.objectLike({
+            Sid: 'AttachToSelf',
+            Condition: { StringEquals: { 'ec2:ResourceTag/solrinstance': 'true' } },
+          }),
+        ]),
+      }),
+    });
+    // The data volume and the instance carry the tags the conditions match.
+    template.hasResourceProperties('AWS::EC2::Volume', { Tags: Match.arrayWith([{ Key: 'solrdata', Value: 'true' }]) });
+    template.hasResourceProperties('AWS::EC2::Instance', { Tags: Match.arrayWith([{ Key: 'solrinstance', Value: 'true' }]) });
+  });
+
+  test('reads the Ansible SSM parameters under the right ARN (single slash)', () => {
+    const json = JSON.stringify(template.toJSON());
+    expect(json).toContain(':parameter/Solr/env-construct');
+    expect(json).not.toContain(':parameter//Solr');
+    expect(json).toContain(':parameter/Ansible/prefix/ssm');
+  });
+});
+
 describe('TmPipelineStack', () => {
   test('deploys the stage then invalidates the distributions', () => {
     const app = new cdk.App({ context: context() });
@@ -431,6 +713,22 @@ describe('TmPipelineStack', () => {
     const json = JSON.stringify(Template.fromStack(pipeline).toJSON());
     expect(json).toContain("jq -r '.[]'");
     expect(json).toContain(TmParameterNames.cloudfrontDistributionIds('prod'));
+    // By default the synth installs the CDK CLI globally, as before.
+    expect(json).toMatch(/npm install -g aws-cdk\\"/);
+    expect(json).toContain('cdk synth --no-lookups');
+    expect(json).not.toContain('npx cdk synth');
+  });
+
+  test('useRepositoryCdkCli synthesizes with the repository CDK CLI (npx)', () => {
+    const app = new cdk.App({ context: context() });
+    const pipeline = new TmPipelineStack(app, 'TmPipelineStack', {
+      env: { account: ACCOUNT, region: 'ca-central-1' },
+      parameters: { ...greenfield, pipeline: { useRepositoryCdkCli: true } },
+      applicationDirectory: path.relative(process.cwd(), buildContextPath),
+    });
+    const json = JSON.stringify(Template.fromStack(pipeline).toJSON());
+    expect(json).toContain('npx cdk synth --no-lookups');
+    expect(json).not.toMatch(/npm install -g aws-cdk\\"/);
     expect(pipeline.appStage.node.id).toBe('AppStage');
     expect(pipeline.crossRegionSupportStacks.map(stack => stack.region)).toEqual(['us-east-1']);
   });

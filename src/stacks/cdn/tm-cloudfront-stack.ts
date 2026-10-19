@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import { HttpOrigin, S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { HttpOrigin, S3BucketOrigin, VpcOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { TmDistributionIdsOptions, TmDistributionIdsParameter } from './distribution-ids-parameter';
@@ -41,6 +41,17 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
    * SSM parameter holding the secret header value sent to the load balancer.
    */
   readonly originCustomHeaderParameterName: string;
+
+  /**
+   * Reaches the load balancer through a CloudFront VPC origin over HTTPS 443,
+   * its ARN and DNS name read from the `vpc-origin` SSM parameters published
+   * by `TmEcsStack` (the internal load balancer, or the bridge during the
+   * migration). When false, the origin is the public load balancer's DNS name
+   * over HTTP 80.
+   *
+   * @default false
+   */
+  readonly vpcOrigin?: boolean;
 
   /**
    * Protects the site with HTTP basic authentication.
@@ -102,12 +113,28 @@ export class TmCloudfrontStack extends cdk.Stack {
     const env = props.environmentName;
     this.distributions = [];
 
-    const loadBalancerOrigin = new HttpOrigin(readParameter(this, TmParameterNames.ecsLoadBalancerDnsName(env)), {
-      protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
-      customHeaders: {
-        'X-Custom-Header': readParameter(this, props.originCustomHeaderParameterName),
-      },
-    });
+    const customHeaders = {
+      'X-Custom-Header': readParameter(this, props.originCustomHeaderParameterName),
+    };
+    const loadBalancerOrigin: cloudfront.IOrigin = props.vpcOrigin
+      ? VpcOrigin.withVpcOrigin(
+        new cloudfront.VpcOrigin(this, 'LoadBalancerVpcOrigin', {
+          // The endpoint is built from the published ARN and DNS name, so the
+          // load balancer itself is not imported (that would need its
+          // security group too, for nothing).
+          endpoint: new LoadBalancerEndpoint(
+            readParameter(this, TmParameterNames.ecsVpcOriginLoadBalancerArn(env)),
+            readParameter(this, TmParameterNames.ecsVpcOriginLoadBalancerDnsName(env))),
+          vpcOriginName: `tm-${env}-www`,
+          protocolPolicy: cloudfront.OriginProtocolPolicy.HTTPS_ONLY,
+          httpsPort: 443,
+          originSslProtocols: [cloudfront.OriginSslPolicy.TLS_V1_2],
+        }),
+        { customHeaders })
+      : new HttpOrigin(readParameter(this, TmParameterNames.ecsLoadBalancerDnsName(env)), {
+        protocolPolicy: cloudfront.OriginProtocolPolicy.HTTP_ONLY,
+        customHeaders,
+      });
 
     const functionAssociations: cloudfront.FunctionAssociation[] = [];
     if (props.basicAuth) {
@@ -213,4 +240,14 @@ function errorResponses(): cloudfront.ErrorResponse[] {
     responsePagePath: `/errors/${code}.html`,
     ttl: cdk.Duration.seconds(30),
   }));
+}
+
+/**
+ * A VPC origin endpoint given by its ARN and domain name (an application load
+ * balancer published in SSM by `TmEcsStack`).
+ */
+class LoadBalancerEndpoint extends cloudfront.VpcOriginEndpoint {
+  constructor(public readonly endpointArn: string, public readonly domainName: string) {
+    super();
+  }
 }

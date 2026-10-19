@@ -1,8 +1,10 @@
 import * as cdk from 'aws-cdk-lib';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
@@ -99,6 +101,46 @@ export interface TmEcsStackProps extends cdk.StackProps {
    * SSM parameter holding the secret header value sent by CloudFront.
    */
   readonly originCustomHeaderParameterName: string;
+
+  /**
+   * Fronts the service with an INTERNAL load balancer meant for a CloudFront
+   * VPC origin: private subnets, HTTPS listener on 443 with an ACM certificate
+   * for `loadBalancerDomains` (DNS validation), ingress from the VPC only. The
+   * load balancer ARN is published in SSM for `TmCloudfrontStack`. When
+   * false, the load balancer is public and listens on HTTP 80 for the
+   * CloudFront origin-facing prefix list.
+   *
+   * @default false
+   */
+  readonly vpcOrigin?: boolean;
+
+  /**
+   * Adds a second, internal HTTPS load balancer ("bridge") on the same
+   * service. While `vpcOrigin` is false it is published as the VPC origin
+   * endpoint, which lets CloudFront move off the public load balancer before
+   * that one is replaced. See `CloudfrontSettings.vpcOriginBridge`.
+   *
+   * @default false
+   */
+  readonly vpcOriginBridge?: boolean;
+
+  /**
+   * Domains of the certificate attached to the HTTPS listeners (the www
+   * domains CloudFront forwards in the `Host` header). Required with
+   * `vpcOrigin` or `vpcOriginBridge`.
+   *
+   * @default - none
+   */
+  readonly loadBalancerDomains?: string[];
+
+  /**
+   * SSM parameter holding the name of a bucket the TASK ROLE may read and
+   * write (FAL on S3 through the AWS SDK default credential chain, without a
+   * service user and access keys).
+   *
+   * @default - the task role gets no bucket access
+   */
+  readonly taskRoleBucketNameParameterName?: string;
 
   /**
    * Generates the CloudFront origin custom-header value instead of reading it
@@ -221,6 +263,20 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly targetMemoryUtilizationPercent?: number;
 
   /**
+   * Drops the memory target-tracking policy (CPU only).
+   *
+   * @default false
+   */
+  readonly disableMemoryScaling?: boolean;
+
+  /**
+   * Runs the tasks in the private subnets with egress, without a public IP.
+   *
+   * @default false - public subnets with a public IP
+   */
+  readonly tasksInPrivateSubnets?: boolean;
+
+  /**
    * Command of the scheduled task (every minute).
    *
    * @default '/usr/local/bin/run-scheduler.sh'
@@ -256,22 +312,56 @@ export class TmEcsStack extends cdk.Stack {
 
     const env = props.environmentName;
     const topology = props.containerTopology;
-    const vpc = importVpc(this, 'Vpc', env, props.vpcCidr, [ec2.SubnetType.PUBLIC, ec2.SubnetType.PRIVATE_WITH_EGRESS]);
+    const vpcOrigin = props.vpcOrigin ?? false;
+    const bridge = props.vpcOriginBridge ?? false;
+    const privateTasks = props.tasksInPrivateSubnets ?? false;
+    // The private subnets are always used (scheduled task, and the internal
+    // load balancer, bridge or private tasks when enabled); the public ones
+    // only by a public load balancer or public tasks.
+    const subnetTypes = [ec2.SubnetType.PRIVATE_WITH_EGRESS];
+    if (!vpcOrigin || !privateTasks) {
+      subnetTypes.unshift(ec2.SubnetType.PUBLIC);
+    }
+    const vpc = importVpc(this, 'Vpc', env, props.vpcCidr, subnetTypes);
     const rdsSecurityGroup = importSecurityGroup(this, 'RdsSecurityGroup', TmParameterNames.rdsSecurityGroupId(env));
     const redisSecurityGroup = importSecurityGroup(this, 'RedisSecurityGroup', TmParameterNames.redisSecurityGroupId(env));
     const bastionSecurityGroup = importSecurityGroup(this, 'BastionSecurityGroup', TmParameterNames.bastionSecurityGroupId(env));
-
-    const cloudFrontPrefixListId = new AwsManagedPrefixList(this, 'CloudfrontOriginPrefixList', {
-      name: 'com.amazonaws.global.cloudfront.origin-facing',
-    }).prefixListId;
 
     const lbSecurityGroup = new ec2.SecurityGroup(this, 'ALBSecurityGroup', {
       vpc,
       allowAllOutbound: true,
       description: 'ALB Security Group',
     });
-    // The description is the fleet's (deployed) one, although the port is HTTP.
-    lbSecurityGroup.addIngressRule(ec2.Peer.prefixList(cloudFrontPrefixListId), ec2.Port.tcp(80), 'Allow HTTPS from CloudFront');
+    if (vpcOrigin) {
+      // Internal load balancer: CloudFront reaches it through the VPC origin's
+      // elastic network interfaces, which carry VPC addresses.
+      lbSecurityGroup.addIngressRule(ec2.Peer.ipv4(props.vpcCidr), ec2.Port.tcp(443), 'Allow HTTPS from the CloudFront VPC origin');
+    } else {
+      const cloudFrontPrefixListId = new AwsManagedPrefixList(this, 'CloudfrontOriginPrefixList', {
+        name: 'com.amazonaws.global.cloudfront.origin-facing',
+      }).prefixListId;
+      // The description is the fleet's (deployed) one, although the port is HTTP.
+      lbSecurityGroup.addIngressRule(ec2.Peer.prefixList(cloudFrontPrefixListId), ec2.Port.tcp(80), 'Allow HTTPS from CloudFront');
+    }
+
+    // VPC origin: the listener terminates TLS with a certificate for the www
+    // domains (CloudFront forwards the viewer's Host header, which the
+    // certificate must cover). DNS validation reuses the CNAME ACM already
+    // issued for the same domains in us-east-1, so it completes on its own.
+    let listenerCertificate: acm.ICertificate | undefined;
+    if (vpcOrigin || bridge) {
+      const domains = props.loadBalancerDomains ?? [];
+      if (domains.length === 0) {
+        throw new Error('vpcOrigin and vpcOriginBridge require loadBalancerDomains (the domains of the HTTPS listener certificate).');
+      }
+      const certificate = new acm.Certificate(this, 'LoadBalancerCertificate', {
+        domainName: domains[0],
+        subjectAlternativeNames: domains.slice(1),
+        validation: acm.CertificateValidation.fromDns(),
+      });
+      certificate.applyRemovalPolicy(cdk.RemovalPolicy.RETAIN);
+      listenerCertificate = certificate;
+    }
 
     const secrets = this.buildSecrets(props);
 
@@ -324,9 +414,22 @@ export class TmEcsStack extends cdk.Stack {
       maxTaskCount: props.maxTaskCount,
       targetCpuUtilizationPercent: props.targetCpuUtilizationPercent,
       targetMemoryUtilizationPercent: props.targetMemoryUtilizationPercent,
-      // CloudFront reaches the load balancer over HTTP.
-      listenerPort: 80,
-      protocol: elbv2.ApplicationProtocol.HTTP,
+      disableMemoryScaling: props.disableMemoryScaling,
+      ...(privateTasks ? { taskSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }, assignPublicIp: false } : {}),
+      // VPC origin: internal load balancer, HTTPS 443. Otherwise CloudFront
+      // reaches the public load balancer over HTTP 80.
+      ...(vpcOrigin
+        ? {
+          publicLoadBalancer: false,
+          listenerPort: 443,
+          protocol: elbv2.ApplicationProtocol.HTTPS,
+          certificate: listenerCertificate,
+          sslPolicy: elbv2.SslPolicy.RECOMMENDED_TLS,
+        }
+        : {
+          listenerPort: 80,
+          protocol: elbv2.ApplicationProtocol.HTTP,
+        }),
       targetProtocol: elbv2.ApplicationProtocol.HTTP,
       customHttpHeaderValue: originCustomHeader,
       secrets,
@@ -377,6 +480,54 @@ export class TmEcsStack extends cdk.Stack {
 
     publishParameter(this, 'LoadBalancerDnsNameParameter',
       TmParameterNames.ecsLoadBalancerDnsName(env), this.service.loadBalancer.loadBalancerDnsName);
+
+    // The bridge: a second internal HTTPS load balancer on the same service,
+    // with the same certificate and the same origin-header rule. ECS registers
+    // the tasks in both target groups.
+    let bridgeLoadBalancer: elbv2.ApplicationLoadBalancer | undefined;
+    if (bridge) {
+      const bridgeSecurityGroup = new ec2.SecurityGroup(this, 'VpcOriginBridgeSecurityGroup', {
+        vpc,
+        allowAllOutbound: true,
+        description: 'VPC origin bridge load balancer',
+      });
+      bridgeSecurityGroup.addIngressRule(ec2.Peer.ipv4(props.vpcCidr), ec2.Port.tcp(443), 'Allow HTTPS from the CloudFront VPC origin');
+      bridgeLoadBalancer = new elbv2.ApplicationLoadBalancer(this, 'VpcOriginBridge', {
+        vpc,
+        internetFacing: false,
+        vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        securityGroup: bridgeSecurityGroup,
+      });
+      const bridgeListener = bridgeLoadBalancer.addListener('Https', {
+        port: 443,
+        certificates: [listenerCertificate!],
+        sslPolicy: elbv2.SslPolicy.RECOMMENDED_TLS,
+        defaultAction: elbv2.ListenerAction.fixedResponse(403, { contentType: 'text/plain', messageBody: 'Access Denied' }),
+      });
+      bridgeListener.addTargets('Service', {
+        priority: 1,
+        conditions: [elbv2.ListenerCondition.httpHeader('X-Custom-Header', [originCustomHeader])],
+        port: 80,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        targets: [this.service.service],
+        deregistrationDelay: cdk.Duration.seconds(60),
+      });
+    }
+
+    // What TmCloudfrontStack builds its VPC origin endpoint from: the service's
+    // own load balancer once internal, the bridge until then.
+    const vpcOriginLoadBalancer = vpcOrigin ? this.service.loadBalancer : bridgeLoadBalancer;
+    if (vpcOriginLoadBalancer) {
+      publishParameter(this, 'VpcOriginLoadBalancerArnParameter',
+        TmParameterNames.ecsVpcOriginLoadBalancerArn(env), vpcOriginLoadBalancer.loadBalancerArn);
+      publishParameter(this, 'VpcOriginLoadBalancerDnsNameParameter',
+        TmParameterNames.ecsVpcOriginLoadBalancerDnsName(env), vpcOriginLoadBalancer.loadBalancerDnsName);
+    }
+
+    if (props.taskRoleBucketNameParameterName) {
+      const bucket = s3.Bucket.fromBucketName(this, 'TaskRoleBucket', readParameter(this, props.taskRoleBucketNameParameterName));
+      bucket.grantReadWrite(this.service.taskDefinition.taskRole);
+    }
   }
 
   /**

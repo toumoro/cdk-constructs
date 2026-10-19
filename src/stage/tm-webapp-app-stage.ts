@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { ContainerTopology, DistributionIdsFormat, FalStorage, ServiceIamUser } from '../config/enums';
+import { ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, ServiceIamUser } from '../config/enums';
 import { EnvironmentParameters } from '../config/environment-parameters';
 import { TmParameterNames } from '../config/parameter-names';
 import { TmBackupStack } from '../stacks/backup/tm-backup-stack';
@@ -147,6 +147,12 @@ export class TmWebappAppStage extends cdk.Stage {
     const vpcCidr = params.vpc.cidr;
     const serviceUsers = params.serviceIamUsers ?? [];
     const falOnS3 = params.fal.storage === FalStorage.S3;
+    const falS3Driver = params.fal.s3Driver ?? FalS3Driver.TM_S3ASSETS;
+    // aus_driver_amazon_s3 without a service user: the task role reads and
+    // writes the content bucket (AWS SDK default credential chain).
+    const taskRoleReadsContentBucket = falOnS3
+      && falS3Driver === FalS3Driver.AUS_DRIVER_AMAZON_S3
+      && !serviceUsers.includes(ServiceIamUser.S3);
     const accessLogs = params.cloudfront !== undefined && (params.cloudfront.accessLogs ?? true);
 
     if (params.cdn && !falOnS3) {
@@ -187,6 +193,8 @@ export class TmWebappAppStage extends cdk.Stage {
       vpcCidr,
       cacheNodeType: params.redis?.cacheNodeType,
       replicasPerNodeGroup: params.redis?.replicasPerNodeGroup,
+      engine: params.redis?.engine,
+      engineVersion: params.redis?.engineVersion,
     });
     this.redisStack.addStackDependency(this.bastionStack);
 
@@ -244,6 +252,10 @@ export class TmWebappAppStage extends cdk.Stage {
       originCustomHeaderParameterName: params.cloudfront?.originCustomHeaderParameterName
         ?? TmParameterNames.cloudfrontOriginCustomHeader(environmentName),
       generateOriginCustomHeader: params.cloudfront?.generateOriginCustomHeader,
+      vpcOrigin: params.cloudfront?.vpcOrigin,
+      vpcOriginBridge: params.cloudfront?.vpcOriginBridge,
+      loadBalancerDomains: (params.cloudfront?.vpcOrigin || params.cloudfront?.vpcOriginBridge) ? this.wwwDomains(params) : undefined,
+      taskRoleBucketNameParameterName: taskRoleReadsContentBucket ? TmParameterNames.s3ContentBucketName(environmentName) : undefined,
       applicationName: params.ecs.applicationName ?? 'tm',
       ...this.ecsVariables(params, region, distributionIds.parameterName),
       solrSecurityGroupIdParameterName: params.solr ? TmParameterNames.solrSecurityGroupId(environmentName) : undefined,
@@ -255,6 +267,8 @@ export class TmWebappAppStage extends cdk.Stage {
       maxTaskCount: params.ecs.maxTaskCount,
       targetCpuUtilizationPercent: params.ecs.targetCpuUtilizationPercent,
       targetMemoryUtilizationPercent: params.ecs.targetMemoryUtilizationPercent,
+      disableMemoryScaling: params.ecs.disableMemoryScaling,
+      tasksInPrivateSubnets: params.ecs.tasksInPrivateSubnets,
       scheduledTasksCommand: params.ecs.scheduledTasksCommand,
       deploymentHookCommand: params.ecs.deploymentHookCommand,
       fixEfsAssetsOwnership: params.ecs.fixEfsAssetsOwnership,
@@ -322,6 +336,8 @@ export class TmWebappAppStage extends cdk.Stage {
         certificateArns: cloudfront.certificateArns,
         originCustomHeaderParameterName: cloudfront.originCustomHeaderParameterName
           ?? TmParameterNames.cloudfrontOriginCustomHeader(environmentName),
+        // The bridge is a VPC origin endpoint too.
+        vpcOrigin: cloudfront.vpcOrigin || cloudfront.vpcOriginBridge,
         basicAuth: cloudfront.basicAuth,
         basicAuthParameterName: cloudfront.basicAuthParameterName,
         webAcl: this.wafStack !== undefined,
@@ -365,6 +381,12 @@ export class TmWebappAppStage extends cdk.Stage {
       ec2RetentionDays: params.backup?.ec2RetentionDays,
       rdsRetentionDays: params.backup?.rdsRetentionDays,
     });
+  }
+
+  /** Every domain the www distributions serve, main domains first. */
+  private wwwDomains(params: EnvironmentParameters): string[] {
+    const domains = params.cloudfront?.domains ?? [];
+    return [...domains, ...domains.flatMap(domain => params.cloudfront?.additionalDomains?.[domain] ?? [])];
   }
 
   private addOptionalDependencies(stack: cdk.Stack, ...dependencies: (cdk.Stack | undefined)[]) {
@@ -433,15 +455,33 @@ export class TmWebappAppStage extends cdk.Stage {
       }
 
       if (params.fal.storage === FalStorage.S3) {
-        ssmVariables.TM_S3ASSETS_BUCKET_NAME = TmParameterNames.s3ContentBucketName(env);
-        plainVariables.TM_S3ASSETS_REGION = region;
+        // Variable names follow the TYPO3 extension reading the bucket.
+        const names = (params.fal.s3Driver ?? FalS3Driver.TM_S3ASSETS) === FalS3Driver.AUS_DRIVER_AMAZON_S3
+          ? {
+            bucket: 'TM_AUS_DRIVER_AMAZON_S3_BUCKET',
+            region: 'TM_AUS_DRIVER_AMAZON_S3_REGION',
+            domain: 'TM_AUS_DRIVER_AMAZON_S3_PUBLIC_BASE_URL',
+            key: 'TM_AUS_DRIVER_AMAZON_S3_KEY',
+            secret: 'TM_AUS_DRIVER_AMAZON_S3_SECRET',
+          }
+          : {
+            bucket: 'TM_S3ASSETS_BUCKET_NAME',
+            region: 'TM_S3ASSETS_REGION',
+            domain: 'TM_S3ASSETS_DOMAIN',
+            key: 'TM_S3ASSETS_ACCESS_KEY_ID',
+            secret: 'TM_S3ASSETS_SECRET_KEY',
+          };
+        ssmVariables[names.bucket] = TmParameterNames.s3ContentBucketName(env);
+        plainVariables[names.region] = region;
         if (params.cdn) {
-          plainVariables.TM_S3ASSETS_DOMAIN = params.cdn.domain;
+          plainVariables[names.domain] = params.cdn.domain;
         }
+        // Without the service user, aus_driver_amazon_s3 uses the task role
+        // (no key variables); tm_s3assets always needs the keys.
         if (serviceUsers.includes(ServiceIamUser.S3)) {
           const secretArnParameterName = TmParameterNames.serviceUserCredentialsSecretArn(env, 's3-service');
-          secretVariables.TM_S3ASSETS_ACCESS_KEY_ID = { secretArnParameterName, field: 'AccessKeyId' };
-          secretVariables.TM_S3ASSETS_SECRET_KEY = { secretArnParameterName, field: 'SecretAccessKey' };
+          secretVariables[names.key] = { secretArnParameterName, field: 'AccessKeyId' };
+          secretVariables[names.secret] = { secretArnParameterName, field: 'SecretAccessKey' };
         }
       }
     }

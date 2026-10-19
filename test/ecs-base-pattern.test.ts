@@ -225,6 +225,91 @@ test('default CPU and memory target-tracking scaling policies are applied by def
   });
 });
 
+test('disableMemoryScaling keeps only the CPU policy', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    minTaskCount: 1,
+    maxTaskCount: 2,
+    disableMemoryScaling: true,
+  });
+
+  const template = Template.fromStack(stack);
+  template.resourceCountIs('AWS::ApplicationAutoScaling::ScalingPolicy', 1);
+  template.hasResourceProperties('AWS::ApplicationAutoScaling::ScalingPolicy', {
+    TargetTrackingScalingPolicyConfiguration: {
+      PredefinedMetricSpecification: { PredefinedMetricType: 'ECSServiceAverageCPUUtilization' },
+    },
+  });
+  expect(JSON.stringify(template.toJSON())).not.toContain('ECSServiceAverageMemoryUtilization');
+});
+
+test('tasks and the deployment hook are public by default', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    ecsDeploymentHookProps: { containerName: 'web', command: ['/usr/local/bin/deployment-hook.sh'] },
+  });
+
+  const template = Template.fromStack(stack);
+  const publicSubnets = vpc.publicSubnets.map(subnet => ({ Ref: stack.getLogicalId(subnet.node.defaultChild as cdk.CfnElement) }));
+  template.hasResourceProperties('AWS::ECS::Service', {
+    NetworkConfiguration: { AwsvpcConfiguration: Match.objectLike({ AssignPublicIp: 'ENABLED', Subnets: publicSubnets }) },
+  });
+  const hook = Object.values(template.findResources('AWS::Lambda::Function')).find(r =>
+    JSON.stringify(r).includes('ECS deployment hook triggered'));
+  expect(JSON.stringify(hook)).toContain("assignPublicIp: 'ENABLED'");
+  expect(JSON.stringify(hook)).toContain(JSON.stringify(publicSubnets[0]));
+});
+
+test('with private task subnets, the tasks, the scheduled task and the deployment hook have no public IP', () => {
+  const app = new cdk.App();
+  const stack = new cdk.Stack(app, 'TestStack');
+  const vpc = new ec2.Vpc(stack, 'Vpc', { maxAzs: 2 });
+
+  new TmApplicationLoadBalancedFargateService(stack, 'Service', {
+    vpc,
+    buildContextPath,
+    buildDockerfile: 'Dockerfile',
+    protocol: elbv2.ApplicationProtocol.HTTP,
+    taskSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+    assignPublicIp: false,
+    scheduledTasksCommand: '/usr/local/bin/run-scheduler.sh',
+    ecsDeploymentHookProps: { containerName: 'web', command: ['/usr/local/bin/deployment-hook.sh'] },
+  });
+
+  const template = Template.fromStack(stack);
+  const privateSubnets = vpc.privateSubnets.map(subnet => ({ Ref: stack.getLogicalId(subnet.node.defaultChild as cdk.CfnElement) }));
+  template.hasResourceProperties('AWS::ECS::Service', {
+    NetworkConfiguration: {
+      AwsvpcConfiguration: Match.objectLike({ AssignPublicIp: 'DISABLED', Subnets: privateSubnets }),
+    },
+  });
+  template.hasResourceProperties('AWS::Events::Rule', {
+    Targets: [Match.objectLike({
+      EcsParameters: Match.objectLike({
+        NetworkConfiguration: { AwsVpcConfiguration: Match.objectLike({ AssignPublicIp: 'DISABLED', Subnets: privateSubnets }) },
+      }),
+    })],
+  });
+  const hook = Object.values(template.findResources('AWS::Lambda::Function')).find(r =>
+    JSON.stringify(r).includes('ECS deployment hook triggered'));
+  expect(JSON.stringify(hook)).toContain("assignPublicIp: 'DISABLED'");
+  expect(JSON.stringify(hook)).toContain(JSON.stringify(privateSubnets[0]));
+});
+
 test('disableDefaultScaling removes the built-in policies but keeps the scalable target', () => {
   const app = new cdk.App();
   const stack = new cdk.Stack(app, 'TestStack');

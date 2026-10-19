@@ -32,6 +32,20 @@ export interface TmRedisStackProps extends cdk.StackProps {
    * @default 0
    */
   readonly replicasPerNodeGroup?: number;
+
+  /**
+   * Cache engine, `redis` or `valkey`.
+   *
+   * @default 'redis'
+   */
+  readonly engine?: string;
+
+  /**
+   * Engine version, e.g. `7.1` (Redis OSS) or `9.1` (Valkey).
+   *
+   * @default '7.1'
+   */
+  readonly engineVersion?: string;
 }
 
 /**
@@ -55,6 +69,8 @@ export class TmRedisStack extends cdk.Stack {
       vpc,
       clusterMode: 'Disabled',
       cacheNodeType: props.cacheNodeType ?? 'cache.t3.micro',
+      engine: props.engine ?? 'redis',
+      engineVersion: props.engineVersion ?? '7.1',
       replicasPerNodeGroup: replicas,
       automaticFailoverEnabled: replicas > 0,
       multiAzEnabled: replicas > 0,

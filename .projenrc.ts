@@ -12,7 +12,7 @@ const project = new awscdk.AwsCdkConstructLibrary({
   repositoryUrl: 'https://github.com/toumoro/cdk-constructs.git',
   description: 'A CDK construct library',
   license: 'GPL-3.0-or-later',
-  gitignore: ['.venv', '.env'],
+  gitignore: ['.venv', '.env', '__pycache__/'],
   devDeps: [
     'cdk',
     'ts-node',
