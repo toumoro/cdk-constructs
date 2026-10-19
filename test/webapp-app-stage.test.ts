@@ -40,6 +40,14 @@ function context() {
   };
 }
 
+/** Inbound 443 rules of the stack, inline or standalone. */
+function https443Ingress(template: Template): any[] {
+  const inline = Object.values(template.findResources('AWS::EC2::SecurityGroup'))
+    .flatMap(sg => sg.Properties.SecurityGroupIngress ?? []);
+  const standalone = Object.values(template.findResources('AWS::EC2::SecurityGroupIngress')).map(r => r.Properties);
+  return [...inline, ...standalone].filter(rule => rule.FromPort === 443);
+}
+
 function synthStage(parameters: EnvironmentParameters): TmWebappAppStage {
   const app = new cdk.App({ context: context() });
   return new TmWebappAppStage(app, 'AppStage', {
@@ -460,13 +468,16 @@ describe('TmWebappAppStage, CloudFront VPC origin (vpcOrigin opt-in)', () => {
     expect(JSON.stringify(Template.fromStack(privateStage.ecsStack).toJSON())).not.toContain('tmprodvpcsubnetspublicids');
   });
 
-  test('the load balancer only accepts HTTPS from the VPC and still requires the origin header', () => {
+  test('the load balancer only accepts HTTPS from the CloudFront prefix list and still requires the origin header', () => {
     const template = Template.fromStack(stage.ecsStack);
-    template.hasResourceProperties('AWS::EC2::SecurityGroup', {
-      GroupDescription: 'ALB Security Group',
-      SecurityGroupIngress: [Match.objectLike({ CidrIp: '10.3.0.0/16', FromPort: 443, ToPort: 443 })],
+    // VPC origin traffic does not carry VPC addresses: a CIDR rule would never match.
+    const rules = https443Ingress(template);
+    expect(rules.length).toBeGreaterThan(0);
+    rules.forEach(rule => {
+      expect(rule.SourcePrefixListId).toBeDefined();
+      expect(rule.CidrIp).toBeUndefined();
     });
-    expect(JSON.stringify(template.toJSON())).not.toContain('cloudfront.origin-facing');
+    expect(JSON.stringify(template.toJSON())).toContain('cloudfront.origin-facing');
     template.hasResourceProperties('AWS::ElasticLoadBalancingV2::ListenerRule', {
       Conditions: Match.arrayWith([Match.objectLike({ Field: 'http-header' })]),
     });
@@ -564,6 +575,10 @@ describe('TmWebappAppStage, no-downtime migration to the VPC origin (vpcOriginBr
     expect(JSON.stringify(arn.Properties.Value)).toContain('VpcOriginBridge');
     const dns = parameters.find(r => r.Properties.Name === TmParameterNames.ecsVpcOriginLoadBalancerDnsName('prod'))!;
     expect(JSON.stringify(dns.Properties.Value)).toContain('VpcOriginBridge');
+    // The bridge only accepts CloudFront, not 0.0.0.0/0 (addListener's default).
+    const bridgeRules = https443Ingress(ecs);
+    expect(bridgeRules.length).toBeGreaterThan(0);
+    bridgeRules.forEach(rule => expect(rule.SourcePrefixListId).toBeDefined());
     // CloudFront already uses the VPC origin.
     Template.fromStack(stage.cloudfrontStack!).resourceCountIs('AWS::CloudFront::VpcOrigin', 1);
   });

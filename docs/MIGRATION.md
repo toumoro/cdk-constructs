@@ -317,7 +317,8 @@ Expected `cdk diff` on the ECS stack (verified on epq):
 - `[~] AWS::ECS::TaskDefinition … replace` (new revision, normal);
 - `[+] VpcOriginBridge…` load balancer, `Https` listener, `ServiceGroup` target
   group, `ServiceRule` listener rule with the header condition,
-  `VpcOriginBridgeSecurityGroup` (443 from the VPC CIDR), the service security
+  `VpcOriginBridgeSecurityGroup` (443 from the CloudFront origin-facing prefix
+  list only), the service security
   group ingress from it on the container port;
 - `[+] LoadBalancerCertificate`;
 - `[+]` SSM `/tm/<env>/ecs/vpc-origin/load-balancer-arn` and
@@ -348,8 +349,8 @@ Expected diff on the ECS stack:
 
 - `servicePatternLB… replace` (`Scheme`), its listener recreated on 443/HTTPS
   with the shared certificate, a new target group (`ECSPrivate…` under the
-  `uniqueTargetGroupId` flag), the ALB security group ingress becomes 443 from
-  the VPC CIDR, the prefix-list custom resource disappears;
+  `uniqueTargetGroupId` flag), the ALB security group ingress moves from 80 to
+  443, still from the CloudFront origin-facing prefix list;
 - `[~] AWS::ECS::Service` in place: the new target group replaces the old one,
   the bridge target group stays;
 - the two `vpc-origin` SSM parameters now point at the service load balancer;
@@ -405,9 +406,15 @@ because the pipeline deploys the ECS stack **before** the CloudFront stack:
   modify the VPC origin in place (its endpoint ARN, port or TLS protocols, for
   example if the service load balancer is replaced for another reason) fails
   with the same 409: give the VPC origin a new construct ID in that change.
-- **VPC origin ENIs** are created by CloudFront in the load balancer's subnets
-  and carry VPC addresses, hence the "443 from the VPC CIDR" ingress rather
-  than the origin-facing prefix list.
+- **Security groups.** CloudFront creates the VPC origin ENIs in the load
+  balancer's subnets, but the traffic does **not** arrive from VPC addresses: a
+  "443 from the VPC CIDR" rule never matches and CloudFront answers 504. AWS
+  documents two options: the `com.amazonaws.global.cloudfront.origin-facing`
+  prefix list (what the package uses, for the service load balancer and the
+  bridge), or the service-managed `CloudFront-VPCOrigins-Service-SG`, which only
+  exists once a VPC origin does and so cannot be referenced on a first deploy.
+  The prefix list weighs about 55 rules against the 60-rule security group
+  quota.
 - **Flipping `vpcOrigin` without the bridge** on a deployed environment is a
   planned outage of several minutes between the ECS and CloudFront stacks. It
   is only acceptable before go-live.

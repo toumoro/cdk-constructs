@@ -340,16 +340,19 @@ export class TmEcsStack extends cdk.Stack {
       allowAllOutbound: true,
       description: 'ALB Security Group',
     });
+    // CloudFront reaches the load balancers from its origin-facing addresses,
+    // VPC origins included: their traffic does not carry VPC addresses, so a
+    // VPC CIDR rule never matches (AWS documents this prefix list, or the
+    // service-managed CloudFront-VPCOrigins-Service-SG, which only exists once
+    // the VPC origin does).
+    const cloudFrontPrefixList = ec2.Peer.prefixList(new AwsManagedPrefixList(this, 'CloudfrontOriginPrefixList', {
+      name: 'com.amazonaws.global.cloudfront.origin-facing',
+    }).prefixListId);
     if (vpcOrigin) {
-      // Internal load balancer: CloudFront reaches it through the VPC origin's
-      // elastic network interfaces, which carry VPC addresses.
-      lbSecurityGroup.addIngressRule(ec2.Peer.ipv4(props.vpcCidr), ec2.Port.tcp(443), 'Allow HTTPS from the CloudFront VPC origin');
+      lbSecurityGroup.addIngressRule(cloudFrontPrefixList, ec2.Port.tcp(443), 'Allow HTTPS from the CloudFront VPC origin');
     } else {
-      const cloudFrontPrefixListId = new AwsManagedPrefixList(this, 'CloudfrontOriginPrefixList', {
-        name: 'com.amazonaws.global.cloudfront.origin-facing',
-      }).prefixListId;
       // The description is the fleet's (deployed) one, although the port is HTTP.
-      lbSecurityGroup.addIngressRule(ec2.Peer.prefixList(cloudFrontPrefixListId), ec2.Port.tcp(80), 'Allow HTTPS from CloudFront');
+      lbSecurityGroup.addIngressRule(cloudFrontPrefixList, ec2.Port.tcp(80), 'Allow HTTPS from CloudFront');
     }
 
     // VPC origin: the listener terminates TLS with a certificate for the www
@@ -501,7 +504,7 @@ export class TmEcsStack extends cdk.Stack {
         allowAllOutbound: true,
         description: 'VPC origin bridge load balancer',
       });
-      bridgeSecurityGroup.addIngressRule(ec2.Peer.ipv4(props.vpcCidr), ec2.Port.tcp(443), 'Allow HTTPS from the CloudFront VPC origin');
+      bridgeSecurityGroup.addIngressRule(cloudFrontPrefixList, ec2.Port.tcp(443), 'Allow HTTPS from the CloudFront VPC origin');
       bridgeLoadBalancer = new elbv2.ApplicationLoadBalancer(this, 'VpcOriginBridge', {
         vpc,
         internetFacing: false,
@@ -510,6 +513,8 @@ export class TmEcsStack extends cdk.Stack {
       });
       const bridgeListener = bridgeLoadBalancer.addListener('Https', {
         port: 443,
+        // Only the rule above, not 0.0.0.0/0.
+        open: false,
         certificates: [listenerCertificate!],
         sslPolicy: elbv2.SslPolicy.RECOMMENDED_TLS,
         defaultAction: elbv2.ListenerAction.fixedResponse(403, { contentType: 'text/plain', messageBody: 'Access Denied' }),
