@@ -147,6 +147,13 @@ skip the Lambda import.
 gateway endpoint). An isolated-subnet Lambda would instead require Secrets
 Manager + STS interface endpoints (~$22/mo), which the VPC does not create.
 
+# Migrating deployed repositories
+
+[docs/MIGRATION.md](docs/MIGRATION.md): converting a hand-written repository to
+`TmPipelineStack` / `TmWebappAppStage` without replacing a resource, and moving
+from public tasks and a public load balancer to private tasks, an internal load
+balancer and a CloudFront VPC origin without downtime.
+
 # Contributing to CDK Construct Toumoro
 [Contributing](CONTRIBUTING.md)
 
