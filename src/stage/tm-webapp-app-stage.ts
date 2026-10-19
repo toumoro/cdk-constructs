@@ -269,6 +269,7 @@ export class TmWebappAppStage extends cdk.Stage {
       targetMemoryUtilizationPercent: params.ecs.targetMemoryUtilizationPercent,
       disableMemoryScaling: params.ecs.disableMemoryScaling,
       tasksInPrivateSubnets: params.ecs.tasksInPrivateSubnets,
+      healthCheck: params.ecs.healthCheck,
       scheduledTasksCommand: params.ecs.scheduledTasksCommand,
       deploymentHookCommand: params.ecs.deploymentHookCommand,
       fixEfsAssetsOwnership: params.ecs.fixEfsAssetsOwnership,

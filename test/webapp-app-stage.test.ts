@@ -593,6 +593,35 @@ describe('TmWebappAppStage, no-downtime migration to the VPC origin (vpcOriginBr
   });
 });
 
+describe('TmWebappAppStage, target group health check', () => {
+  test('ecs.healthCheck applies to the service target group and to the bridge', () => {
+    const stage = synthStage({
+      ...greenfield,
+      ecs: { ...greenfield.ecs, healthCheck: { path: '/', healthyHttpCodes: '200-499', intervalSeconds: 15 } },
+      cloudfront: { domains: ['www.example.com'], vpcOriginBridge: true },
+    });
+    const template = Template.fromStack(stage.ecsStack);
+    template.resourceCountIs('AWS::ElasticLoadBalancingV2::TargetGroup', 2);
+    const groups = Object.values(template.findResources('AWS::ElasticLoadBalancingV2::TargetGroup'));
+    for (const group of groups) {
+      expect(group.Properties.HealthCheckPath).toBe('/');
+      expect(group.Properties.Matcher).toEqual({ HttpCode: '200-499' });
+      expect(group.Properties.HealthCheckIntervalSeconds).toBe(15);
+      // Unset fields keep the ELB defaults.
+      expect(group.Properties.HealthCheckTimeoutSeconds).toBeUndefined();
+    }
+  });
+
+  test('default keeps the ELB health check untouched', () => {
+    const template = Template.fromStack(synthStage(greenfield).ecsStack);
+    template.hasResourceProperties('AWS::ElasticLoadBalancingV2::TargetGroup', {
+      HealthCheckPath: Match.absent(),
+      Matcher: Match.absent(),
+      HealthCheckIntervalSeconds: Match.absent(),
+    });
+  });
+});
+
 describe('TmWebappAppStage, FAL S3 driver', () => {
   test('aus_driver_amazon_s3 with the S3 service user passes the TM_AUS_DRIVER_AMAZON_S3_* variables and keys', () => {
     const stage = synthStage({ ...greenfield, fal: { storage: FalStorage.S3, s3Driver: FalS3Driver.AUS_DRIVER_AMAZON_S3 } });

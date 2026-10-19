@@ -10,6 +10,7 @@ import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 import { AwsManagedPrefixList } from '../../cdn/cloudfront/prefixList';
 import { ContainerTopology } from '../../config/enums';
+import { EcsHealthCheckSettings } from '../../config/environment-parameters';
 import { TmParameterNames } from '../../config/parameter-names';
 import {
   IIefsVolumes,
@@ -277,6 +278,13 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly tasksInPrivateSubnets?: boolean;
 
   /**
+   * Health check of the target group(s), see `EcsHealthCheckSettings`.
+   *
+   * @default - ELB defaults
+   */
+  readonly healthCheck?: EcsHealthCheckSettings;
+
+  /**
    * Command of the scheduled task (every minute).
    *
    * @default '/usr/local/bin/run-scheduler.sh'
@@ -386,6 +394,7 @@ export class TmEcsStack extends cdk.Stack {
 
     const cpu = props.cpu ?? 1024;
     const memoryLimitMiB = props.memoryLimitMiB ?? 2048;
+    const targetGroupHealthCheck = healthCheck(props.healthCheck);
     const twoContainers = topology !== ContainerTopology.SINGLE;
     const commandContainer = twoContainers ? 'php-fpm' : 'web';
 
@@ -416,6 +425,7 @@ export class TmEcsStack extends cdk.Stack {
       targetMemoryUtilizationPercent: props.targetMemoryUtilizationPercent,
       disableMemoryScaling: props.disableMemoryScaling,
       ...(privateTasks ? { taskSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS }, assignPublicIp: false } : {}),
+      targetGroupHealthCheck,
       // VPC origin: internal load balancer, HTTPS 443. Otherwise CloudFront
       // reaches the public load balancer over HTTP 80.
       ...(vpcOrigin
@@ -511,6 +521,7 @@ export class TmEcsStack extends cdk.Stack {
         protocol: elbv2.ApplicationProtocol.HTTP,
         targets: [this.service.service],
         deregistrationDelay: cdk.Duration.seconds(60),
+        healthCheck: targetGroupHealthCheck,
       });
     }
 
@@ -624,6 +635,23 @@ export class TmEcsStack extends cdk.Stack {
 
     return secrets;
   }
+}
+
+/**
+ * The ELB health check for the settings, or undefined (ELB defaults) when none.
+ */
+function healthCheck(settings?: EcsHealthCheckSettings): elbv2.HealthCheck | undefined {
+  if (!settings) {
+    return undefined;
+  }
+  return {
+    path: settings.path,
+    healthyHttpCodes: settings.healthyHttpCodes,
+    interval: settings.intervalSeconds !== undefined ? cdk.Duration.seconds(settings.intervalSeconds) : undefined,
+    timeout: settings.timeoutSeconds !== undefined ? cdk.Duration.seconds(settings.timeoutSeconds) : undefined,
+    healthyThresholdCount: settings.healthyThresholdCount,
+    unhealthyThresholdCount: settings.unhealthyThresholdCount,
+  };
 }
 
 /**

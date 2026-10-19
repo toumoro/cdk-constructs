@@ -168,6 +168,53 @@ export interface SolrSettings {
 }
 
 /**
+ * Health check of the load balancer target group(s).
+ */
+export interface EcsHealthCheckSettings {
+  /**
+   * Request path.
+   *
+   * @default '/'
+   */
+  readonly path?: string;
+
+  /**
+   * HTTP codes counted as healthy, e.g. `200`, `200,301` or `200-499`.
+   *
+   * @default '200'
+   */
+  readonly healthyHttpCodes?: string;
+
+  /**
+   * Seconds between two checks of a target.
+   *
+   * @default 30
+   */
+  readonly intervalSeconds?: number;
+
+  /**
+   * Seconds without a response before a check fails.
+   *
+   * @default 5
+   */
+  readonly timeoutSeconds?: number;
+
+  /**
+   * Consecutive successes before a target is healthy.
+   *
+   * @default 5
+   */
+  readonly healthyThresholdCount?: number;
+
+  /**
+   * Consecutive failures before a target is unhealthy.
+   *
+   * @default 2
+   */
+  readonly unhealthyThresholdCount?: number;
+}
+
+/**
  * ECS service settings.
  */
 export interface EcsSettings {
@@ -288,6 +335,15 @@ export interface EcsSettings {
    * @default false - public subnets with a public IP, as before
    */
   readonly tasksInPrivateSubnets?: boolean;
+
+  /**
+   * Health check of the load balancer target group (and of the VPC origin
+   * bridge's, when present). Only the fields set here change; a target group
+   * without this setting keeps the ELB defaults as before.
+   *
+   * @default - ELB defaults (path `/`, code 200)
+   */
+  readonly healthCheck?: EcsHealthCheckSettings;
 
   /**
    * Application name used in the secrets path `/applications/<name>/secrets/`.

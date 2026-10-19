@@ -66,6 +66,9 @@ what it deployed before.
      replaced by an internal one and CloudFront repoints to it, while the
      bridge carries the traffic.
   3. `vpcOrigin: true` alone: the bridge is removed.
+- `ecs.healthCheck` sets the target group health check (path, healthy HTTP
+  codes such as `200-499`, interval, timeout, thresholds) on the service's
+  target group and on the bridge's. Unset fields keep the ELB defaults.
 - `redis.engine` / `redis.engineVersion` select Redis OSS (default `redis`
   `7.1`) or Valkey (e.g. `valkey` `9.1`, with a parameter group of the
   matching family). ElastiCache upgrades Redis OSS to Valkey in place.
