@@ -68,6 +68,10 @@ export interface TmSorlEc2Props extends ec2.InstanceProps {
 }
 
 export class TmSolrEc2 extends ec2.Instance {
+  /**
+   * The Solr Docker image, pulled from ECR by the Ansible playbook.
+   */
+  public readonly dockerImageAsset: ecr_assets.DockerImageAsset;
 
   constructor(scope: Construct, id: string, props: TmSorlEc2Props) {
 
@@ -144,6 +148,7 @@ export class TmSolrEc2 extends ec2.Instance {
     const mergedProps = { ...defautProps, ...props };
 
     super(scope, id, mergedProps);
+    this.dockerImageAsset = dockerImageAsset;
 
     /*
         * Tag to ansible playbook to identify the Solr instance.

@@ -724,6 +724,23 @@ describe('TmWebappAppStage, Redis engine', () => {
   });
 });
 
+describe('TmSolrStack, configuration by Ansible', () => {
+  test('an SSM association runs solr-ec2-deploy.yml on the instance tagged solrinstance', () => {
+    const stage = synthStage({ ...greenfield, solr: {} });
+    const template = Template.fromStack(stage.solrStack!);
+    template.resourceCountIs('AWS::SSM::Association', 1);
+    const association = Object.values(template.findResources('AWS::SSM::Association'))[0].Properties;
+    expect(association.Name).toBe('AWS-ApplyAnsiblePlaybooks');
+    expect(association.Targets).toEqual([{ Key: 'tag:solrinstance', Values: ['true'] }]);
+    expect(association.Parameters.PlaybookFile).toEqual(['solr-ec2-deploy.yml']);
+    expect(association.Parameters.SourceInfo[0]).toContain('{{ssm-secure:/ansible/tm/github/token}}');
+    // Runs again when the image changes.
+    const hash = stage.solrStack!.instance.dockerImageAsset.assetHash;
+    expect(association.AssociationName).toBe(`Deployment-Solr-prod-${hash.slice(0, 12)}`);
+    template.hasResourceProperties('AWS::EC2::Instance', { Tags: Match.arrayWith([{ Key: 'solrinstance', Value: 'true' }]) });
+  });
+});
+
 describe('TmSolrStack, instance role', () => {
   const stage = synthStage({ ...greenfield, solr: {} });
   const template = Template.fromStack(stage.solrStack!);

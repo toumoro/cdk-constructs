@@ -18,6 +18,13 @@ export interface IAnsiblePlaybookEc2Props {
   gitHubPath?: string;
   playbookFile?: string;
   gitHubTokenSsmSecure?: string;
+  /*
+   * Name of the association. Changing it updates the association, which runs
+   * the playbook again on every target.
+   *
+   * @default `Deployment-${tagTargetValue}`
+   */
+  associationName?: string;
 }
 
 export class TmAnsiblePlaybookEc2 extends Construct {
@@ -35,6 +42,7 @@ export class TmAnsiblePlaybookEc2 extends Construct {
       gitHubPath = 'playbooks',
       playbookFile = 'docker-deploy.yml',
       gitHubTokenSsmSecure = '/ansible/tm/github/token',
+      associationName = `Deployment-${tagTargetValue}`,
     } = props;
 
     const parametersAnsible = {
@@ -73,7 +81,7 @@ export class TmAnsiblePlaybookEc2 extends Construct {
           values: [`${tagTargetValue}`],
         },
       ],
-      associationName: `Deployment-${tagTargetValue}`,
+      associationName,
       applyOnlyAtCronInterval: false,
       waitForSuccessTimeoutSeconds: 600,
       maxConcurrency: '1', // Only one instance at a time

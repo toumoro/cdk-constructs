@@ -84,6 +84,15 @@ what it deployed before.
   SSM, pulling its image from ECR, describing volumes and instances, and
   attaching the volume tagged `solrdata` to the instance tagged
   `solrinstance`. No `AmazonEC2FullAccess`.
+- The Solr stack creates the SSM association that runs tm-ansible's
+  `solr-ec2-deploy.yml` on the instance tagged `solrinstance` (attach and mount
+  the data volume, install Docker, run the image). It runs again when the
+  image changes, and on a replaced instance as soon as it registers with SSM.
+  **Prerequisite**, shared with the bastion's playbook: a SecureString
+  parameter `/ansible/tm/github/token` holding a GitHub token that can read
+  `toumoro/tm-ansible`. Without it every run fails at `downloadContent`, and
+  CloudFormation does not report it (the association does not block the
+  deployment): check `aws ssm list-commands`.
 
 Stacks never import each other's CloudFormation exports: producers publish
 their identifiers in SSM under `/tm/<env>/<component>/<resource>/<attribute>`

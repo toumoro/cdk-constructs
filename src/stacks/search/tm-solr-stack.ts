@@ -3,6 +3,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import { Construct } from 'constructs';
 import { TmParameterNames } from '../../config/parameter-names';
+import { TmAnsiblePlaybookEc2 } from '../../management/ansible';
 import { TmSolrEc2 } from '../../search/solr/solr-ec2-base-pattern';
 import { importSecurityGroup, importVpc, publishParameter, readParameter } from '../common/references';
 
@@ -119,6 +120,20 @@ export class TmSolrStack extends cdk.Stack {
       ebsVolumeSize: props.ebsVolumeSize,
       hostedZone,
       recordName: props.recordName,
+    });
+
+    // The instance is only a host: tm-ansible's solr-ec2-deploy.yml attaches
+    // and mounts the `solrdata` volume, installs Docker, pulls the image and
+    // runs Solr. The association targets the `solrinstance` tag, so a
+    // replaced instance is configured as soon as it registers with SSM; the
+    // image hash in its name runs the playbook again when the image changes.
+    // SSM downloads tm-ansible (private) with the GitHub token stored in the
+    // SecureString parameter `/ansible/tm/github/token`, like the bastion.
+    new TmAnsiblePlaybookEc2(this, 'SolrAnsiblePlaybook', {
+      tagTargetKey: 'solrinstance',
+      tagTargetValue: 'true',
+      playbookFile: 'solr-ec2-deploy.yml',
+      associationName: `Deployment-Solr-${env}-${this.instance.dockerImageAsset.assetHash.slice(0, 12)}`,
     });
 
     // Access to the Solr port from the bastion. Access from the ECS task is
