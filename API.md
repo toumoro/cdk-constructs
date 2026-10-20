@@ -17189,6 +17189,7 @@ Check whether the given construct is a Resource.
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.osType">osType</a></code> | <code>aws-cdk-lib.aws_ec2.OperatingSystemType</code> | The type of OS the instance is running. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.role">role</a></code> | <code>aws-cdk-lib.aws_iam.IRole</code> | The IAM role assumed by the instance. |
 | <code><a href="#tm-cdk-constructs.TmSolrEc2.property.userData">userData</a></code> | <code>aws-cdk-lib.aws_ec2.UserData</code> | UserData for the instance. |
+| <code><a href="#tm-cdk-constructs.TmSolrEc2.property.dockerImageAsset">dockerImageAsset</a></code> | <code>aws-cdk-lib.aws_ecr_assets.DockerImageAsset</code> | The Solr Docker image, pulled from ECR by the Ansible playbook. |
 
 ---
 
@@ -17393,6 +17394,18 @@ public readonly userData: UserData;
 - *Type:* aws-cdk-lib.aws_ec2.UserData
 
 UserData for the instance.
+
+---
+
+##### `dockerImageAsset`<sup>Required</sup> <a name="dockerImageAsset" id="tm-cdk-constructs.TmSolrEc2.property.dockerImageAsset"></a>
+
+```typescript
+public readonly dockerImageAsset: DockerImageAsset;
+```
+
+- *Type:* aws-cdk-lib.aws_ecr_assets.DockerImageAsset
+
+The Solr Docker image, pulled from ECR by the Ansible playbook.
 
 ---
 
@@ -22136,6 +22149,8 @@ const cloudfrontSettings: CloudfrontSettings = { ... }
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsParameterName">distributionIdsParameterName</a></code> | <code>string</code> | Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline invalidation step. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of requiring a pre-seeded SSM parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value CloudFront sends to the load balancer. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Connects the distributions to the load balancer through a CloudFront VPC origin over HTTPS (port 443) instead of a public load balancer over HTTP. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOriginBridge">vpcOriginBridge</a></code> | <code>boolean</code> | Adds a second, INTERNAL HTTPS load balancer ("bridge") to the same service, and makes it the VPC origin endpoint while `vpcOrigin` is false. |
 
 ---
 
@@ -22303,6 +22318,158 @@ The load balancer rejects requests without it.
 
 ---
 
+##### `vpcOrigin`<sup>Optional</sup> <a name="vpcOrigin" id="tm-cdk-constructs.CloudfrontSettings.property.vpcOrigin"></a>
+
+```typescript
+public readonly vpcOrigin: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - public load balancer, HTTP origin on port 80
+
+Connects the distributions to the load balancer through a CloudFront VPC origin over HTTPS (port 443) instead of a public load balancer over HTTP.
+
+When true, the ECS stack creates an INTERNAL load balancer in the private
+subnets, with an HTTPS listener and an ACM certificate (DNS validation,
+same CNAME as the us-east-1 certificate of the same domain) covering the
+www domains, publishes its ARN in SSM, and the CloudFront stack reaches it
+through a VPC origin: the load balancer has no public address at all. The
+secret origin header is still required by the listener.
+
+A load balancer cannot change scheme in place: on a deployed environment,
+flipping this alone REPLACES it and CloudFront only follows at the next
+stack, hence an outage. Use `vpcOriginBridge` for the no-downtime path.
+
+---
+
+##### `vpcOriginBridge`<sup>Optional</sup> <a name="vpcOriginBridge" id="tm-cdk-constructs.CloudfrontSettings.property.vpcOriginBridge"></a>
+
+```typescript
+public readonly vpcOriginBridge: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Adds a second, INTERNAL HTTPS load balancer ("bridge") to the same service, and makes it the VPC origin endpoint while `vpcOrigin` is false.
+
+It is the no-downtime migration path from the public load balancer, in
+three pipeline runs, each one keeping a serving load balancer throughout:
+
+1. `vpcOriginBridge: true` (`vpcOrigin` false): the bridge is created and
+   CloudFront switches to a VPC origin on it; the public load balancer
+   keeps serving until CloudFront's new configuration is live. Combine
+   with `ecs.tasksInPrivateSubnets: true` (rolling update).
+2. `vpcOrigin: true`, `vpcOriginBridge: true`: the service's own load
+   balancer is replaced by an internal one and CloudFront repoints to it,
+   while the bridge carries the traffic.
+3. `vpcOrigin: true` alone: the bridge is removed.
+
+---
+
+### EcsHealthCheckSettings <a name="EcsHealthCheckSettings" id="tm-cdk-constructs.EcsHealthCheckSettings"></a>
+
+Health check of the load balancer target group(s).
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.EcsHealthCheckSettings.Initializer"></a>
+
+```typescript
+import { EcsHealthCheckSettings } from 'tm-cdk-constructs'
+
+const ecsHealthCheckSettings: EcsHealthCheckSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings.property.healthyHttpCodes">healthyHttpCodes</a></code> | <code>string</code> | HTTP codes counted as healthy, e.g. `200`, `200,301` or `200-499`. |
+| <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings.property.healthyThresholdCount">healthyThresholdCount</a></code> | <code>number</code> | Consecutive successes before a target is healthy. |
+| <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings.property.intervalSeconds">intervalSeconds</a></code> | <code>number</code> | Seconds between two checks of a target. |
+| <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings.property.path">path</a></code> | <code>string</code> | Request path. |
+| <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings.property.timeoutSeconds">timeoutSeconds</a></code> | <code>number</code> | Seconds without a response before a check fails. |
+| <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings.property.unhealthyThresholdCount">unhealthyThresholdCount</a></code> | <code>number</code> | Consecutive failures before a target is unhealthy. |
+
+---
+
+##### `healthyHttpCodes`<sup>Optional</sup> <a name="healthyHttpCodes" id="tm-cdk-constructs.EcsHealthCheckSettings.property.healthyHttpCodes"></a>
+
+```typescript
+public readonly healthyHttpCodes: string;
+```
+
+- *Type:* string
+- *Default:* '200'
+
+HTTP codes counted as healthy, e.g. `200`, `200,301` or `200-499`.
+
+---
+
+##### `healthyThresholdCount`<sup>Optional</sup> <a name="healthyThresholdCount" id="tm-cdk-constructs.EcsHealthCheckSettings.property.healthyThresholdCount"></a>
+
+```typescript
+public readonly healthyThresholdCount: number;
+```
+
+- *Type:* number
+- *Default:* 5
+
+Consecutive successes before a target is healthy.
+
+---
+
+##### `intervalSeconds`<sup>Optional</sup> <a name="intervalSeconds" id="tm-cdk-constructs.EcsHealthCheckSettings.property.intervalSeconds"></a>
+
+```typescript
+public readonly intervalSeconds: number;
+```
+
+- *Type:* number
+- *Default:* 30
+
+Seconds between two checks of a target.
+
+---
+
+##### `path`<sup>Optional</sup> <a name="path" id="tm-cdk-constructs.EcsHealthCheckSettings.property.path"></a>
+
+```typescript
+public readonly path: string;
+```
+
+- *Type:* string
+- *Default:* '/'
+
+Request path.
+
+---
+
+##### `timeoutSeconds`<sup>Optional</sup> <a name="timeoutSeconds" id="tm-cdk-constructs.EcsHealthCheckSettings.property.timeoutSeconds"></a>
+
+```typescript
+public readonly timeoutSeconds: number;
+```
+
+- *Type:* number
+- *Default:* 5
+
+Seconds without a response before a check fails.
+
+---
+
+##### `unhealthyThresholdCount`<sup>Optional</sup> <a name="unhealthyThresholdCount" id="tm-cdk-constructs.EcsHealthCheckSettings.property.unhealthyThresholdCount"></a>
+
+```typescript
+public readonly unhealthyThresholdCount: number;
+```
+
+- *Type:* number
+- *Default:* 2
+
+Consecutive failures before a target is unhealthy.
+
+---
+
 ### EcsSettings <a name="EcsSettings" id="tm-cdk-constructs.EcsSettings"></a>
 
 ECS service settings.
@@ -22326,9 +22493,11 @@ const ecsSettings: EcsSettings = { ... }
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.cpu">cpu</a></code> | <code>number</code> | Task CPU units. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.deploymentHookCommand">deploymentHookCommand</a></code> | <code>string[]</code> | Command run in a one-off task after each deployment. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.disableMemoryScaling">disableMemoryScaling</a></code> | <code>boolean</code> | Drops the memory target-tracking policy and scales on CPU only. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables passed to the containers. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.fixEfsAssetsOwnership">fixEfsAssetsOwnership</a></code> | <code>boolean</code> | Prepends a `chown` of the EFS `typo3temp/assets` mount (to uid/gid 33, www-data) to the post-deploy hook command. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.generatedSecrets">generatedSecrets</a></code> | <code>string[]</code> | Variables whose value CDK generates once and stores in Secrets Manager, never in the template nor in this file. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.healthCheck">healthCheck</a></code> | <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings">EcsHealthCheckSettings</a></code> | Health check of the load balancer target group (and of the VPC origin bridge's, when present). |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | Autoscaling upper bound. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Task memory in MiB. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | Autoscaling lower bound. |
@@ -22339,9 +22508,10 @@ const ecsSettings: EcsSettings = { ... }
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.secretsFromSsmParameterStore">secretsFromSsmParameterStore</a></code> | <code>string[]</code> | Hand-made SecureString parameters passed to the containers, by variable name. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the autoscaling policy. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.tasksInPrivateSubnets">tasksInPrivateSubnets</a></code> | <code>boolean</code> | Runs the tasks (service, deployment hook) in the private subnets with egress, without a public IP: only the load balancer is reachable. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.webBuildTarget">webBuildTarget</a></code> | <code>string</code> | Docker build target stage of the `web` container. |
 | <code><a href="#tm-cdk-constructs.EcsSettings.property.webDockerfile">webDockerfile</a></code> | <code>string</code> | Dockerfile of the `web` container, relative to the build context. |
-| <code><a href="#tm-cdk-constructs.EcsSettings.property.wireStageOutputs">wireStageOutputs</a></code> | <code>boolean</code> | Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the `TM_S3ASSETS_*` variables when FAL is on S3. |
+| <code><a href="#tm-cdk-constructs.EcsSettings.property.wireStageOutputs">wireStageOutputs</a></code> | <code>boolean</code> | Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the S3 FAL variables (`FalSettings.s3Driver`) when FAL is on S3. |
 
 ---
 
@@ -22443,6 +22613,23 @@ Number of tasks when the service is created.
 
 ---
 
+##### `disableMemoryScaling`<sup>Optional</sup> <a name="disableMemoryScaling" id="tm-cdk-constructs.EcsSettings.property.disableMemoryScaling"></a>
+
+```typescript
+public readonly disableMemoryScaling: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - both policies, as before
+
+Drops the memory target-tracking policy and scales on CPU only.
+
+A PHP-FPM
+task's memory utilization barely depends on the load, so a memory target
+either never triggers or scales out to `maxTaskCount` and stays there.
+
+---
+
 ##### `environment`<sup>Optional</sup> <a name="environment" id="tm-cdk-constructs.EcsSettings.property.environment"></a>
 
 ```typescript
@@ -22490,6 +22677,22 @@ its ARN is published to SSM at
 `/applications/<applicationName>/generated/<NAME>-arn`. Use it for machine
 values no human sets (e.g. a TYPO3 encryption key or install-tool
 password).
+
+---
+
+##### `healthCheck`<sup>Optional</sup> <a name="healthCheck" id="tm-cdk-constructs.EcsSettings.property.healthCheck"></a>
+
+```typescript
+public readonly healthCheck: EcsHealthCheckSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.EcsHealthCheckSettings">EcsHealthCheckSettings</a>
+- *Default:* ELB defaults (path `/`, code 200)
+
+Health check of the load balancer target group (and of the VPC origin bridge's, when present).
+
+Only the fields set here change; a target group
+without this setting keeps the ELB defaults as before.
 
 ---
 
@@ -22641,6 +22844,22 @@ Target memory utilization of the autoscaling policy.
 
 ---
 
+##### `tasksInPrivateSubnets`<sup>Optional</sup> <a name="tasksInPrivateSubnets" id="tm-cdk-constructs.EcsSettings.property.tasksInPrivateSubnets"></a>
+
+```typescript
+public readonly tasksInPrivateSubnets: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - public subnets with a public IP, as before
+
+Runs the tasks (service, deployment hook) in the private subnets with egress, without a public IP: only the load balancer is reachable.
+
+Turning
+it on is a rolling update of the service (no downtime).
+
+---
+
 ##### `webBuildTarget`<sup>Optional</sup> <a name="webBuildTarget" id="tm-cdk-constructs.EcsSettings.property.webBuildTarget"></a>
 
 ```typescript
@@ -22679,7 +22898,7 @@ public readonly wireStageOutputs: boolean;
 - *Type:* boolean
 - *Default:* true
 
-Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the `TM_S3ASSETS_*` variables when FAL is on S3.
+Passes the values produced by the other stacks of the stage to the containers: database and Redis endpoints, and the S3 FAL variables (`FalSettings.s3Driver`) when FAL is on S3.
 
 ---
 
@@ -22961,6 +23180,7 @@ const falSettings: FalSettings = { ... }
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.FalSettings.property.storage">storage</a></code> | <code><a href="#tm-cdk-constructs.FalStorage">FalStorage</a></code> | FAL backend. |
 | <code><a href="#tm-cdk-constructs.FalSettings.property.efsDirectories">efsDirectories</a></code> | <code>string[]</code> | With `FalStorage.EFS`, the FAL directories stored on EFS, relative to the document root, e.g. `['fileadmin', 'uploads']`. |
+| <code><a href="#tm-cdk-constructs.FalSettings.property.s3Driver">s3Driver</a></code> | <code><a href="#tm-cdk-constructs.FalS3Driver">FalS3Driver</a></code> | With `FalStorage.S3`, the TYPO3 extension reading the content bucket. It selects the variable names passed to the containers (see `FalS3Driver`). |
 
 ---
 
@@ -22991,6 +23211,19 @@ With `FalStorage.EFS`, the FAL directories stored on EFS, relative to the docume
 
 ---
 
+##### `s3Driver`<sup>Optional</sup> <a name="s3Driver" id="tm-cdk-constructs.FalSettings.property.s3Driver"></a>
+
+```typescript
+public readonly s3Driver: FalS3Driver;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.FalS3Driver">FalS3Driver</a>
+- *Default:* FalS3Driver.TM_S3ASSETS
+
+With `FalStorage.S3`, the TYPO3 extension reading the content bucket. It selects the variable names passed to the containers (see `FalS3Driver`).
+
+---
+
 ### PipelineSettings <a name="PipelineSettings" id="tm-cdk-constructs.PipelineSettings"></a>
 
 CodePipeline settings.
@@ -23018,6 +23251,7 @@ const pipelineSettings: PipelineSettings = { ... }
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.sourceBranch">sourceBranch</a></code> | <code>string</code> | `S3` source only: the git branch CI uploads from, allowed to assume the OIDC upload role (`refs/heads/<sourceBranch>` in the trust subject). |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.sourceEnvironment">sourceEnvironment</a></code> | <code>string</code> | `S3` source only: the name of the GitHub Environment whose OIDC token may assume the upload role. |
 | <code><a href="#tm-cdk-constructs.PipelineSettings.property.sourceType">sourceType</a></code> | <code><a href="#tm-cdk-constructs.PipelineSourceType">PipelineSourceType</a></code> | Where the pipeline reads its source from. |
+| <code><a href="#tm-cdk-constructs.PipelineSettings.property.useRepositoryCdkCli">useRepositoryCdkCli</a></code> | <code>boolean</code> | Runs the synth with the repository's own CDK CLI (`npx cdk`, the `aws-cdk` devDependency installed by `npm ci`) instead of a global `npm install -g aws-cdk` of whatever version is current that day. |
 
 ---
 
@@ -23212,6 +23446,22 @@ source, one for the application), an IAM role GitHub Actions assumes over
 OIDC to upload `source.zip` into them, and EventBridge rules that start the
 pipeline on every upload. The remaining `S3`-only fields configure the OIDC
 trust. The OIDC provider itself must already exist in the account.
+
+---
+
+##### `useRepositoryCdkCli`<sup>Optional</sup> <a name="useRepositoryCdkCli" id="tm-cdk-constructs.PipelineSettings.property.useRepositoryCdkCli"></a>
+
+```typescript
+public readonly useRepositoryCdkCli: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - global install, as before
+
+Runs the synth with the repository's own CDK CLI (`npx cdk`, the `aws-cdk` devDependency installed by `npm ci`) instead of a global `npm install -g aws-cdk` of whatever version is current that day.
+
+The
+repository must list `aws-cdk` in its devDependencies.
 
 ---
 
@@ -23411,6 +23661,8 @@ const redisSettings: RedisSettings = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.RedisSettings.property.cacheNodeType">cacheNodeType</a></code> | <code>string</code> | Cache node type. |
+| <code><a href="#tm-cdk-constructs.RedisSettings.property.engine">engine</a></code> | <code>string</code> | Cache engine, `redis` or `valkey`. |
+| <code><a href="#tm-cdk-constructs.RedisSettings.property.engineVersion">engineVersion</a></code> | <code>string</code> | Engine version, e.g. `7.1` for Redis OSS or `9.1` for Valkey. With `valkey`, a parameter group of the matching family (`valkey9`) is created. |
 | <code><a href="#tm-cdk-constructs.RedisSettings.property.replicasPerNodeGroup">replicasPerNodeGroup</a></code> | <code>number</code> | Number of replicas. |
 
 ---
@@ -23425,6 +23677,35 @@ public readonly cacheNodeType: string;
 - *Default:* 'cache.t3.micro'
 
 Cache node type.
+
+---
+
+##### `engine`<sup>Optional</sup> <a name="engine" id="tm-cdk-constructs.RedisSettings.property.engine"></a>
+
+```typescript
+public readonly engine: string;
+```
+
+- *Type:* string
+- *Default:* 'redis'
+
+Cache engine, `redis` or `valkey`.
+
+ElastiCache upgrades a Redis OSS
+replication group to Valkey in place.
+
+---
+
+##### `engineVersion`<sup>Optional</sup> <a name="engineVersion" id="tm-cdk-constructs.RedisSettings.property.engineVersion"></a>
+
+```typescript
+public readonly engineVersion: string;
+```
+
+- *Type:* string
+- *Default:* '7.1'
+
+Engine version, e.g. `7.1` for Redis OSS or `9.1` for Valkey. With `valkey`, a parameter group of the matching family (`valkey9`) is created.
 
 ---
 
@@ -23615,6 +23896,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.containerPort">containerPort</a></code> | <code>number</code> | The container port. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.customHttpHeaderValue">customHttpHeaderValue</a></code> | <code>string</code> | Custom http header value. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableDefaultScaling">disableDefaultScaling</a></code> | <code>boolean</code> | Completely disable the built-in auto-scaling policies. |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableMemoryScaling">disableMemoryScaling</a></code> | <code>boolean</code> | Skips the built-in memory target-tracking policy and keeps the CPU one. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps">ecsDeploymentHookProps</a></code> | <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a></code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancingAlgorithmType">loadBalancingAlgorithmType</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.TargetGroupLoadBalancingAlgorithmType</code> | The load balancing algorithm the target group uses to route requests to its registered targets. |
@@ -23627,9 +23909,9 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.scheduledTasksCommand">scheduledTasksCommand</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.secrets">secrets</a></code> | <code>{[ key: string ]: aws-cdk-lib.aws_ecs.Secret}</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.sharedVolumes">sharedVolumes</a></code> | <code><a href="#tm-cdk-constructs.TmSharedVolume">TmSharedVolume</a>[]</code> | Volumes on the task's ephemeral storage, mounted in every container. |
-| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the built-in target-tracking scaling policy. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetGroupHealthCheck">targetGroupHealthCheck</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.HealthCheck</code> | The health check configuration applied to the ALB target group. |
-| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the built-in target-tracking scaling policy. |
 
 ---
 
@@ -24390,7 +24672,8 @@ Completely disable the built-in auto-scaling policies.
 By default this construct enables target-tracking auto scaling on both CPU
 and memory utilization (targets from `targetCpuUtilizationPercent` /
 `targetMemoryUtilizationPercent`, 60-second scale-in/scale-out cooldowns,
-capacity from `minTaskCount` / `maxTaskCount`).
+capacity from `minTaskCount` / `maxTaskCount`). See
+`disableMemoryScaling` to keep only the CPU policy.
 
 Set this to `true` to skip those default policies entirely and take full
 control of scaling yourself. The construct still creates the
@@ -24401,6 +24684,24 @@ scheduled scaling, step scaling, ...) from your own stack.
 
 This keeps the current behavior as the default for everyone who does not
 pass it, while allowing a complete override.
+
+---
+
+##### `disableMemoryScaling`<sup>Optional</sup> <a name="disableMemoryScaling" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableMemoryScaling"></a>
+
+```typescript
+public readonly disableMemoryScaling: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Skips the built-in memory target-tracking policy and keeps the CPU one.
+
+A PHP-FPM task's memory utilization is roughly constant whatever the
+load, so a memory target either never triggers or scales out to
+`maxTaskCount` and stays there. Off by default: existing consumers keep
+both policies.
 
 ---
 
@@ -24559,6 +24860,9 @@ public readonly targetCpuUtilizationPercent: number;
 ```
 
 - *Type:* number
+- *Default:* 30
+
+Target CPU utilization of the built-in target-tracking scaling policy.
 
 ---
 
@@ -24591,6 +24895,9 @@ public readonly targetMemoryUtilizationPercent: number;
 ```
 
 - *Type:* number
+- *Default:* 30
+
+Target memory utilization of the built-in target-tracking scaling policy.
 
 ---
 
@@ -26305,6 +26612,8 @@ const tmCloudfrontStackProps: TmCloudfrontStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.certificateArns">certificateArns</a></code> | <code>{[ key: string ]: string}</code> | ACM certificate ARNs (us-east-1), keyed by an entry of `domains`. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.distributionIds">distributionIds</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | Writes the distribution-ID parameter for these distributions. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.errorPages">errorPages</a></code> | <code>boolean</code> | Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Reaches the load balancer through a CloudFront VPC origin over HTTPS 443, its ARN and DNS name read from the `vpc-origin` SSM parameters published by `TmEcsStack` (the internal load balancer, or the bridge during the migration). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOriginViaBridge">vpcOriginViaBridge</a></code> | <code>boolean</code> | The `vpc-origin` SSM parameters point at the migration bridge rather than the service load balancer (`vpcOriginBridge` without `vpcOrigin`). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl">webAcl</a></code> | <code>boolean</code> | Associates the WebACL of `TmWafStack` (ARN read from SSM). |
 
 ---
@@ -26685,6 +26994,40 @@ Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for
 
 ---
 
+##### `vpcOrigin`<sup>Optional</sup> <a name="vpcOrigin" id="tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOrigin"></a>
+
+```typescript
+public readonly vpcOrigin: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Reaches the load balancer through a CloudFront VPC origin over HTTPS 443, its ARN and DNS name read from the `vpc-origin` SSM parameters published by `TmEcsStack` (the internal load balancer, or the bridge during the migration).
+
+When false, the origin is the public load balancer's DNS name
+over HTTP 80.
+
+---
+
+##### `vpcOriginViaBridge`<sup>Optional</sup> <a name="vpcOriginViaBridge" id="tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOriginViaBridge"></a>
+
+```typescript
+public readonly vpcOriginViaBridge: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+The `vpc-origin` SSM parameters point at the migration bridge rather than the service load balancer (`vpcOriginBridge` without `vpcOrigin`).
+
+CloudFront refuses to modify a VPC origin while a distribution uses it, so
+each endpoint gets its own VPC origin resource: moving from the bridge to
+the service load balancer creates the new VPC origin, repoints the
+distribution, then deletes the old one.
+
+---
+
 ##### `webAcl`<sup>Optional</sup> <a name="webAcl" id="tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl"></a>
 
 ```typescript
@@ -26827,11 +27170,14 @@ const tmEcsStackProps: TmEcsStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.cpu">cpu</a></code> | <code>number</code> | Task CPU units. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.deploymentHookCommand">deploymentHookCommand</a></code> | <code>string[]</code> | Command run in a one-off task after each deployment. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.disableMemoryScaling">disableMemoryScaling</a></code> | <code>boolean</code> | Drops the memory target-tracking policy (CPU only). |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.falEfsDirectories">falEfsDirectories</a></code> | <code>string[]</code> | FAL directories stored on EFS, relative to the document root. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.fixEfsAssetsOwnership">fixEfsAssetsOwnership</a></code> | <code>boolean</code> | Prepends a `chown` of the EFS `typo3temp/assets` mount (uid/gid 33) to the post-deploy hook command. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.generatedSecrets">generatedSecrets</a></code> | <code>string[]</code> | Variables whose value CDK generates once and stores in Secrets Manager, never in the template. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of reading it from a pre-seeded SSM parameter. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.healthCheck">healthCheck</a></code> | <code><a href="#tm-cdk-constructs.EcsHealthCheckSettings">EcsHealthCheckSettings</a></code> | Health check of the target group(s), see `EcsHealthCheckSettings`. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.loadBalancerDomains">loadBalancerDomains</a></code> | <code>string[]</code> | Domains of the certificate attached to the HTTPS listeners (the www domains CloudFront forwards in the `Host` header). |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | Autoscaling upper bound. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.memoryLimitMiB">memoryLimitMiB</a></code> | <code>number</code> | Task memory in MiB. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.minTaskCount">minTaskCount</a></code> | <code>number</code> | Autoscaling lower bound. |
@@ -26843,6 +27189,10 @@ const tmEcsStackProps: TmEcsStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.solrSecurityGroupIdParameterName">solrSecurityGroupIdParameterName</a></code> | <code>string</code> | SSM parameter holding the Solr security group ID. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.targetCpuUtilizationPercent">targetCpuUtilizationPercent</a></code> | <code>number</code> | Target CPU utilization of the autoscaling policy. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.targetMemoryUtilizationPercent">targetMemoryUtilizationPercent</a></code> | <code>number</code> | Target memory utilization of the autoscaling policy. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.taskRoleBucketNameParameterName">taskRoleBucketNameParameterName</a></code> | <code>string</code> | SSM parameter holding the name of a bucket the TASK ROLE may read and write (FAL on S3 through the AWS SDK default credential chain, without a service user and access keys). |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.tasksInPrivateSubnets">tasksInPrivateSubnets</a></code> | <code>boolean</code> | Runs the tasks in the private subnets with egress, without a public IP. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Fronts the service with an INTERNAL load balancer meant for a CloudFront VPC origin: private subnets, HTTPS listener on 443 with an ACM certificate for `loadBalancerDomains` (DNS validation), ingress from the VPC only. |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.vpcOriginBridge">vpcOriginBridge</a></code> | <code>boolean</code> | Adds a second, internal HTTPS load balancer ("bridge") on the same service. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.webBuildTarget">webBuildTarget</a></code> | <code>string</code> | Docker build target stage of the `web` container. |
 
 ---
@@ -27227,6 +27577,19 @@ Number of tasks when the service is created.
 
 ---
 
+##### `disableMemoryScaling`<sup>Optional</sup> <a name="disableMemoryScaling" id="tm-cdk-constructs.TmEcsStackProps.property.disableMemoryScaling"></a>
+
+```typescript
+public readonly disableMemoryScaling: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Drops the memory target-tracking policy (CPU only).
+
+---
+
 ##### `environment`<sup>Optional</sup> <a name="environment" id="tm-cdk-constructs.TmEcsStackProps.property.environment"></a>
 
 ```typescript
@@ -27303,6 +27666,35 @@ concrete literal (identical to the one `TmCloudfrontStack` uses, since both
 derive it the same way) and publishes it to
 `originCustomHeaderParameterName`, so no human seeds the parameter. When
 false, the value is read from the parameter (which a human must seed).
+
+---
+
+##### `healthCheck`<sup>Optional</sup> <a name="healthCheck" id="tm-cdk-constructs.TmEcsStackProps.property.healthCheck"></a>
+
+```typescript
+public readonly healthCheck: EcsHealthCheckSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.EcsHealthCheckSettings">EcsHealthCheckSettings</a>
+- *Default:* ELB defaults
+
+Health check of the target group(s), see `EcsHealthCheckSettings`.
+
+---
+
+##### `loadBalancerDomains`<sup>Optional</sup> <a name="loadBalancerDomains" id="tm-cdk-constructs.TmEcsStackProps.property.loadBalancerDomains"></a>
+
+```typescript
+public readonly loadBalancerDomains: string[];
+```
+
+- *Type:* string[]
+- *Default:* none
+
+Domains of the certificate attached to the HTTPS listeners (the www domains CloudFront forwards in the `Host` header).
+
+Required with
+`vpcOrigin` or `vpcOriginBridge`.
 
 ---
 
@@ -27451,6 +27843,67 @@ public readonly targetMemoryUtilizationPercent: number;
 - *Default:* 30
 
 Target memory utilization of the autoscaling policy.
+
+---
+
+##### `taskRoleBucketNameParameterName`<sup>Optional</sup> <a name="taskRoleBucketNameParameterName" id="tm-cdk-constructs.TmEcsStackProps.property.taskRoleBucketNameParameterName"></a>
+
+```typescript
+public readonly taskRoleBucketNameParameterName: string;
+```
+
+- *Type:* string
+- *Default:* the task role gets no bucket access
+
+SSM parameter holding the name of a bucket the TASK ROLE may read and write (FAL on S3 through the AWS SDK default credential chain, without a service user and access keys).
+
+---
+
+##### `tasksInPrivateSubnets`<sup>Optional</sup> <a name="tasksInPrivateSubnets" id="tm-cdk-constructs.TmEcsStackProps.property.tasksInPrivateSubnets"></a>
+
+```typescript
+public readonly tasksInPrivateSubnets: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false - public subnets with a public IP
+
+Runs the tasks in the private subnets with egress, without a public IP.
+
+---
+
+##### `vpcOrigin`<sup>Optional</sup> <a name="vpcOrigin" id="tm-cdk-constructs.TmEcsStackProps.property.vpcOrigin"></a>
+
+```typescript
+public readonly vpcOrigin: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Fronts the service with an INTERNAL load balancer meant for a CloudFront VPC origin: private subnets, HTTPS listener on 443 with an ACM certificate for `loadBalancerDomains` (DNS validation), ingress from the VPC only.
+
+The
+load balancer ARN is published in SSM for `TmCloudfrontStack`. When
+false, the load balancer is public and listens on HTTP 80 for the
+CloudFront origin-facing prefix list.
+
+---
+
+##### `vpcOriginBridge`<sup>Optional</sup> <a name="vpcOriginBridge" id="tm-cdk-constructs.TmEcsStackProps.property.vpcOriginBridge"></a>
+
+```typescript
+public readonly vpcOriginBridge: boolean;
+```
+
+- *Type:* boolean
+- *Default:* false
+
+Adds a second, internal HTTPS load balancer ("bridge") on the same service.
+
+While `vpcOrigin` is false it is published as the VPC origin
+endpoint, which lets CloudFront move off the public load balancer before
+that one is replaced. See `CloudfrontSettings.vpcOriginBridge`.
 
 ---
 
@@ -29953,6 +30406,8 @@ const tmRedisStackProps: TmRedisStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
 | <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.vpcCidr">vpcCidr</a></code> | <code>string</code> | CIDR range of the VPC. |
 | <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.cacheNodeType">cacheNodeType</a></code> | <code>string</code> | Cache node type. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.engine">engine</a></code> | <code>string</code> | Cache engine, `redis` or `valkey`. |
+| <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.engineVersion">engineVersion</a></code> | <code>string</code> | Engine version, e.g. `7.1` (Redis OSS) or `9.1` (Valkey). |
 | <code><a href="#tm-cdk-constructs.TmRedisStackProps.property.replicasPerNodeGroup">replicasPerNodeGroup</a></code> | <code>number</code> | Number of replicas. |
 
 ---
@@ -30235,6 +30690,32 @@ public readonly cacheNodeType: string;
 - *Default:* 'cache.t3.micro'
 
 Cache node type.
+
+---
+
+##### `engine`<sup>Optional</sup> <a name="engine" id="tm-cdk-constructs.TmRedisStackProps.property.engine"></a>
+
+```typescript
+public readonly engine: string;
+```
+
+- *Type:* string
+- *Default:* 'redis'
+
+Cache engine, `redis` or `valkey`.
+
+---
+
+##### `engineVersion`<sup>Optional</sup> <a name="engineVersion" id="tm-cdk-constructs.TmRedisStackProps.property.engineVersion"></a>
+
+```typescript
+public readonly engineVersion: string;
+```
+
+- *Type:* string
+- *Default:* '7.1'
+
+Engine version, e.g. `7.1` (Redis OSS) or `9.1` (Valkey).
 
 ---
 
@@ -33965,6 +34446,8 @@ new TmParameterNames()
 | <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontWwwCertificateArn">cloudfrontWwwCertificateArn</a></code> | Default name of the hand-made parameter holding the ACM certificate ARN (us-east-1) of a www distribution. |
 | <code><a href="#tm-cdk-constructs.TmParameterNames.cloudfrontWwwDistributionId">cloudfrontWwwDistributionId</a></code> | ID of a www distribution. |
 | <code><a href="#tm-cdk-constructs.TmParameterNames.ecsLoadBalancerDnsName">ecsLoadBalancerDnsName</a></code> | DNS name of the application load balancer. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.ecsVpcOriginLoadBalancerArn">ecsVpcOriginLoadBalancerArn</a></code> | ARN of the load balancer CloudFront reaches through its VPC origin: the bridge while it is the endpoint, otherwise the service's own. |
+| <code><a href="#tm-cdk-constructs.TmParameterNames.ecsVpcOriginLoadBalancerDnsName">ecsVpcOriginLoadBalancerDnsName</a></code> | DNS name of the load balancer behind the VPC origin (see `ecsVpcOriginLoadBalancerArn`). |
 | <code><a href="#tm-cdk-constructs.TmParameterNames.generatedSecretArn">generatedSecretArn</a></code> | SSM parameter holding the complete ARN of a CDK-generated application secret. |
 | <code><a href="#tm-cdk-constructs.TmParameterNames.of">of</a></code> | Builds a parameter name that follows the convention. |
 | <code><a href="#tm-cdk-constructs.TmParameterNames.rdsClusterArn">rdsClusterArn</a></code> | RDS cluster ARN. |
@@ -34159,6 +34642,38 @@ TmParameterNames.ecsLoadBalancerDnsName(env: string)
 DNS name of the application load balancer.
 
 ###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.ecsLoadBalancerDnsName.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `ecsVpcOriginLoadBalancerArn` <a name="ecsVpcOriginLoadBalancerArn" id="tm-cdk-constructs.TmParameterNames.ecsVpcOriginLoadBalancerArn"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.ecsVpcOriginLoadBalancerArn(env: string)
+```
+
+ARN of the load balancer CloudFront reaches through its VPC origin: the bridge while it is the endpoint, otherwise the service's own.
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.ecsVpcOriginLoadBalancerArn.parameter.env"></a>
+
+- *Type:* string
+
+---
+
+##### `ecsVpcOriginLoadBalancerDnsName` <a name="ecsVpcOriginLoadBalancerDnsName" id="tm-cdk-constructs.TmParameterNames.ecsVpcOriginLoadBalancerDnsName"></a>
+
+```typescript
+import { TmParameterNames } from 'tm-cdk-constructs'
+
+TmParameterNames.ecsVpcOriginLoadBalancerDnsName(env: string)
+```
+
+DNS name of the load balancer behind the VPC origin (see `ecsVpcOriginLoadBalancerArn`).
+
+###### `env`<sup>Required</sup> <a name="env" id="tm-cdk-constructs.TmParameterNames.ecsVpcOriginLoadBalancerDnsName.parameter.env"></a>
 
 - *Type:* string
 
@@ -34590,6 +35105,7 @@ Prefix of every parameter created by the package.
 
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.associationName">associationName</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubBranch">gitHubBranch</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubOwner">gitHubOwner</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.gitHubPath">gitHubPath</a></code> | <code>string</code> | *No description.* |
@@ -34598,6 +35114,16 @@ Prefix of every parameter created by the package.
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.playbookFile">playbookFile</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetKey">tagTargetKey</a></code> | <code>string</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.tagTargetValue">tagTargetValue</a></code> | <code>string</code> | *No description.* |
+
+---
+
+##### `associationName`<sup>Optional</sup> <a name="associationName" id="tm-cdk-constructs.IAnsiblePlaybookEc2Props.property.associationName"></a>
+
+```typescript
+public readonly associationName: string;
+```
+
+- *Type:* string
 
 ---
 
@@ -35028,6 +35554,7 @@ Props for `TmEcsDeploymentHook`.
 | <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.securityGroups">securityGroups</a></code> | <code>aws-cdk-lib.aws_ec2.ISecurityGroup[]</code> | The security groups to associate with the task. |
 | <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.subnets">subnets</a></code> | <code>aws-cdk-lib.aws_ec2.ISubnet[]</code> | The subnets where the task will be launched. |
 | <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.taskDefinition">taskDefinition</a></code> | <code>aws-cdk-lib.aws_ecs.FargateTaskDefinition</code> | The ECS task definition to run. |
+| <code><a href="#tm-cdk-constructs.ITmEcsDeploymentHookProps.property.assignPublicIp">assignPublicIp</a></code> | <code>boolean</code> | Whether the task gets a public IP (required in a public subnet without NAT). |
 
 ---
 
@@ -35105,6 +35632,19 @@ The ECS task definition to run.
 
 ---
 
+##### `assignPublicIp`<sup>Optional</sup> <a name="assignPublicIp" id="tm-cdk-constructs.ITmEcsDeploymentHookProps.property.assignPublicIp"></a>
+
+```typescript
+public readonly assignPublicIp: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Whether the task gets a public IP (required in a public subnet without NAT).
+
+---
+
 ## Enums <a name="Enums" id="Enums"></a>
 
 ### ContainerTopology <a name="ContainerTopology" id="tm-cdk-constructs.ContainerTopology"></a>
@@ -35179,6 +35719,41 @@ A JSON object mapping each domain to its distribution ID.
 ---
 
 
+### FalS3Driver <a name="FalS3Driver" id="tm-cdk-constructs.FalS3Driver"></a>
+
+TYPO3 extension reading the FAL content bucket.
+
+Selects the variable names
+the stage passes to the containers.
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.FalS3Driver.TM_S3ASSETS">TM_S3ASSETS</a></code> | tm_s3assets (deprecated): `TM_S3ASSETS_BUCKET_NAME`, `TM_S3ASSETS_REGION`, `TM_S3ASSETS_DOMAIN` (the CDN domain), and with the S3 service user `TM_S3ASSETS_ACCESS_KEY_ID` / `TM_S3ASSETS_SECRET_KEY`. |
+| <code><a href="#tm-cdk-constructs.FalS3Driver.AUS_DRIVER_AMAZON_S3">AUS_DRIVER_AMAZON_S3</a></code> | aus_driver_amazon_s3: `TM_AUS_DRIVER_AMAZON_S3_BUCKET`, `TM_AUS_DRIVER_AMAZON_S3_REGION`, `TM_AUS_DRIVER_AMAZON_S3_PUBLIC_BASE_URL` (the CDN domain, without protocol), and with the S3 service user `TM_AUS_DRIVER_AMAZON_S3_KEY` / `TM_AUS_DRIVER_AMAZON_S3_SECRET`. |
+
+---
+
+##### `TM_S3ASSETS` <a name="TM_S3ASSETS" id="tm-cdk-constructs.FalS3Driver.TM_S3ASSETS"></a>
+
+tm_s3assets (deprecated): `TM_S3ASSETS_BUCKET_NAME`, `TM_S3ASSETS_REGION`, `TM_S3ASSETS_DOMAIN` (the CDN domain), and with the S3 service user `TM_S3ASSETS_ACCESS_KEY_ID` / `TM_S3ASSETS_SECRET_KEY`.
+
+---
+
+
+##### `AUS_DRIVER_AMAZON_S3` <a name="AUS_DRIVER_AMAZON_S3" id="tm-cdk-constructs.FalS3Driver.AUS_DRIVER_AMAZON_S3"></a>
+
+aus_driver_amazon_s3: `TM_AUS_DRIVER_AMAZON_S3_BUCKET`, `TM_AUS_DRIVER_AMAZON_S3_REGION`, `TM_AUS_DRIVER_AMAZON_S3_PUBLIC_BASE_URL` (the CDN domain, without protocol), and with the S3 service user `TM_AUS_DRIVER_AMAZON_S3_KEY` / `TM_AUS_DRIVER_AMAZON_S3_SECRET`.
+
+Without
+the service user the key variables are not set and the driver falls back
+to the AWS SDK default credential chain, i.e. the ECS task role, which the
+stage then grants read/write on the content bucket.
+
+---
+
+
 ### FalStorage <a name="FalStorage" id="tm-cdk-constructs.FalStorage"></a>
 
 Where TYPO3 stores its FAL files (`fileadmin`).
@@ -35187,14 +35762,14 @@ Where TYPO3 stores its FAL files (`fileadmin`).
 
 | **Name** | **Description** |
 | --- | --- |
-| <code><a href="#tm-cdk-constructs.FalStorage.S3">S3</a></code> | A content bucket, read by TYPO3 with the `TM_S3ASSETS_*` variables. |
+| <code><a href="#tm-cdk-constructs.FalStorage.S3">S3</a></code> | A content bucket, read by TYPO3 through the extension selected by `FalSettings.s3Driver` (the `TM_S3ASSETS_*` variables by default). |
 | <code><a href="#tm-cdk-constructs.FalStorage.EFS">EFS</a></code> | EFS volumes mounted in the containers. |
 
 ---
 
 ##### `S3` <a name="S3" id="tm-cdk-constructs.FalStorage.S3"></a>
 
-A content bucket, read by TYPO3 with the `TM_S3ASSETS_*` variables.
+A content bucket, read by TYPO3 through the extension selected by `FalSettings.s3Driver` (the `TM_S3ASSETS_*` variables by default).
 
 ---
 
