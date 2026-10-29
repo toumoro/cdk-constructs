@@ -590,6 +590,21 @@ export interface CloudfrontSettings {
   readonly distributionIdsFormat?: DistributionIdsFormat;
 
   /**
+   * Serves the FAL content bucket under this path of the www distributions
+   * (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs
+   * as `public/fileadmin` and same host as the site. The path is removed
+   * before the request reaches the bucket (keys have no prefix), and the
+   * responses carry the Content-Security-Policy of TYPO3's
+   * `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can
+   * display) and `X-Content-Type-Options: nosniff`. The FAL public base URL
+   * becomes `<first domain><falPath>`. Requires `fal.storage`
+   * `FalStorage.S3`; exclusive with `cdn`.
+   *
+   * @default - the bucket is not served by the www distributions
+   */
+  readonly falPath?: string;
+
+  /**
    * Writes CloudFront access logs to the log bucket.
    *
    * @default true

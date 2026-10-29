@@ -703,6 +703,88 @@ describe('TmWebappAppStage, FAL S3 driver', () => {
   });
 });
 
+describe('TmWebappAppStage, FAL bucket on the www distribution (cloudfront.falPath)', () => {
+  const falSettings: EnvironmentParameters = {
+    ...greenfield,
+    fal: { storage: FalStorage.S3, s3Driver: FalS3Driver.AUS_DRIVER_AMAZON_S3 },
+    serviceIamUsers: [ServiceIamUser.CLOUDFRONT],
+    cloudfront: { domains: ['www.example.com'], falPath: '/fileadmin' },
+    cdn: undefined,
+  };
+
+  /** Runs the code of a CloudFront function of the stack, found by its comment. */
+  function cloudfrontFunction(template: Template, comment: string): (event: any) => any {
+    const fn = Object.values(template.findResources('AWS::CloudFront::Function'))
+      .find(r => r.Properties.FunctionConfig.Comment.startsWith(comment));
+    const code = fn!.Properties.FunctionCode;
+    expect(typeof code).toBe('string');
+    return new Function(`${code}; return handler;`)();
+  }
+
+  test('serves the content bucket under /fileadmin/* of the www distribution, and creates no CDN', () => {
+    const stage = synthStage(falSettings);
+    expect(stage.cdnStack).toBeUndefined();
+    const template = Template.fromStack(stage.cloudfrontStack!);
+    template.hasResourceProperties('AWS::CloudFront::Distribution', {
+      DistributionConfig: Match.objectLike({
+        CacheBehaviors: Match.arrayWith([Match.objectLike({
+          PathPattern: '/fileadmin/*',
+          AllowedMethods: ['GET', 'HEAD'],
+          FunctionAssociations: [
+            Match.objectLike({ EventType: 'viewer-request' }),
+            Match.objectLike({ EventType: 'viewer-response' }),
+          ],
+        })]),
+      }),
+    });
+    template.resourceCountIs('AWS::CloudFront::OriginAccessControl', 1);
+  });
+
+  test('removes the path before the bucket and adds the fileadmin CSP, PDF variant in any case', () => {
+    const template = Template.fromStack(synthStage(falSettings).cloudfrontStack!);
+    const request = cloudfrontFunction(template, 'Removes /fileadmin');
+    expect(request({ request: { uri: '/fileadmin/user_upload/a b.jpg', headers: {} } }).uri).toBe('/user_upload/a b.jpg');
+
+    const response = cloudfrontFunction(template, 'Content-Security-Policy');
+    const headers = (uri: string) => response({ request: { uri }, response: { headers: {} } }).headers;
+    expect(headers('/fileadmin/a.svg')['content-security-policy'].value).toContain('sandbox');
+    expect(headers('/fileadmin/a.svg')['x-content-type-options'].value).toBe('nosniff');
+    for (const uri of ['/fileadmin/a.pdf', '/fileadmin/A.PDF', '/a.Pdf']) {
+      expect(headers(uri)['content-security-policy'].value).toContain('plugin-types application/pdf');
+      expect(headers(uri)['content-security-policy'].value).not.toContain('sandbox');
+    }
+  });
+
+  test('with basic auth, the FAL request function checks the credentials too', () => {
+    const template = Template.fromStack(synthStage({
+      ...falSettings,
+      cloudfront: { ...falSettings.cloudfront!, basicAuth: true },
+    }).cloudfrontStack!);
+    const fn = Object.values(template.findResources('AWS::CloudFront::Function'))
+      .find(r => r.Properties.FunctionConfig.Comment.startsWith('Removes /fileadmin'));
+    expect(JSON.stringify(fn!.Properties.FunctionCode)).toContain('www-authenticate');
+  });
+
+  test('passes <domain>/fileadmin as the public base URL, and the www stack writes the distribution IDs', () => {
+    const stage = synthStage(falSettings);
+    const taskDefinition = Object.values(Template.fromStack(stage.ecsStack).findResources('AWS::ECS::TaskDefinition'))[0];
+    expect(taskDefinition.Properties.ContainerDefinitions[1].Environment).toEqual(expect.arrayContaining([
+      { Name: 'TM_AUS_DRIVER_AMAZON_S3_PUBLIC_BASE_URL', Value: 'www.example.com/fileadmin' },
+    ]));
+    const parameters = Object.values(Template.fromStack(stage.cloudfrontStack!).findResources('AWS::SSM::Parameter'))
+      .map(r => r.Properties.Name);
+    expect(parameters).toContain(TmParameterNames.cloudfrontDistributionIds('prod'));
+  });
+
+  test('rejects falPath with a CDN, without S3 FAL, or with a malformed path', () => {
+    expect(() => synthStage({ ...falSettings, cdn: { domain: 'cdn.example.com' } })).toThrow(/choose one/);
+    expect(() => synthStage({ ...falSettings, fal: { storage: FalStorage.EFS } })).toThrow(/falPath/);
+    for (const falPath of ['fileadmin', '/fileadmin/', '/']) {
+      expect(() => synthStage({ ...falSettings, cloudfront: { domains: ['www.example.com'], falPath } })).toThrow(/falPath/);
+    }
+  });
+});
+
 describe('TmWebappAppStage, Redis engine', () => {
   test('valkey creates a parameter group of the matching family', () => {
     const stage = synthStage({ ...greenfield, redis: { cacheNodeType: 'cache.t4g.micro', engine: 'valkey', engineVersion: '9.1' } });

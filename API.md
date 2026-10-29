@@ -22147,6 +22147,7 @@ const cloudfrontSettings: CloudfrontSettings = { ... }
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.createCertificate">createCertificate</a></code> | <code>boolean</code> | Creates each distribution's ACM certificate (us-east-1) with manual DNS validation, instead of requiring a pre-made certificate ARN. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsFormat">distributionIdsFormat</a></code> | <code><a href="#tm-cdk-constructs.DistributionIdsFormat">DistributionIdsFormat</a></code> | Value format of the distribution-ID parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsParameterName">distributionIdsParameterName</a></code> | <code>string</code> | Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline invalidation step. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry the Content-Security-Policy of TYPO3's `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can display) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of requiring a pre-seeded SSM parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value CloudFront sends to the load balancer. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Connects the distributions to the load balancer through a CloudFront VPC origin over HTTPS (port 443) instead of a public load balancer over HTTP. |
@@ -22283,6 +22284,19 @@ public readonly distributionIdsParameterName: string;
 - *Default:* TmParameterNames.cloudfrontDistributionIds
 
 Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline invalidation step.
+
+---
+
+##### `falPath`<sup>Optional</sup> <a name="falPath" id="tm-cdk-constructs.CloudfrontSettings.property.falPath"></a>
+
+```typescript
+public readonly falPath: string;
+```
+
+- *Type:* string
+- *Default:* the bucket is not served by the www distributions
+
+Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry the Content-Security-Policy of TYPO3's `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can display) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`.
 
 ---
 
@@ -26612,6 +26626,7 @@ const tmCloudfrontStackProps: TmCloudfrontStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.certificateArns">certificateArns</a></code> | <code>{[ key: string ]: string}</code> | ACM certificate ARNs (us-east-1), keyed by an entry of `domains`. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.distributionIds">distributionIds</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | Writes the distribution-ID parameter for these distributions. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.errorPages">errorPages</a></code> | <code>boolean</code> | Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's `fileadmin/.htaccess`. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Reaches the load balancer through a CloudFront VPC origin over HTTPS 443, its ARN and DNS name read from the `vpc-origin` SSM parameters published by `TmEcsStack` (the internal load balancer, or the bridge during the migration). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOriginViaBridge">vpcOriginViaBridge</a></code> | <code>boolean</code> | The `vpc-origin` SSM parameters point at the migration bridge rather than the service load balancer (`vpcOriginBridge` without `vpcOrigin`). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl">webAcl</a></code> | <code>boolean</code> | Associates the WebACL of `TmWafStack` (ARN read from SSM). |
@@ -26991,6 +27006,19 @@ public readonly errorPages: boolean;
 - *Default:* false
 
 Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses.
+
+---
+
+##### `falPath`<sup>Optional</sup> <a name="falPath" id="tm-cdk-constructs.TmCloudfrontStackProps.property.falPath"></a>
+
+```typescript
+public readonly falPath: string;
+```
+
+- *Type:* string
+- *Default:* the content bucket is not served
+
+Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's `fileadmin/.htaccess`.
 
 ---
 

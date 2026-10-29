@@ -158,6 +158,18 @@ export class TmWebappAppStage extends cdk.Stage {
     if (params.cdn && !falOnS3) {
       throw new Error('cdn serves the FAL content bucket: it requires fal.storage FalStorage.S3.');
     }
+    const falPath = params.cloudfront?.falPath;
+    if (falPath !== undefined) {
+      if (!falOnS3) {
+        throw new Error('cloudfront.falPath serves the FAL content bucket: it requires fal.storage FalStorage.S3.');
+      }
+      if (params.cdn) {
+        throw new Error('cloudfront.falPath and cdn both serve the FAL content bucket: choose one.');
+      }
+      if (!/^(\/[\w.-]+)+$/.test(falPath)) {
+        throw new Error(`cloudfront.falPath must start with "/" and not end with "/" (got "${falPath}").`);
+      }
+    }
     if (serviceUsers.includes(ServiceIamUser.S3) && !falOnS3) {
       throw new Error('The S3 service user needs the FAL content bucket: it requires fal.storage FalStorage.S3.');
     }
@@ -345,6 +357,7 @@ export class TmWebappAppStage extends cdk.Stage {
         webAcl: this.wafStack !== undefined,
         accessLogs,
         errorPages: props.errorPagesPath !== undefined,
+        falPath: cloudfront.falPath,
         distributionIds: params.cdn ? undefined : distributionIds,
       });
       this.cloudfrontStack.addStackDependency(this.ecsStack);
@@ -477,6 +490,9 @@ export class TmWebappAppStage extends cdk.Stage {
         plainVariables[names.region] = region;
         if (params.cdn) {
           plainVariables[names.domain] = params.cdn.domain;
+        } else if (params.cloudfront?.falPath) {
+          // Without the protocol, like the CDN domain.
+          plainVariables[names.domain] = `${params.cloudfront.domains[0]}${params.cloudfront.falPath}`;
         }
         // Without the service user, aus_driver_amazon_s3 uses the task role
         // (no key variables); tm_s3assets always needs the keys.

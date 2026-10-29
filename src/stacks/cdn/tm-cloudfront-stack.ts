@@ -103,6 +103,15 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
   readonly errorPages?: boolean;
 
   /**
+   * Serves the FAL content bucket of `TmS3Stack` under this path (e.g.
+   * `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's
+   * `fileadmin/.htaccess`.
+   *
+   * @default - the content bucket is not served
+   */
+  readonly falPath?: string;
+
+  /**
    * Writes the distribution-ID parameter for these distributions. Leave unset
    * when `TmCloudfrontCdnStack` writes it.
    *
@@ -151,22 +160,25 @@ export class TmCloudfrontStack extends cdk.Stack {
       });
 
     const functionAssociations: cloudfront.FunctionAssociation[] = [];
+    // Returns the 401 response when the request lacks the credentials, in the
+    // viewer-request functions (one per behavior, so the FAL one repeats it).
+    let basicAuthCheck = '';
     if (props.basicAuth) {
       const basicAuthBase64 = readParameter(this, props.basicAuthParameterName ?? TmParameterNames.cloudfrontBasicAuth(env));
+      basicAuthCheck = `
+            var authHeaders = event.request.headers.authorization;
+            if (!authHeaders || authHeaders.value !== "Basic ${basicAuthBase64}") {
+              return {
+                statusCode: 401,
+                statusDescription: "Unauthorized",
+                headers: { "www-authenticate": { value: 'Basic realm="Authentification"' } },
+              };
+            }`;
       const authFunction = new cloudfront.Function(this, 'BasicAuthFunction', {
         functionName: 'BasicAuthFunction',
         code: cloudfront.FunctionCode.fromInline(`
-          function handler(event) {
-            var authHeaders = event.request.headers.authorization;
-            var expected = "Basic ${basicAuthBase64}";
-            if (authHeaders && authHeaders.value === expected) {
-              return event.request;
-            }
-            return {
-              statusCode: 401,
-              statusDescription: "Unauthorized",
-              headers: { "www-authenticate": { value: 'Basic realm="Authentification"' } },
-            };
+          function handler(event) {${basicAuthCheck}
+            return event.request;
           }
         `),
       });
@@ -187,7 +199,16 @@ export class TmCloudfrontStack extends cdk.Stack {
         region: this.region,
       }))
       : undefined;
-    if (errorBucketOrigin) {
+    const falOrigin = props.falPath !== undefined
+      ? S3BucketOrigin.withOriginAccessControl(s3.Bucket.fromBucketAttributes(this, 'ContentBucket', {
+        bucketName: readParameter(this, TmParameterNames.s3ContentBucketName(env)),
+        region: this.region,
+      }))
+      : undefined;
+    const falFunctionAssociations = props.falPath !== undefined
+      ? this.falFunctionAssociations(props.falPath, basicAuthCheck)
+      : [];
+    if (errorBucketOrigin || falOrigin) {
       cdk.Annotations.of(this).acknowledgeWarning('@aws-cdk/aws-cloudfront-origins:updateImportedBucketPolicyOac',
         'TmS3Stack grants the account distributions read access to the bucket.');
     }
@@ -232,6 +253,15 @@ export class TmCloudfrontStack extends cdk.Stack {
         });
       }
 
+      if (falOrigin) {
+        distribution.addBehavior(`${props.falPath}/*`, falOrigin, {
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+          cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+          functionAssociations: falFunctionAssociations,
+        });
+      }
+
       publishParameter(this, `DistributionIdParameter${suffix}`,
         TmParameterNames.cloudfrontWwwDistributionId(env, index), distribution.distributionId);
       this.distributions.push(distribution);
@@ -245,7 +275,50 @@ export class TmCloudfrontStack extends cdk.Stack {
         })));
     }
   }
+
+  /**
+   * Viewer functions of the FAL behavior: the request one checks basic auth
+   * (if any) and removes the path, since the bucket keys have no prefix; the
+   * response one adds the CSP, choosing the PDF variant by extension, in any
+   * case (CloudFront path patterns are case-sensitive, hence a function rather
+   * than a behavior per extension).
+   */
+  private falFunctionAssociations(falPath: string, basicAuthCheck: string): cloudfront.FunctionAssociation[] {
+    const request = new cloudfront.Function(this, 'FalRequestFunction', {
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
+      comment: `Removes ${falPath} before the FAL content bucket`,
+      code: cloudfront.FunctionCode.fromInline(`
+          function handler(event) {${basicAuthCheck}
+            var request = event.request;
+            request.uri = request.uri.substring(${falPath.length});
+            return request;
+          }
+        `),
+    });
+    const response = new cloudfront.Function(this, 'FalResponseFunction', {
+      runtime: cloudfront.FunctionRuntime.JS_2_0,
+      comment: 'Content-Security-Policy of the FAL files',
+      code: cloudfront.FunctionCode.fromInline(`
+          function handler(event) {
+            var response = event.response;
+            var pdf = /\\.pdf$/i.test(event.request.uri);
+            response.headers['content-security-policy'] = { value: pdf ? ${JSON.stringify(FAL_PDF_CSP)} : ${JSON.stringify(FAL_CSP)} };
+            response.headers['x-content-type-options'] = { value: 'nosniff' };
+            return response;
+          }
+        `),
+    });
+    return [
+      { function: request, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST },
+      { function: response, eventType: cloudfront.FunctionEventType.VIEWER_RESPONSE },
+    ];
+  }
 }
+
+/** Content-Security-Policy of the files under the FAL path, from TYPO3's `fileadmin/.htaccess`. */
+const FAL_CSP = "default-src 'self'; script-src 'none'; style-src 'unsafe-inline'; object-src 'none'; sandbox;";
+/** The same for PDF files, which browsers refuse to display in a sandbox. */
+const FAL_PDF_CSP = "default-src 'self' 'unsafe-inline'; script-src 'none'; object-src 'self'; plugin-types application/pdf;";
 
 function errorResponses(): cloudfront.ErrorResponse[] {
   return [400, 403, 500, 501, 502, 503, 504].map(code => ({
