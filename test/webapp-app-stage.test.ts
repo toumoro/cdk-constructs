@@ -232,6 +232,20 @@ describe('TmWebappAppStage, greenfield settings', () => {
     });
   });
 
+  test('counts the body rules and blocks their matches outside the TYPO3 exceptions', () => {
+    const rules: any[] = Object.values(Template.fromStack(stage.wafStack!).findResources('AWS::WAFv2::WebACL'))[0].Properties.Rules;
+    const rule = (name: string) => rules.find(r => r.Name === name);
+    const counted = (name: string) => rule(name).Statement.ManagedRuleGroupStatement.RuleActionOverrides.map((o: any) => o.Name);
+    expect(counted('AWS-AWSManagedRulesSQLiRuleSet')).toEqual(['SQLi_BODY']);
+    expect(counted('AWS-AWSManagedRulesPHPRuleSet')).toEqual(['PHPHighRiskMethodsVariables_BODY']);
+    expect(rule('AWS-AWSManagedRulesSQLiRuleSet').Statement.ManagedRuleGroupStatement.ScopeDownStatement).toBeUndefined();
+    const sqli = rule('TYPO3_SQLi_Body');
+    expect(sqli.Priority).toBeGreaterThan(rule('AWS-AWSManagedRulesPHPRuleSet').Priority);
+    expect(sqli.Action).toEqual({ Block: {} });
+    expect(sqli.Statement.AndStatement.Statements[0].LabelMatchStatement.Key).toBe('awswaf:managed:aws:sql-database:SQLi_Body');
+    expect(JSON.stringify(sqli.Statement)).toContain('/typo3/file/commit');
+  });
+
   test('stores service user keys in Secrets Manager', () => {
     const template = Template.fromStack(stage.serviceIamUsersStack!);
     template.resourceCountIs('AWS::IAM::User', 2);

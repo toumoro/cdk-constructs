@@ -50,10 +50,12 @@ const NO_CHALLENGE_URI_REGEX = '\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|
 /**
  * Baseline CloudFront-scope WebACL, derived from pgu's: AWS anti-DDoS, IP
  * reputation, known bad inputs, a per-IP rate limit, and the common, SQL
- * injection and PHP rule sets outside the TYPO3 backend (`/typo3/`). Anonymous
- * IPs are counted only, but hosting-provider IPs (except Site24x7 monitoring)
- * get a challenge on pages. Must be deployed in us-east-1. The ARN is
- * published in SSM in the application region.
+ * injection and PHP rule sets. Anonymous IPs are counted only, but
+ * hosting-provider IPs (except Site24x7 monitoring) get a challenge on pages.
+ * The body rules of the common, SQL injection and PHP sets only count; the
+ * TYPO3 rules, from sqnim's TYPO3Overrider, block their matches except where
+ * TYPO3 legitimately posts such bodies. Must be deployed in us-east-1. The ARN
+ * is published in SSM in the application region.
  */
 export class TmWafStack extends cdk.Stack {
   /** ARN of the WebACL. */
@@ -146,10 +148,23 @@ export class TmWafStack extends cdk.Stack {
         visibilityConfig: visibility('Rate-limit-per-ip'),
       },
       managedRuleGroup('AWSManagedRulesKnownBadInputsRuleSet', 40),
-      // Large request bodies are normal for file uploads.
-      managedRuleGroup('AWSManagedRulesCommonRuleSet', 50, { outsideBackend: true, countedRules: ['SizeRestrictions_BODY'] }),
-      managedRuleGroup('AWSManagedRulesSQLiRuleSet', 60, { outsideBackend: true }),
-      managedRuleGroup('AWSManagedRulesPHPRuleSet', 70, { outsideBackend: true }),
+      // Body rules: counted here, blocked by the TYPO3 rules below.
+      managedRuleGroup('AWSManagedRulesCommonRuleSet', 50, {
+        countedRules: ['SizeRestrictions_BODY', 'CrossSiteScripting_BODY', 'GenericLFI_BODY'],
+      }),
+      managedRuleGroup('AWSManagedRulesSQLiRuleSet', 60, { countedRules: ['SQLi_BODY'] }),
+      managedRuleGroup('AWSManagedRulesPHPRuleSet', 70, { countedRules: ['PHPHighRiskMethodsVariables_BODY'] }),
+      // Large bodies: SAML responses, Powermail forms, backend uploads.
+      typo3Rule('TYPO3_SizeRestrictions_Body', 80, 'core-rule-set:SizeRestrictions_Body', [
+        uriStartsWith('/simplesaml/module.php/saml/sp/saml2-acs.php/'),
+        queryStringStartsWith('tx_powermail_pi1'),
+        uriStartsWith('/typo3/'),
+      ]),
+      // Rich text and code in backend forms.
+      typo3Rule('TYPO3_CrossSiteScripting_BODY', 81, 'core-rule-set:CrossSiteScripting_Body', [uriStartsWith('/typo3')]),
+      typo3Rule('TYPO3_SQLi_Body', 82, 'sql-database:SQLi_Body', [uriStartsWith('/typo3/file/commit')]),
+      typo3Rule('TYPO3_PHPHighRiskMethodsVariables_Body', 83, 'php-app:PHPHighRiskMethodsVariables_Body', [uriStartsWith('/typo3/record/edit')]),
+      typo3Rule('TYPO3_GenericLFI_Body', 84, 'core-rule-set:GenericLFI_Body', [uriStartsWith('/typo3/index.php')]),
     );
 
     const webAcl = new CfnWebACL(this, 'WebAcl', {
@@ -219,8 +234,6 @@ function visibility(metricName: string): CfnWebACL.VisibilityConfigProperty {
 interface ManagedRuleGroupOptions {
   /** Counts the group's matches instead of applying its actions. */
   readonly countOnly?: boolean;
-  /** Doesn't evaluate the group on the TYPO3 backend. */
-  readonly outsideBackend?: boolean;
   /** Rules of the group that only count. */
   readonly countedRules?: string[];
   /** Configuration of the group. */
@@ -228,18 +241,6 @@ interface ManagedRuleGroupOptions {
 }
 
 function managedRuleGroup(name: string, priority: number, options: ManagedRuleGroupOptions = {}): CfnWebACL.RuleProperty {
-  const outsideBackend: CfnWebACL.StatementProperty = {
-    notStatement: {
-      statement: {
-        byteMatchStatement: {
-          searchString: '/typo3/',
-          fieldToMatch: { uriPath: {} },
-          textTransformations: [{ priority: 0, type: 'LOWERCASE' }],
-          positionalConstraint: 'STARTS_WITH',
-        },
-      },
-    },
-  };
   return {
     name: `AWS-${name}`,
     priority,
@@ -248,11 +249,50 @@ function managedRuleGroup(name: string, priority: number, options: ManagedRuleGr
       managedRuleGroupStatement: {
         vendorName: 'AWS',
         name,
-        scopeDownStatement: options.outsideBackend ? outsideBackend : undefined,
         ruleActionOverrides: options.countedRules?.map(rule => ({ name: rule, actionToUse: { count: {} } })),
         managedRuleGroupConfigs: options.configs,
       },
     },
     visibilityConfig: visibility(`AWS-${name}`),
+  };
+}
+
+/**
+ * Blocks the requests that a counted managed rule labeled (`label`, after
+ * `awswaf:managed:aws:`), except those matching one of `exceptions`.
+ */
+function typo3Rule(name: string, priority: number, label: string, exceptions: CfnWebACL.StatementProperty[]): CfnWebACL.RuleProperty {
+  return {
+    name,
+    priority,
+    action: { block: {} },
+    statement: {
+      andStatement: {
+        statements: [
+          { labelMatchStatement: { scope: 'LABEL', key: `awswaf:managed:aws:${label}` } },
+          { notStatement: { statement: exceptions.length > 1 ? { orStatement: { statements: exceptions } } : exceptions[0] } },
+        ],
+      },
+    },
+    visibilityConfig: visibility(name),
+  };
+}
+
+function uriStartsWith(path: string): CfnWebACL.StatementProperty {
+  return startsWith(path, { uriPath: {} });
+}
+
+function queryStringStartsWith(value: string): CfnWebACL.StatementProperty {
+  return startsWith(value, { queryString: {} });
+}
+
+function startsWith(searchString: string, fieldToMatch: CfnWebACL.FieldToMatchProperty): CfnWebACL.StatementProperty {
+  return {
+    byteMatchStatement: {
+      searchString,
+      fieldToMatch,
+      textTransformations: [{ priority: 0, type: 'NONE' }],
+      positionalConstraint: 'STARTS_WITH',
+    },
   };
 }
