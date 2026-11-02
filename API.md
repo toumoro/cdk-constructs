@@ -470,7 +470,11 @@ Uniquely identifies this class.
 
 ### TmBackupStack <a name="TmBackupStack" id="tm-cdk-constructs.TmBackupStack"></a>
 
-Daily AWS Backup plans for every EBS volume and RDS cluster of the account, in an encrypted vault.
+AWS Backup plans in an encrypted vault.
+
+By default, two daily plans for every EBS volume and RDS cluster of the
+account. With `rules`, a single plan for `resources` and the resources
+tagged with `SELECTION_TAG_KEY`.
 
 #### Initializers <a name="Initializers" id="tm-cdk-constructs.TmBackupStack.Initializer"></a>
 
@@ -1023,6 +1027,7 @@ Convert an object, potentially containing tokens, to a YAML string.
 | <code><a href="#tm-cdk-constructs.TmBackupStack.consumeReference">consumeReference</a></code> | Override the reference strength for a specific cross-stack reference value. |
 | <code><a href="#tm-cdk-constructs.TmBackupStack.isStack">isStack</a></code> | Return whether the given object is a Stack. |
 | <code><a href="#tm-cdk-constructs.TmBackupStack.of">of</a></code> | Looks up the first stack scope in which `construct` is defined. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.select">select</a></code> | Tags `resource` so the plan of `rules` backs it up. |
 
 ---
 
@@ -1172,6 +1177,22 @@ Will return the closest containing `Stack` or `NestedStack`.
 - *Type:* constructs.IConstruct
 
 The construct to start the search from.
+
+---
+
+##### `select` <a name="select" id="tm-cdk-constructs.TmBackupStack.select"></a>
+
+```typescript
+import { TmBackupStack } from 'tm-cdk-constructs'
+
+TmBackupStack.select(resource: IConstruct)
+```
+
+Tags `resource` so the plan of `rules` backs it up.
+
+###### `resource`<sup>Required</sup> <a name="resource" id="tm-cdk-constructs.TmBackupStack.select.parameter.resource"></a>
+
+- *Type:* constructs.IConstruct
 
 ---
 
@@ -1546,6 +1567,38 @@ Whether termination protection is enabled for this stack.
 
 ---
 
+#### Constants <a name="Constants" id="Constants"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.SELECTION_TAG_KEY">SELECTION_TAG_KEY</a></code> | <code>string</code> | Key of the tag selecting a resource for the plan of `rules`. |
+| <code><a href="#tm-cdk-constructs.TmBackupStack.property.SELECTION_TAG_VALUE">SELECTION_TAG_VALUE</a></code> | <code>string</code> | Value of the tag selecting a resource for the plan of `rules`. |
+
+---
+
+##### `SELECTION_TAG_KEY`<sup>Required</sup> <a name="SELECTION_TAG_KEY" id="tm-cdk-constructs.TmBackupStack.property.SELECTION_TAG_KEY"></a>
+
+```typescript
+public readonly SELECTION_TAG_KEY: string;
+```
+
+- *Type:* string
+
+Key of the tag selecting a resource for the plan of `rules`.
+
+---
+
+##### `SELECTION_TAG_VALUE`<sup>Required</sup> <a name="SELECTION_TAG_VALUE" id="tm-cdk-constructs.TmBackupStack.property.SELECTION_TAG_VALUE"></a>
+
+```typescript
+public readonly SELECTION_TAG_VALUE: string;
+```
+
+- *Type:* string
+
+Value of the tag selecting a resource for the plan of `rules`.
+
+---
 
 ### TmBastionStack <a name="TmBastionStack" id="tm-cdk-constructs.TmBastionStack"></a>
 
@@ -20384,11 +20437,16 @@ The VPC.
 
 ### TmWafStack <a name="TmWafStack" id="tm-cdk-constructs.TmWafStack"></a>
 
-Baseline CloudFront-scope WebACL, derived from pgu's: AWS IP reputation, known bad inputs, a per-IP rate limit, and the common, SQL injection and PHP rule sets outside the TYPO3 backend (`/typo3/`).
+Baseline CloudFront-scope WebACL, derived from pgu's: AWS anti-DDoS, IP reputation, known bad inputs, a per-IP rate limit, and the common, SQL injection and PHP rule sets.
 
-Anonymous IPs are counted
-only. Must be deployed in us-east-1. The ARN is published in SSM in the
-application region.
+Anonymous IPs are counted only, but
+hosting-provider IPs (except Site24x7 monitoring) get a challenge on pages.
+Solr searches (`tx_solr`) are rate limited per IP, and facet filters
+challenged.
+The body rules of the common, SQL injection and PHP sets only count; the
+TYPO3 rules, from sqnim's TYPO3Overrider, block their matches except where
+TYPO3 legitimately posts such bodies. Must be deployed in us-east-1. The ARN
+is published in SSM in the application region.
 
 #### Initializers <a name="Initializers" id="tm-cdk-constructs.TmWafStack.Initializer"></a>
 
@@ -21994,7 +22052,10 @@ const backupSettings: BackupSettings = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.BackupSettings.property.ec2RetentionDays">ec2RetentionDays</a></code> | <code>number</code> | Retention of the EBS volume backups, in days. |
+| <code><a href="#tm-cdk-constructs.BackupSettings.property.efsAutomaticBackups">efsAutomaticBackups</a></code> | <code>boolean</code> | EFS automatic backups (the AWS default plan, daily, kept 35 days). |
 | <code><a href="#tm-cdk-constructs.BackupSettings.property.rdsRetentionDays">rdsRetentionDays</a></code> | <code>number</code> | Retention of the RDS cluster backups, in days. |
+| <code><a href="#tm-cdk-constructs.BackupSettings.property.resources">resources</a></code> | <code><a href="#tm-cdk-constructs.BackupResourceType">BackupResourceType</a>[]</code> | Resources backed up by `rules`. |
+| <code><a href="#tm-cdk-constructs.BackupSettings.property.rules">rules</a></code> | <code><a href="#tm-cdk-constructs.TmBackupRule">TmBackupRule</a>[]</code> | Rules of a single plan backing up `resources`, in place of the daily EBS and RDS plans (e.g. daily kept 30 days and monthly kept 365 days). The vault is kept, with its recovery points. |
 
 ---
 
@@ -22009,6 +22070,25 @@ public readonly ec2RetentionDays: number;
 
 Retention of the EBS volume backups, in days.
 
+Ignored when `rules` is set.
+
+---
+
+##### `efsAutomaticBackups`<sup>Optional</sup> <a name="efsAutomaticBackups" id="tm-cdk-constructs.BackupSettings.property.efsAutomaticBackups"></a>
+
+```typescript
+public readonly efsAutomaticBackups: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+EFS automatic backups (the AWS default plan, daily, kept 35 days).
+
+Turn
+off when `resources` includes `BackupResourceType.EFS`, so EFS is not
+backed up twice.
+
 ---
 
 ##### `rdsRetentionDays`<sup>Optional</sup> <a name="rdsRetentionDays" id="tm-cdk-constructs.BackupSettings.property.rdsRetentionDays"></a>
@@ -22021,6 +22101,34 @@ public readonly rdsRetentionDays: number;
 - *Default:* 35
 
 Retention of the RDS cluster backups, in days.
+
+Ignored when `rules` is set.
+
+---
+
+##### `resources`<sup>Optional</sup> <a name="resources" id="tm-cdk-constructs.BackupSettings.property.resources"></a>
+
+```typescript
+public readonly resources: BackupResourceType[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.BackupResourceType">BackupResourceType</a>[]
+- *Default:* [BackupResourceType.EBS_VOLUMES, BackupResourceType.RDS_CLUSTERS]
+
+Resources backed up by `rules`.
+
+---
+
+##### `rules`<sup>Optional</sup> <a name="rules" id="tm-cdk-constructs.BackupSettings.property.rules"></a>
+
+```typescript
+public readonly rules: TmBackupRule[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmBackupRule">TmBackupRule</a>[]
+- *Default:* daily EBS and RDS plans, see `ec2RetentionDays` and `rdsRetentionDays`
+
+Rules of a single plan backing up `resources`, in place of the daily EBS and RDS plans (e.g. daily kept 30 days and monthly kept 365 days). The vault is kept, with its recovery points.
 
 ---
 
@@ -23912,6 +24020,7 @@ const tmApplicationLoadBalancedFargateServiceProps: TmApplicationLoadBalancedFar
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableDefaultScaling">disableDefaultScaling</a></code> | <code>boolean</code> | Completely disable the built-in auto-scaling policies. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.disableMemoryScaling">disableMemoryScaling</a></code> | <code>boolean</code> | Skips the built-in memory target-tracking policy and keeps the CPU one. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.ecsDeploymentHookProps">ecsDeploymentHookProps</a></code> | <code><a href="#tm-cdk-constructs.IIEcsDeploymentHookProps">IIEcsDeploymentHookProps</a></code> | *No description.* |
+| <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsAutomaticBackups">efsAutomaticBackups</a></code> | <code>boolean</code> | EFS automatic backups of the `efsVolumes` file systems. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes">efsVolumes</a></code> | <code><a href="#tm-cdk-constructs.IIefsVolumes">IIefsVolumes</a>[]</code> | *No description.* |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.loadBalancingAlgorithmType">loadBalancingAlgorithmType</a></code> | <code>aws-cdk-lib.aws_elasticloadbalancingv2.TargetGroupLoadBalancingAlgorithmType</code> | The load balancing algorithm the target group uses to route requests to its registered targets. |
 | <code><a href="#tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.maxTaskCount">maxTaskCount</a></code> | <code>number</code> | The maximum number of task. |
@@ -24729,6 +24838,19 @@ public readonly ecsDeploymentHookProps: IIEcsDeploymentHookProps;
 
 ---
 
+##### `efsAutomaticBackups`<sup>Optional</sup> <a name="efsAutomaticBackups" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsAutomaticBackups"></a>
+
+```typescript
+public readonly efsAutomaticBackups: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+EFS automatic backups of the `efsVolumes` file systems.
+
+---
+
 ##### `efsVolumes`<sup>Optional</sup> <a name="efsVolumes" id="tm-cdk-constructs.TmApplicationLoadBalancedFargateServiceProps.property.efsVolumes"></a>
 
 ```typescript
@@ -24915,6 +25037,65 @@ Target memory utilization of the built-in target-tracking scaling policy.
 
 ---
 
+### TmBackupRule <a name="TmBackupRule" id="tm-cdk-constructs.TmBackupRule"></a>
+
+A rule of the backup plan: when to back up, and how long to keep it.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.TmBackupRule.Initializer"></a>
+
+```typescript
+import { TmBackupRule } from 'tm-cdk-constructs'
+
+const tmBackupRule: TmBackupRule = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.TmBackupRule.property.retentionDays">retentionDays</a></code> | <code>number</code> | Retention of the recovery points, in days. |
+| <code><a href="#tm-cdk-constructs.TmBackupRule.property.ruleName">ruleName</a></code> | <code>string</code> | Name of the rule, unique in the plan (e.g. `Daily`, `Monthly`). |
+| <code><a href="#tm-cdk-constructs.TmBackupRule.property.scheduleExpression">scheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | Backup schedule. |
+
+---
+
+##### `retentionDays`<sup>Required</sup> <a name="retentionDays" id="tm-cdk-constructs.TmBackupRule.property.retentionDays"></a>
+
+```typescript
+public readonly retentionDays: number;
+```
+
+- *Type:* number
+
+Retention of the recovery points, in days.
+
+---
+
+##### `ruleName`<sup>Required</sup> <a name="ruleName" id="tm-cdk-constructs.TmBackupRule.property.ruleName"></a>
+
+```typescript
+public readonly ruleName: string;
+```
+
+- *Type:* string
+
+Name of the rule, unique in the plan (e.g. `Daily`, `Monthly`).
+
+---
+
+##### `scheduleExpression`<sup>Optional</sup> <a name="scheduleExpression" id="tm-cdk-constructs.TmBackupRule.property.scheduleExpression"></a>
+
+```typescript
+public readonly scheduleExpression: Schedule;
+```
+
+- *Type:* aws-cdk-lib.aws_events.Schedule
+- *Default:* daily at midnight UTC
+
+Backup schedule.
+
+---
+
 ### TmBackupStackProps <a name="TmBackupStackProps" id="tm-cdk-constructs.TmBackupStackProps"></a>
 
 Props for `TmBackupStack`.
@@ -24945,7 +25126,9 @@ const tmBackupStackProps: TmBackupStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.terminationProtection">terminationProtection</a></code> | <code>boolean</code> | Whether to enable termination protection for this stack. |
 | <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.ec2RetentionDays">ec2RetentionDays</a></code> | <code>number</code> | Retention of the EBS volume backups, in days. |
 | <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.rdsRetentionDays">rdsRetentionDays</a></code> | <code>number</code> | Retention of the RDS cluster backups, in days. |
-| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.scheduleExpression">scheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | Backup schedule. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.resources">resources</a></code> | <code>aws-cdk-lib.aws_backup.BackupResource[]</code> | Resources backed up by `rules`, by ARN (wildcards allowed). |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.rules">rules</a></code> | <code><a href="#tm-cdk-constructs.TmBackupRule">TmBackupRule</a>[]</code> | Rules of a single plan backing up `resources`, in place of the EBS and RDS plans. |
+| <code><a href="#tm-cdk-constructs.TmBackupStackProps.property.scheduleExpression">scheduleExpression</a></code> | <code>aws-cdk-lib.aws_events.Schedule</code> | Backup schedule of the EBS and RDS plans. |
 
 ---
 
@@ -25204,6 +25387,8 @@ public readonly ec2RetentionDays: number;
 
 Retention of the EBS volume backups, in days.
 
+Ignored when `rules` is set.
+
 ---
 
 ##### `rdsRetentionDays`<sup>Optional</sup> <a name="rdsRetentionDays" id="tm-cdk-constructs.TmBackupStackProps.property.rdsRetentionDays"></a>
@@ -25217,6 +25402,37 @@ public readonly rdsRetentionDays: number;
 
 Retention of the RDS cluster backups, in days.
 
+Ignored when `rules` is set.
+
+---
+
+##### `resources`<sup>Optional</sup> <a name="resources" id="tm-cdk-constructs.TmBackupStackProps.property.resources"></a>
+
+```typescript
+public readonly resources: BackupResource[];
+```
+
+- *Type:* aws-cdk-lib.aws_backup.BackupResource[]
+- *Default:* none, only the tagged resources
+
+Resources backed up by `rules`, by ARN (wildcards allowed).
+
+Resources
+tagged with the `TmBackupStack.SELECTION_TAG_KEY` tag are backed up too.
+
+---
+
+##### `rules`<sup>Optional</sup> <a name="rules" id="tm-cdk-constructs.TmBackupStackProps.property.rules"></a>
+
+```typescript
+public readonly rules: TmBackupRule[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.TmBackupRule">TmBackupRule</a>[]
+- *Default:* the EBS and RDS plans
+
+Rules of a single plan backing up `resources`, in place of the EBS and RDS plans.
+
 ---
 
 ##### `scheduleExpression`<sup>Optional</sup> <a name="scheduleExpression" id="tm-cdk-constructs.TmBackupStackProps.property.scheduleExpression"></a>
@@ -25228,7 +25444,9 @@ public readonly scheduleExpression: Schedule;
 - *Type:* aws-cdk-lib.aws_events.Schedule
 - *Default:* daily at midnight UTC
 
-Backup schedule.
+Backup schedule of the EBS and RDS plans.
+
+Ignored when `rules` is set.
 
 ---
 
@@ -27199,6 +27417,7 @@ const tmEcsStackProps: TmEcsStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.deploymentHookCommand">deploymentHookCommand</a></code> | <code>string[]</code> | Command run in a one-off task after each deployment. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.desiredCount">desiredCount</a></code> | <code>number</code> | Number of tasks when the service is created. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.disableMemoryScaling">disableMemoryScaling</a></code> | <code>boolean</code> | Drops the memory target-tracking policy (CPU only). |
+| <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.efsAutomaticBackups">efsAutomaticBackups</a></code> | <code>boolean</code> | EFS automatic backups (the AWS default plan) of the service file systems. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.environment">environment</a></code> | <code>{[ key: string ]: string}</code> | Plain environment variables. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.falEfsDirectories">falEfsDirectories</a></code> | <code>string[]</code> | FAL directories stored on EFS, relative to the document root. |
 | <code><a href="#tm-cdk-constructs.TmEcsStackProps.property.fixEfsAssetsOwnership">fixEfsAssetsOwnership</a></code> | <code>boolean</code> | Prepends a `chown` of the EFS `typo3temp/assets` mount (uid/gid 33) to the post-deploy hook command. |
@@ -27615,6 +27834,19 @@ public readonly disableMemoryScaling: boolean;
 - *Default:* false
 
 Drops the memory target-tracking policy (CPU only).
+
+---
+
+##### `efsAutomaticBackups`<sup>Optional</sup> <a name="efsAutomaticBackups" id="tm-cdk-constructs.TmEcsStackProps.property.efsAutomaticBackups"></a>
+
+```typescript
+public readonly efsAutomaticBackups: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+EFS automatic backups (the AWS default plan) of the service file systems.
 
 ---
 
@@ -35674,6 +35906,57 @@ Whether the task gets a public IP (required in a public subnet without NAT).
 ---
 
 ## Enums <a name="Enums" id="Enums"></a>
+
+### BackupResourceType <a name="BackupResourceType" id="tm-cdk-constructs.BackupResourceType"></a>
+
+Resources selected by the backup plan of `BackupSettings.rules`.
+
+#### Members <a name="Members" id="Members"></a>
+
+| **Name** | **Description** |
+| --- | --- |
+| <code><a href="#tm-cdk-constructs.BackupResourceType.EC2_INSTANCES">EC2_INSTANCES</a></code> | Every EC2 instance of the region, with its EBS volumes. |
+| <code><a href="#tm-cdk-constructs.BackupResourceType.EBS_VOLUMES">EBS_VOLUMES</a></code> | Every EBS volume of the region. |
+| <code><a href="#tm-cdk-constructs.BackupResourceType.RDS_CLUSTERS">RDS_CLUSTERS</a></code> | Every RDS cluster of the region. |
+| <code><a href="#tm-cdk-constructs.BackupResourceType.EFS">EFS</a></code> | The EFS file systems of the ECS service. |
+| <code><a href="#tm-cdk-constructs.BackupResourceType.S3_CONTENT_BUCKET">S3_CONTENT_BUCKET</a></code> | The FAL content bucket only (versioned). |
+
+---
+
+##### `EC2_INSTANCES` <a name="EC2_INSTANCES" id="tm-cdk-constructs.BackupResourceType.EC2_INSTANCES"></a>
+
+Every EC2 instance of the region, with its EBS volumes.
+
+---
+
+
+##### `EBS_VOLUMES` <a name="EBS_VOLUMES" id="tm-cdk-constructs.BackupResourceType.EBS_VOLUMES"></a>
+
+Every EBS volume of the region.
+
+---
+
+
+##### `RDS_CLUSTERS` <a name="RDS_CLUSTERS" id="tm-cdk-constructs.BackupResourceType.RDS_CLUSTERS"></a>
+
+Every RDS cluster of the region.
+
+---
+
+
+##### `EFS` <a name="EFS" id="tm-cdk-constructs.BackupResourceType.EFS"></a>
+
+The EFS file systems of the ECS service.
+
+---
+
+
+##### `S3_CONTENT_BUCKET` <a name="S3_CONTENT_BUCKET" id="tm-cdk-constructs.BackupResourceType.S3_CONTENT_BUCKET"></a>
+
+The FAL content bucket only (versioned).
+
+---
+
 
 ### ContainerTopology <a name="ContainerTopology" id="tm-cdk-constructs.ContainerTopology"></a>
 

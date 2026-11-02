@@ -99,6 +99,13 @@ export interface TmEcsStackProps extends cdk.StackProps {
   readonly fixEfsAssetsOwnership?: boolean;
 
   /**
+   * EFS automatic backups (the AWS default plan) of the service file systems.
+   *
+   * @default true
+   */
+  readonly efsAutomaticBackups?: boolean;
+
+  /**
    * SSM parameter holding the secret header value sent by CloudFront.
    */
   readonly originCustomHeaderParameterName: string;
@@ -452,6 +459,7 @@ export class TmEcsStack extends cdk.Stack {
       scheduledTasksCommand: props.scheduledTasksCommand ?? '/usr/local/bin/run-scheduler.sh',
       scheduledTaskContainerName: commandContainer,
       efsVolumes,
+      efsAutomaticBackups: props.efsAutomaticBackups,
       ecsDeploymentHookProps: {
         containerName: commandContainer,
         command: deploymentHookWithChown,

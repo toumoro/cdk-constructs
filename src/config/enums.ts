@@ -110,3 +110,29 @@ export enum FalS3Driver {
    */
   AUS_DRIVER_AMAZON_S3 = 'aus_driver_amazon_s3',
 }
+
+/**
+ * Resources selected by the backup plan of `BackupSettings.rules`.
+ */
+export enum BackupResourceType {
+  /**
+   * Every EC2 instance of the region, with its EBS volumes.
+   */
+  EC2_INSTANCES = 'EC2_INSTANCES',
+  /**
+   * Every EBS volume of the region.
+   */
+  EBS_VOLUMES = 'EBS_VOLUMES',
+  /**
+   * Every RDS cluster of the region.
+   */
+  RDS_CLUSTERS = 'RDS_CLUSTERS',
+  /**
+   * The EFS file systems of the ECS service.
+   */
+  EFS = 'EFS',
+  /**
+   * The FAL content bucket only (versioned).
+   */
+  S3_CONTENT_BUCKET = 'S3_CONTENT_BUCKET',
+}

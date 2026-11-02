@@ -46,6 +46,11 @@ export class TmEfsFileSystem extends Construct {
       throughputMode: throughputMode,
       allowAnonymousAccess: mergedProps.allowAnonymousAccess,
     });
+    // CDK omits BackupPolicy when automatic backups are off, which leaves an
+    // existing file system's backups on: write DISABLED explicitly.
+    if (!mergedProps.enableAutomaticBackups) {
+      (this.efsFileSystem.node.defaultChild as efs.CfnFileSystem).backupPolicy = { status: 'DISABLED' };
+    }
 
     this.efsAccessPoint = new efs.AccessPoint(this, 'EFSAccessPoint', {
       fileSystem: this.efsFileSystem,

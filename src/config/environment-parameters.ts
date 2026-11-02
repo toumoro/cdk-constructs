@@ -1,5 +1,8 @@
-import { ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
+import { BackupResourceType, ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
+import { TmBackupRule } from '../stacks/backup/tm-backup-stack';
 import { TmSecretField } from '../stacks/compute/tm-ecs-stack';
+
+export { TmBackupRule } from '../stacks/backup/tm-backup-stack';
 
 export { TmSecretField } from '../stacks/compute/tm-ecs-stack';
 
@@ -708,18 +711,43 @@ export interface RedirectionsSettings {
  */
 export interface BackupSettings {
   /**
-   * Retention of the EBS volume backups, in days.
+   * Retention of the EBS volume backups, in days. Ignored when `rules` is set.
    *
    * @default 7
    */
   readonly ec2RetentionDays?: number;
 
   /**
-   * Retention of the RDS cluster backups, in days.
+   * Retention of the RDS cluster backups, in days. Ignored when `rules` is set.
    *
    * @default 35
    */
   readonly rdsRetentionDays?: number;
+
+  /**
+   * Rules of a single plan backing up `resources`, in place of the daily EBS
+   * and RDS plans (e.g. daily kept 30 days and monthly kept 365 days). The
+   * vault is kept, with its recovery points.
+   *
+   * @default - daily EBS and RDS plans, see `ec2RetentionDays` and `rdsRetentionDays`
+   */
+  readonly rules?: TmBackupRule[];
+
+  /**
+   * Resources backed up by `rules`.
+   *
+   * @default [BackupResourceType.EBS_VOLUMES, BackupResourceType.RDS_CLUSTERS]
+   */
+  readonly resources?: BackupResourceType[];
+
+  /**
+   * EFS automatic backups (the AWS default plan, daily, kept 35 days). Turn
+   * off when `resources` includes `BackupResourceType.EFS`, so EFS is not
+   * backed up twice.
+   *
+   * @default true
+   */
+  readonly efsAutomaticBackups?: boolean;
 }
 
 /**

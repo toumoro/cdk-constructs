@@ -1,7 +1,9 @@
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
+import * as events from 'aws-cdk-lib/aws-events';
 import {
+  BackupResourceType,
   ContainerTopology,
   EnvironmentParameters,
   FalS3Driver,
@@ -1180,5 +1182,79 @@ describe('TmParameterNames', () => {
 
   test('rejects segments that are not kebab-case', () => {
     expect(() => TmParameterNames.of('Prod', 'rds', 'cluster', 'arn')).toThrow(/lower-kebab-case/);
+  });
+});
+
+describe('TmWebappAppStage, backups', () => {
+  test('defaults to the daily EBS and RDS plans, and EFS automatic backups', () => {
+    const stage = synthStage(greenfield);
+    const backup = Template.fromStack(stage.backupStack);
+    backup.resourceCountIs('AWS::Backup::BackupPlan', 2);
+    backup.hasResourceProperties('AWS::Backup::BackupPlan', {
+      BackupPlan: Match.objectLike({ BackupPlanName: 'EC2BackupPlan', BackupPlanRule: [Match.objectLike({ Lifecycle: { DeleteAfterDays: 7 } })] }),
+    });
+    backup.hasResourceProperties('AWS::Backup::BackupPlan', {
+      BackupPlan: Match.objectLike({ BackupPlanName: 'RDSBackupPlan', BackupPlanRule: [Match.objectLike({ Lifecycle: { DeleteAfterDays: 35 } })] }),
+    });
+    expect(Object.keys(backup.findResources('AWS::Backup::BackupPlan'))).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^EC2BackupPlan/), expect.stringMatching(/^RDSBackupPlan/),
+    ]));
+    backup.hasResourceProperties('AWS::IAM::Role', { ManagedPolicyArns: Match.arrayEquals([Match.anyValue()]) });
+    Template.fromStack(stage.ecsStack).hasResourceProperties('AWS::EFS::FileSystem', { BackupPolicy: { Status: 'ENABLED' } });
+    expect(JSON.stringify(Template.fromStack(stage.ecsStack).toJSON())).not.toContain('tm:backup');
+  });
+
+  test('with rules, one plan for the selected resources, the EFS and the content bucket tagged', () => {
+    const stage = synthStage({
+      ...greenfield,
+      backup: {
+        rules: [
+          { ruleName: 'Daily', retentionDays: 30, scheduleExpression: events.Schedule.cron({ minute: '0', hour: '6' }) },
+          { ruleName: 'Monthly', retentionDays: 365, scheduleExpression: events.Schedule.cron({ minute: '0', hour: '6', day: '1' }) },
+        ],
+        resources: [BackupResourceType.EC2_INSTANCES, BackupResourceType.RDS_CLUSTERS, BackupResourceType.EFS, BackupResourceType.S3_CONTENT_BUCKET],
+        efsAutomaticBackups: false,
+      },
+    });
+    const backup = Template.fromStack(stage.backupStack);
+    backup.resourceCountIs('AWS::Backup::BackupPlan', 1);
+    backup.resourceCountIs('AWS::Backup::BackupVault', 1);
+    backup.hasResourceProperties('AWS::Backup::BackupPlan', {
+      BackupPlan: Match.objectLike({
+        BackupPlanRule: [
+          Match.objectLike({ RuleName: 'Daily', ScheduleExpression: 'cron(0 6 * * ? *)', Lifecycle: { DeleteAfterDays: 30 } }),
+          Match.objectLike({ RuleName: 'Monthly', ScheduleExpression: 'cron(0 6 1 * ? *)', Lifecycle: { DeleteAfterDays: 365 } }),
+        ],
+      }),
+    });
+    backup.hasResourceProperties('AWS::Backup::BackupSelection', {
+      BackupSelection: Match.objectLike({
+        Resources: [`arn:aws:ec2:ca-central-1:${ACCOUNT}:instance/*`, `arn:aws:rds:ca-central-1:${ACCOUNT}:cluster:*`],
+      }),
+    });
+    backup.hasResourceProperties('AWS::Backup::BackupSelection', {
+      BackupSelection: Match.objectLike({
+        ListOfTags: [{ ConditionKey: 'tm:backup', ConditionType: 'STRINGEQUALS', ConditionValue: 'true' }],
+      }),
+    });
+    const tag = { Key: 'tm:backup', Value: 'true' };
+    Template.fromStack(stage.ecsStack).hasResourceProperties('AWS::EFS::FileSystem', {
+      BackupPolicy: { Status: 'DISABLED' },
+      FileSystemTags: Match.arrayWith([tag]),
+    });
+    Template.fromStack(stage.s3Stack!).hasResourceProperties('AWS::S3::Bucket', {
+      VersioningConfiguration: { Status: 'Enabled' },
+      Tags: Match.arrayWith([tag]),
+    });
+  });
+
+  test('rejects S3_CONTENT_BUCKET without a content bucket', () => {
+    expect(() => synthStage({
+      ...greenfield,
+      fal: { storage: FalStorage.EFS },
+      serviceIamUsers: [],
+      cdn: undefined,
+      backup: { rules: [{ ruleName: 'Daily', retentionDays: 30 }], resources: [BackupResourceType.S3_CONTENT_BUCKET] },
+    })).toThrow(/S3_CONTENT_BUCKET/);
   });
 });

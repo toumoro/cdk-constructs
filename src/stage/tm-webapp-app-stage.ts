@@ -1,7 +1,8 @@
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
+import * as backup from 'aws-cdk-lib/aws-backup';
 import { Construct } from 'constructs';
-import { ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, ServiceIamUser } from '../config/enums';
+import { BackupResourceType, ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, ServiceIamUser } from '../config/enums';
 import { EnvironmentParameters } from '../config/environment-parameters';
 import { TmParameterNames } from '../config/parameter-names';
 import { TmBackupStack } from '../stacks/backup/tm-backup-stack';
@@ -285,6 +286,7 @@ export class TmWebappAppStage extends cdk.Stage {
       scheduledTasksCommand: params.ecs.scheduledTasksCommand,
       deploymentHookCommand: params.ecs.deploymentHookCommand,
       fixEfsAssetsOwnership: params.ecs.fixEfsAssetsOwnership,
+      efsAutomaticBackups: params.backup?.efsAutomaticBackups,
     });
     this.ecsStack.addStackDependency(this.rdsStack);
     this.ecsStack.addStackDependency(this.redisStack);
@@ -395,7 +397,43 @@ export class TmWebappAppStage extends cdk.Stage {
       env,
       ec2RetentionDays: params.backup?.ec2RetentionDays,
       rdsRetentionDays: params.backup?.rdsRetentionDays,
+      rules: params.backup?.rules,
+      resources: params.backup?.rules ? this.backupResources(params, env) : undefined,
     });
+  }
+
+  /**
+   * ARNs selected by the plan of `backup.rules`. The EFS file systems and the
+   * content bucket are tagged instead: their names are only known at deploy
+   * time, and a wildcard would also catch retained file systems.
+   */
+  private backupResources(params: EnvironmentParameters, env: { account: string; region: string }): backup.BackupResource[] {
+    const types = params.backup?.resources ?? [BackupResourceType.EBS_VOLUMES, BackupResourceType.RDS_CLUSTERS];
+    const { account, region } = env;
+    const resources: backup.BackupResource[] = [];
+    for (const type of new Set(types)) {
+      switch (type) {
+        case BackupResourceType.EC2_INSTANCES:
+          resources.push(backup.BackupResource.fromArn(`arn:aws:ec2:${region}:${account}:instance/*`));
+          break;
+        case BackupResourceType.EBS_VOLUMES:
+          resources.push(backup.BackupResource.fromArn(`arn:aws:ec2:${region}:${account}:volume/*`));
+          break;
+        case BackupResourceType.RDS_CLUSTERS:
+          resources.push(backup.BackupResource.fromArn(`arn:aws:rds:${region}:${account}:cluster:*`));
+          break;
+        case BackupResourceType.EFS:
+          this.ecsStack.service.efsFileSystems.forEach(fileSystem => TmBackupStack.select(fileSystem));
+          break;
+        case BackupResourceType.S3_CONTENT_BUCKET:
+          if (!this.s3Stack?.contentBucket) {
+            throw new Error('backup.resources includes S3_CONTENT_BUCKET, but no content bucket is created.');
+          }
+          TmBackupStack.select(this.s3Stack.contentBucket);
+          break;
+      }
+    }
+    return resources;
   }
 
   /** Every domain the www distributions serve, main domains first. */

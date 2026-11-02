@@ -193,6 +193,13 @@ export interface TmApplicationLoadBalancedFargateServiceProps extends ecsPattern
   */
   readonly efsVolumes?: IIefsVolumes[];
 
+  /**
+   * EFS automatic backups of the `efsVolumes` file systems.
+   *
+   * @default true
+   */
+  readonly efsAutomaticBackups?: boolean;
+
   /*
   * Deployment Hook Props
   */
@@ -434,6 +441,7 @@ export class TmApplicationLoadBalancedFargateService extends ecsPatterns.Applica
         vpc: mergedProps.vpc!,
         uid: '33',
         gid: '33',
+        enableAutomaticBackups: mergedProps.efsAutomaticBackups ?? true,
       });
       taskDefinition.addVolume({
         name: volume.name,
