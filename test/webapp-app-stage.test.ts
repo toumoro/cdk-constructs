@@ -217,6 +217,21 @@ describe('TmWebappAppStage, greenfield settings', () => {
     expect(writer).toContain('\\"region\\":\\"ca-central-1\\"');
   });
 
+  test('challenges hosting providers, except Site24x7, after the anonymous IP list labels them', () => {
+    const rules: any[] = Object.values(Template.fromStack(stage.wafStack!).findResources('AWS::WAFv2::WebACL'))[0].Properties.Rules;
+    const priority = (name: string) => rules.find(rule => rule.Name === name).Priority;
+    expect(priority('AWS-AWSManagedRulesAnonymousIpList')).toBeLessThan(priority('Challenge-hosting-provider-not-site24x7'));
+    const challenge = rules.find(rule => rule.Name === 'Challenge-hosting-provider-not-site24x7');
+    expect(challenge.Action).toEqual({ Challenge: {} });
+    expect(JSON.stringify(challenge.Statement)).toContain('awswaf:managed:aws:anonymous-ip-list:HostingProviderIPList');
+    expect(JSON.stringify(challenge.Statement)).toContain('Site24x7');
+    const antiDdos = rules.find(rule => rule.Name === 'AWS-AWSManagedRulesAntiDDoSRuleSet');
+    expect(antiDdos.Statement.ManagedRuleGroupStatement.ManagedRuleGroupConfigs[0].AWSManagedRulesAntiDDoSRuleSet).toMatchObject({
+      ClientSideActionConfig: { Challenge: { UsageOfAction: 'ENABLED', Sensitivity: 'HIGH' } },
+      SensitivityToBlock: 'LOW',
+    });
+  });
+
   test('stores service user keys in Secrets Manager', () => {
     const template = Template.fromStack(stage.serviceIamUsersStack!);
     template.resourceCountIs('AWS::IAM::User', 2);

@@ -43,11 +43,17 @@ export interface TmWafStackProps extends cdk.StackProps {
 }
 
 /**
- * Baseline CloudFront-scope WebACL, derived from pgu's: AWS IP reputation,
- * known bad inputs, a per-IP rate limit, and the common, SQL injection and PHP
- * rule sets outside the TYPO3 backend (`/typo3/`). Anonymous IPs are counted
- * only. Must be deployed in us-east-1. The ARN is published in SSM in the
- * application region.
+ * Static files and API calls: they can't answer a browser challenge.
+ */
+const NO_CHALLENGE_URI_REGEX = '\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|mp[34]|ogg|otf|pdf|png|tiff?|ttf|webm|webp|woff2?|xml)$';
+
+/**
+ * Baseline CloudFront-scope WebACL, derived from pgu's: AWS anti-DDoS, IP
+ * reputation, known bad inputs, a per-IP rate limit, and the common, SQL
+ * injection and PHP rule sets outside the TYPO3 backend (`/typo3/`). Anonymous
+ * IPs are counted only, but hosting-provider IPs (except Site24x7 monitoring)
+ * get a challenge on pages. Must be deployed in us-east-1. The ARN is
+ * published in SSM in the application region.
  */
 export class TmWafStack extends cdk.Stack {
   /** ARN of the WebACL. */
@@ -70,8 +76,62 @@ export class TmWafStack extends cdk.Stack {
     }
 
     rules.push(
+      // Challenges suspicious browsers and blocks the most likely DDoS requests.
+      managedRuleGroup('AWSManagedRulesAntiDDoSRuleSet', 5, {
+        configs: [{
+          awsManagedRulesAntiDDoSRuleSet: {
+            clientSideActionConfig: {
+              challenge: {
+                usageOfAction: 'ENABLED',
+                sensitivity: 'HIGH',
+                exemptUriRegularExpressions: [{ regexString: NO_CHALLENGE_URI_REGEX }],
+              },
+            },
+            sensitivityToBlock: 'LOW',
+          },
+        }],
+      }),
       managedRuleGroup('AWSManagedRulesAmazonIpReputationList', 10),
+      // Counted only, but labels the requests for the next rule.
       managedRuleGroup('AWSManagedRulesAnonymousIpList', 20, { countOnly: true }),
+      {
+        name: 'Challenge-hosting-provider-not-site24x7',
+        priority: 25,
+        action: { challenge: {} },
+        statement: {
+          andStatement: {
+            statements: [
+              { labelMatchStatement: { scope: 'LABEL', key: 'awswaf:managed:aws:anonymous-ip-list:HostingProviderIPList' } },
+              // Site24x7 uptime monitoring runs from hosting providers.
+              {
+                notStatement: {
+                  statement: {
+                    byteMatchStatement: {
+                      searchString: 'Site24x7',
+                      fieldToMatch: { singleHeader: { Name: 'user-agent' } },
+                      textTransformations: [{ priority: 0, type: 'NONE' }],
+                      positionalConstraint: 'EXACTLY',
+                    },
+                  },
+                },
+              },
+              {
+                notStatement: {
+                  statement: {
+                    regexMatchStatement: {
+                      regexString: NO_CHALLENGE_URI_REGEX,
+                      fieldToMatch: { uriPath: {} },
+                      textTransformations: [{ priority: 0, type: 'LOWERCASE' }],
+                    },
+                  },
+                },
+              },
+            ],
+          },
+        },
+        challengeConfig: { immunityTimeProperty: { immunityTime: 300 } },
+        visibilityConfig: visibility('Challenge-hosting-provider-not-site24x7'),
+      },
       {
         name: 'Rate-limit-per-ip',
         priority: 30,
@@ -163,6 +223,8 @@ interface ManagedRuleGroupOptions {
   readonly outsideBackend?: boolean;
   /** Rules of the group that only count. */
   readonly countedRules?: string[];
+  /** Configuration of the group. */
+  readonly configs?: CfnWebACL.ManagedRuleGroupConfigProperty[];
 }
 
 function managedRuleGroup(name: string, priority: number, options: ManagedRuleGroupOptions = {}): CfnWebACL.RuleProperty {
@@ -188,6 +250,7 @@ function managedRuleGroup(name: string, priority: number, options: ManagedRuleGr
         name,
         scopeDownStatement: options.outsideBackend ? outsideBackend : undefined,
         ruleActionOverrides: options.countedRules?.map(rule => ({ name: rule, actionToUse: { count: {} } })),
+        managedRuleGroupConfigs: options.configs,
       },
     },
     visibilityConfig: visibility(`AWS-${name}`),
