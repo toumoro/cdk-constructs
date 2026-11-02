@@ -52,6 +52,8 @@ const NO_CHALLENGE_URI_REGEX = '\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|
  * reputation, known bad inputs, a per-IP rate limit, and the common, SQL
  * injection and PHP rule sets. Anonymous IPs are counted only, but
  * hosting-provider IPs (except Site24x7 monitoring) get a challenge on pages.
+ * Solr searches (`tx_solr`) are rate limited per IP, and facet filters
+ * challenged.
  * The body rules of the common, SQL injection and PHP sets only count; the
  * TYPO3 rules, from sqnim's TYPO3Overrider, block their matches except where
  * TYPO3 legitimately posts such bodies. Must be deployed in us-east-1. The ARN
@@ -146,6 +148,38 @@ export class TmWafStack extends cdk.Stack {
           },
         },
         visibilityConfig: visibility('Rate-limit-per-ip'),
+      },
+      // Solr searches: bots crawling every facet combination.
+      {
+        name: 'Rate-limit-solr-block',
+        priority: 31,
+        action: {
+          block: { customResponse: { responseCode: 429, responseHeaders: [{ name: 'Retry-After', value: '60' }] } },
+        },
+        statement: solrRateLimit(300),
+        visibilityConfig: visibility('Rate-limit-solr-block'),
+      },
+      {
+        name: 'Rate-limit-solr-challenge',
+        priority: 32,
+        action: { challenge: {} },
+        statement: solrRateLimit(100),
+        visibilityConfig: visibility('Rate-limit-solr-challenge'),
+      },
+      // One client of a shared IP: same IP and TLS fingerprint.
+      {
+        name: 'Rate-limit-solr-ja4-challenge',
+        priority: 33,
+        action: { challenge: {} },
+        statement: solrRateLimit(60, [{ ip: {} }, { ja4Fingerprint: { fallbackBehavior: 'NO_MATCH' } }]),
+        visibilityConfig: visibility('Rate-limit-solr-ja4-challenge'),
+      },
+      {
+        name: 'Challenge-solr-filter',
+        priority: 34,
+        action: { challenge: {} },
+        statement: queryStringContains('tx_solr[filter]'),
+        visibilityConfig: visibility('Challenge-solr-filter'),
       },
       managedRuleGroup('AWSManagedRulesKnownBadInputsRuleSet', 40),
       // Body rules: counted here, blocked by the TYPO3 rules below.
@@ -275,6 +309,33 @@ function typo3Rule(name: string, priority: number, label: string, exceptions: Cf
       },
     },
     visibilityConfig: visibility(name),
+  };
+}
+
+/**
+ * More than `limit` Solr searches (`tx_solr` in the query string) per minute
+ * by the same `customKeys`, or the same IP without them.
+ */
+function solrRateLimit(limit: number, customKeys?: CfnWebACL.RateBasedStatementCustomKeyProperty[]): CfnWebACL.StatementProperty {
+  return {
+    rateBasedStatement: {
+      limit,
+      evaluationWindowSec: 60,
+      aggregateKeyType: customKeys ? 'CUSTOM_KEYS' : 'IP',
+      customKeys,
+      scopeDownStatement: queryStringContains('tx_solr'),
+    },
+  };
+}
+
+function queryStringContains(value: string): CfnWebACL.StatementProperty {
+  return {
+    byteMatchStatement: {
+      searchString: value,
+      fieldToMatch: { queryString: {} },
+      textTransformations: [{ priority: 0, type: 'URL_DECODE' }, { priority: 1, type: 'LOWERCASE' }],
+      positionalConstraint: 'CONTAINS',
+    },
   };
 }
 

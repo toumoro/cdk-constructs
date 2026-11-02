@@ -246,6 +246,19 @@ describe('TmWebappAppStage, greenfield settings', () => {
     expect(JSON.stringify(sqli.Statement)).toContain('/typo3/file/commit');
   });
 
+  test('rate limits Solr searches per IP, and per IP and JA4 fingerprint', () => {
+    const rules: any[] = Object.values(Template.fromStack(stage.wafStack!).findResources('AWS::WAFv2::WebACL'))[0].Properties.Rules;
+    const rule = (name: string) => rules.find(r => r.Name === name);
+    const block = rule('Rate-limit-solr-block');
+    expect(block.Action.Block.CustomResponse).toEqual({ ResponseCode: 429, ResponseHeaders: [{ Name: 'Retry-After', Value: '60' }] });
+    expect(block.Statement.RateBasedStatement).toMatchObject({ Limit: 300, EvaluationWindowSec: 60, AggregateKeyType: 'IP' });
+    expect(block.Statement.RateBasedStatement.ScopeDownStatement.ByteMatchStatement.SearchString).toBe('tx_solr');
+    expect(rule('Rate-limit-solr-challenge').Statement.RateBasedStatement.Limit).toBe(100);
+    expect(rule('Rate-limit-solr-ja4-challenge').Statement.RateBasedStatement.CustomKeys)
+      .toEqual([{ IP: {} }, { JA4Fingerprint: { FallbackBehavior: 'NO_MATCH' } }]);
+    expect(rule('Challenge-solr-filter').Action).toEqual({ Challenge: {} });
+  });
+
   test('stores service user keys in Secrets Manager', () => {
     const template = Template.fromStack(stage.serviceIamUsersStack!);
     template.resourceCountIs('AWS::IAM::User', 2);
