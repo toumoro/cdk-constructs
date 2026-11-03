@@ -613,6 +613,33 @@ export interface CloudfrontSettings {
    * @default true
    */
   readonly accessLogs?: boolean;
+
+  /**
+   * Response headers policy on every behavior of the www distributions: CORS
+   * for the distribution's own domains (`https://<domain>` and its
+   * `additionalDomains`) plus `additionalCorsOrigins`, HSTS (one year,
+   * includeSubDomains, preload), `X-Content-Type-Options: nosniff`,
+   * `Referrer-Policy: strict-origin-when-cross-origin`,
+   * `X-Frame-Options: SAMEORIGIN` and a restrictive `Permissions-Policy`;
+   * removes `Server` and `X-Powered-By`. No Content-Security-Policy: the
+   * application sets it.
+   *
+   * @default - no response headers policy
+   */
+  readonly responseHeaders?: ResponseHeadersSettings;
+}
+
+/**
+ * Response headers of the www distributions.
+ */
+export interface ResponseHeadersSettings {
+  /**
+   * CORS origins allowed besides the distribution's own domains, with their
+   * scheme (e.g. `https://www.example.com`).
+   *
+   * @default []
+   */
+  readonly additionalCorsOrigins?: string[];
 }
 
 /**

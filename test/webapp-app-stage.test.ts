@@ -829,6 +829,54 @@ describe('TmWebappAppStage, FAL bucket on the www distribution (cloudfront.falPa
   });
 });
 
+describe('TmWebappAppStage, response headers (cloudfront.responseHeaders opt-in)', () => {
+  const headersSettings: EnvironmentParameters = {
+    ...greenfield,
+    fal: { storage: FalStorage.S3, s3Driver: FalS3Driver.AUS_DRIVER_AMAZON_S3 },
+    cloudfront: {
+      domains: ['www.example.com'],
+      additionalDomains: { 'www.example.com': ['example.com'] },
+      falPath: '/fileadmin',
+      responseHeaders: { additionalCorsOrigins: ['https://other.example.org'] },
+    },
+    cdn: undefined,
+  };
+
+  test('allows CORS from the distribution domains and the additional origins, with HSTS and no CSP', () => {
+    const template = Template.fromStack(synthStage(headersSettings).cloudfrontStack!);
+    template.resourceCountIs('AWS::CloudFront::ResponseHeadersPolicy', 1);
+    const config = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0]
+      .Properties.ResponseHeadersPolicyConfig;
+    expect(config.CorsConfig.AccessControlAllowOrigins.Items)
+      .toEqual(['https://www.example.com', 'https://example.com', 'https://other.example.org']);
+    expect(config.CorsConfig.AccessControlAllowCredentials).toBe(false);
+    expect(config.CorsConfig.OriginOverride).toBe(false);
+    expect(config.SecurityHeadersConfig.StrictTransportSecurity).toEqual({
+      AccessControlMaxAgeSec: 31536000, IncludeSubdomains: true, Preload: true, Override: true,
+    });
+    expect(config.SecurityHeadersConfig.ContentSecurityPolicy).toBeUndefined();
+    expect(config.SecurityHeadersConfig.FrameOptions.FrameOption).toBe('SAMEORIGIN');
+    expect(config.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy).toBe('strict-origin-when-cross-origin');
+    expect(config.CustomHeadersConfig.Items[0].Header).toBe('Permissions-Policy');
+    expect(config.RemoveHeadersConfig.Items).toEqual([{ Header: 'Server' }, { Header: 'X-Powered-By' }]);
+  });
+
+  test('applies the policy to every behavior, FAL included', () => {
+    const template = Template.fromStack(synthStage(headersSettings).cloudfrontStack!);
+    const policyId = Object.keys(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0];
+    const config = Object.values(template.findResources('AWS::CloudFront::Distribution'))[0].Properties.DistributionConfig;
+    const behaviors = [config.DefaultCacheBehavior, ...config.CacheBehaviors];
+    expect(behaviors.map((b: any) => b.PathPattern)).toEqual([undefined, '/typo3/*', '/fileadmin/*']);
+    for (const behavior of behaviors) {
+      expect(behavior.ResponseHeadersPolicyId).toEqual({ Ref: policyId });
+    }
+  });
+
+  test('default (no responseHeaders) creates no policy', () => {
+    Template.fromStack(synthStage(greenfield).cloudfrontStack!).resourceCountIs('AWS::CloudFront::ResponseHeadersPolicy', 0);
+  });
+});
+
 describe('TmWebappAppStage, Redis engine', () => {
   test('valkey creates a parameter group of the matching family', () => {
     const stage = synthStage({ ...greenfield, redis: { cacheNodeType: 'cache.t4g.micro', engine: 'valkey', engineVersion: '9.1' } });

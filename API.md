@@ -22258,6 +22258,7 @@ const cloudfrontSettings: CloudfrontSettings = { ... }
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry the Content-Security-Policy of TYPO3's `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can display) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of requiring a pre-seeded SSM parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value CloudFront sends to the load balancer. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS (one year, includeSubDomains, preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN` and a restrictive `Permissions-Policy`; |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Connects the distributions to the load balancer through a CloudFront VPC origin over HTTPS (port 443) instead of a public load balancer over HTTP. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOriginBridge">vpcOriginBridge</a></code> | <code>boolean</code> | Adds a second, INTERNAL HTTPS load balancer ("bridge") to the same service, and makes it the VPC origin endpoint while `vpcOrigin` is false. |
 
@@ -22437,6 +22438,22 @@ public readonly originCustomHeaderParameterName: string;
 SSM parameter holding the secret header value CloudFront sends to the load balancer.
 
 The load balancer rejects requests without it.
+
+---
+
+##### `responseHeaders`<sup>Optional</sup> <a name="responseHeaders" id="tm-cdk-constructs.CloudfrontSettings.property.responseHeaders"></a>
+
+```typescript
+public readonly responseHeaders: ResponseHeadersSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a>
+- *Default:* no response headers policy
+
+Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS (one year, includeSubDomains, preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN` and a restrictive `Permissions-Policy`;
+
+removes `Server` and `X-Powered-By`. No Content-Security-Policy: the
+application sets it.
 
 ---
 
@@ -23844,6 +23861,39 @@ Number of replicas.
 
 With at least one replica, automatic failover and
 Multi-AZ are enabled.
+
+---
+
+### ResponseHeadersSettings <a name="ResponseHeadersSettings" id="tm-cdk-constructs.ResponseHeadersSettings"></a>
+
+Response headers of the www distributions.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.ResponseHeadersSettings.Initializer"></a>
+
+```typescript
+import { ResponseHeadersSettings } from 'tm-cdk-constructs'
+
+const responseHeadersSettings: ResponseHeadersSettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.additionalCorsOrigins">additionalCorsOrigins</a></code> | <code>string[]</code> | CORS origins allowed besides the distribution's own domains, with their scheme (e.g. `https://www.example.com`). |
+
+---
+
+##### `additionalCorsOrigins`<sup>Optional</sup> <a name="additionalCorsOrigins" id="tm-cdk-constructs.ResponseHeadersSettings.property.additionalCorsOrigins"></a>
+
+```typescript
+public readonly additionalCorsOrigins: string[];
+```
+
+- *Type:* string[]
+- *Default:* []
+
+CORS origins allowed besides the distribution's own domains, with their scheme (e.g. `https://www.example.com`).
 
 ---
 
@@ -26845,6 +26895,7 @@ const tmCloudfrontStackProps: TmCloudfrontStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.distributionIds">distributionIds</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | Writes the distribution-ID parameter for these distributions. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.errorPages">errorPages</a></code> | <code>boolean</code> | Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's `fileadmin/.htaccess`. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior (CORS for the distribution's domains, HSTS and security headers, no CSP). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Reaches the load balancer through a CloudFront VPC origin over HTTPS 443, its ARN and DNS name read from the `vpc-origin` SSM parameters published by `TmEcsStack` (the internal load balancer, or the bridge during the migration). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOriginViaBridge">vpcOriginViaBridge</a></code> | <code>boolean</code> | The `vpc-origin` SSM parameters point at the migration bridge rather than the service load balancer (`vpcOriginBridge` without `vpcOrigin`). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl">webAcl</a></code> | <code>boolean</code> | Associates the WebACL of `TmWafStack` (ARN read from SSM). |
@@ -27237,6 +27288,19 @@ public readonly falPath: string;
 - *Default:* the content bucket is not served
 
 Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's `fileadmin/.htaccess`.
+
+---
+
+##### `responseHeaders`<sup>Optional</sup> <a name="responseHeaders" id="tm-cdk-constructs.TmCloudfrontStackProps.property.responseHeaders"></a>
+
+```typescript
+public readonly responseHeaders: ResponseHeadersSettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a>
+- *Default:* no response headers policy
+
+Response headers policy on every behavior (CORS for the distribution's domains, HSTS and security headers, no CSP).
 
 ---
 

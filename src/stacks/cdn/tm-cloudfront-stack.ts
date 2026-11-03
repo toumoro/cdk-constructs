@@ -6,6 +6,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 import { TmDistributionIdsOptions, TmDistributionIdsParameter } from './distribution-ids-parameter';
 import { TmCachePolicy } from '../../cdn/cloudfront/cachePolicy';
+import { ResponseHeadersSettings } from '../../config/environment-parameters';
 import { TmParameterNames } from '../../config/parameter-names';
 import { publishParameter, readParameter } from '../common/references';
 
@@ -110,6 +111,14 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
    * @default - the content bucket is not served
    */
   readonly falPath?: string;
+
+  /**
+   * Response headers policy on every behavior (CORS for the distribution's
+   * domains, HSTS and security headers, no CSP).
+   *
+   * @default - no response headers policy
+   */
+  readonly responseHeaders?: ResponseHeadersSettings;
 
   /**
    * Writes the distribution-ID parameter for these distributions. Leave unset
@@ -218,9 +227,14 @@ export class TmCloudfrontStack extends cdk.Stack {
       const suffix = index === 0 ? '' : String(index + 1);
       const certificateArn = props.certificateArns?.[domain]
         ?? readParameter(this, TmParameterNames.cloudfrontWwwCertificateArn(env, index));
+      const domainNames = [domain, ...(props.additionalDomains?.[domain] ?? [])];
+      // One policy per distribution: the CORS origins are its own domains.
+      const responseHeadersPolicy = props.responseHeaders
+        ? this.responseHeadersPolicy(`ResponseHeadersPolicy${suffix}`, domainNames, props.responseHeaders)
+        : undefined;
 
       const distribution = new cloudfront.Distribution(this, `CloudFrontDistribution${suffix}`, {
-        domainNames: [domain, ...(props.additionalDomains?.[domain] ?? [])],
+        domainNames,
         certificate: acm.Certificate.fromCertificateArn(this, `Certificate${suffix}`, certificateArn),
         priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
         webAclId,
@@ -234,6 +248,7 @@ export class TmCloudfrontStack extends cdk.Stack {
           allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           cachePolicy,
           functionAssociations,
+          responseHeadersPolicy,
         },
         errorResponses: errorBucketOrigin ? errorResponses() : undefined,
       });
@@ -245,11 +260,13 @@ export class TmCloudfrontStack extends cdk.Stack {
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER,
         functionAssociations,
+        responseHeadersPolicy,
       });
 
       if (errorBucketOrigin) {
         distribution.addBehavior('/errors/*', errorBucketOrigin, {
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          responseHeadersPolicy,
         });
       }
 
@@ -259,6 +276,7 @@ export class TmCloudfrontStack extends cdk.Stack {
           allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
           cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           functionAssociations: falFunctionAssociations,
+          responseHeadersPolicy,
         });
       }
 
@@ -274,6 +292,47 @@ export class TmCloudfrontStack extends cdk.Stack {
           distributionId: this.distributions[index].distributionId,
         })));
     }
+  }
+
+  /**
+   * CORS for the distribution's domains plus the additional origins, HSTS and
+   * security headers. No Content-Security-Policy, which the application sets;
+   * the CORS headers of the origin win, the security headers of CloudFront do.
+   */
+  private responseHeadersPolicy(id: string, domainNames: string[], settings: ResponseHeadersSettings) {
+    return new cloudfront.ResponseHeadersPolicy(this, id, {
+      comment: `CORS for ${domainNames[0]}, HSTS and security headers`,
+      corsBehavior: {
+        accessControlAllowOrigins: [
+          ...domainNames.map(name => `https://${name}`),
+          ...(settings.additionalCorsOrigins ?? []),
+        ],
+        accessControlAllowMethods: ['GET', 'HEAD', 'OPTIONS'],
+        accessControlAllowHeaders: ['*'],
+        accessControlAllowCredentials: false,
+        accessControlMaxAge: cdk.Duration.minutes(10),
+        originOverride: false,
+      },
+      securityHeadersBehavior: {
+        strictTransportSecurity: {
+          accessControlMaxAge: cdk.Duration.days(365),
+          includeSubdomains: true,
+          preload: true,
+          override: true,
+        },
+        contentTypeOptions: { override: true },
+        frameOptions: { frameOption: cloudfront.HeadersFrameOption.SAMEORIGIN, override: true },
+        referrerPolicy: { referrerPolicy: cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN, override: true },
+      },
+      customHeadersBehavior: {
+        customHeaders: [{
+          header: 'Permissions-Policy',
+          value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+          override: true,
+        }],
+      },
+      removeHeaders: ['Server', 'X-Powered-By'],
+    });
   }
 
   /**
