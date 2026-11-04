@@ -22258,7 +22258,7 @@ const cloudfrontSettings: CloudfrontSettings = { ... }
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry the Content-Security-Policy of TYPO3's `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can display) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of requiring a pre-seeded SSM parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value CloudFront sends to the load balancer. |
-| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS (one year, includeSubDomains, preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN` and a restrictive `Permissions-Policy`; |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy`; |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Connects the distributions to the load balancer through a CloudFront VPC origin over HTTPS (port 443) instead of a public load balancer over HTTP. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.vpcOriginBridge">vpcOriginBridge</a></code> | <code>boolean</code> | Adds a second, INTERNAL HTTPS load balancer ("bridge") to the same service, and makes it the VPC origin endpoint while `vpcOrigin` is false. |
 
@@ -22450,10 +22450,11 @@ public readonly responseHeaders: ResponseHeadersSettings;
 - *Type:* <a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a>
 - *Default:* no response headers policy
 
-Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS (one year, includeSubDomains, preload), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Frame-Options: SAMEORIGIN` and a restrictive `Permissions-Policy`;
+Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy`;
 
-removes `Server` and `X-Powered-By`. No Content-Security-Policy: the
-application sets it.
+removes `Server` and `X-Powered-By`. Each one is set
+in `ResponseHeadersSettings`. No Content-Security-Policy: the application
+sets it.
 
 ---
 
@@ -23881,6 +23882,12 @@ const responseHeadersSettings: ResponseHeadersSettings = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.additionalCorsOrigins">additionalCorsOrigins</a></code> | <code>string[]</code> | CORS origins allowed besides the distribution's own domains, with their scheme (e.g. `https://www.example.com`). |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.contentTypeOptions">contentTypeOptions</a></code> | <code>boolean</code> | Sets `X-Content-Type-Options: nosniff`. |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.frameOption">frameOption</a></code> | <code>aws-cdk-lib.aws_cloudfront.HeadersFrameOption</code> | Value of the `X-Frame-Options` header. |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.permissionsPolicy">permissionsPolicy</a></code> | <code>string</code> | Value of the `Permissions-Policy` header. |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.referrerPolicy">referrerPolicy</a></code> | <code>aws-cdk-lib.aws_cloudfront.HeadersReferrerPolicy</code> | Value of the `Referrer-Policy` header. |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.removeHeaders">removeHeaders</a></code> | <code>string[]</code> | Headers removed from the responses of the origin. |
+| <code><a href="#tm-cdk-constructs.ResponseHeadersSettings.property.strictTransportSecurity">strictTransportSecurity</a></code> | <code><a href="#tm-cdk-constructs.StrictTransportSecuritySettings">StrictTransportSecuritySettings</a></code> | `Strict-Transport-Security` header. |
 
 ---
 
@@ -23894,6 +23901,84 @@ public readonly additionalCorsOrigins: string[];
 - *Default:* []
 
 CORS origins allowed besides the distribution's own domains, with their scheme (e.g. `https://www.example.com`).
+
+---
+
+##### `contentTypeOptions`<sup>Optional</sup> <a name="contentTypeOptions" id="tm-cdk-constructs.ResponseHeadersSettings.property.contentTypeOptions"></a>
+
+```typescript
+public readonly contentTypeOptions: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Sets `X-Content-Type-Options: nosniff`.
+
+---
+
+##### `frameOption`<sup>Optional</sup> <a name="frameOption" id="tm-cdk-constructs.ResponseHeadersSettings.property.frameOption"></a>
+
+```typescript
+public readonly frameOption: HeadersFrameOption;
+```
+
+- *Type:* aws-cdk-lib.aws_cloudfront.HeadersFrameOption
+- *Default:* HeadersFrameOption.SAMEORIGIN
+
+Value of the `X-Frame-Options` header.
+
+---
+
+##### `permissionsPolicy`<sup>Optional</sup> <a name="permissionsPolicy" id="tm-cdk-constructs.ResponseHeadersSettings.property.permissionsPolicy"></a>
+
+```typescript
+public readonly permissionsPolicy: string;
+```
+
+- *Type:* string
+- *Default:* 'accelerometer=(), camera=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), geolocation=()'
+
+Value of the `Permissions-Policy` header.
+
+---
+
+##### `referrerPolicy`<sup>Optional</sup> <a name="referrerPolicy" id="tm-cdk-constructs.ResponseHeadersSettings.property.referrerPolicy"></a>
+
+```typescript
+public readonly referrerPolicy: HeadersReferrerPolicy;
+```
+
+- *Type:* aws-cdk-lib.aws_cloudfront.HeadersReferrerPolicy
+- *Default:* HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
+
+Value of the `Referrer-Policy` header.
+
+---
+
+##### `removeHeaders`<sup>Optional</sup> <a name="removeHeaders" id="tm-cdk-constructs.ResponseHeadersSettings.property.removeHeaders"></a>
+
+```typescript
+public readonly removeHeaders: string[];
+```
+
+- *Type:* string[]
+- *Default:* ['Server', 'X-Powered-By']
+
+Headers removed from the responses of the origin.
+
+---
+
+##### `strictTransportSecurity`<sup>Optional</sup> <a name="strictTransportSecurity" id="tm-cdk-constructs.ResponseHeadersSettings.property.strictTransportSecurity"></a>
+
+```typescript
+public readonly strictTransportSecurity: StrictTransportSecuritySettings;
+```
+
+- *Type:* <a href="#tm-cdk-constructs.StrictTransportSecuritySettings">StrictTransportSecuritySettings</a>
+- *Default:* one year, includeSubDomains and preload
+
+`Strict-Transport-Security` header.
 
 ---
 
@@ -23997,6 +24082,71 @@ public readonly solrOpts: string;
 - *Default:* '-XX:-UseLargePages'
 
 Solr JVM options (`SOLR_OPTS`).
+
+---
+
+### StrictTransportSecuritySettings <a name="StrictTransportSecuritySettings" id="tm-cdk-constructs.StrictTransportSecuritySettings"></a>
+
+`Strict-Transport-Security` header of the www distributions.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.StrictTransportSecuritySettings.Initializer"></a>
+
+```typescript
+import { StrictTransportSecuritySettings } from 'tm-cdk-constructs'
+
+const strictTransportSecuritySettings: StrictTransportSecuritySettings = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.StrictTransportSecuritySettings.property.includeSubdomains">includeSubdomains</a></code> | <code>boolean</code> | Adds `includeSubDomains`. |
+| <code><a href="#tm-cdk-constructs.StrictTransportSecuritySettings.property.maxAge">maxAge</a></code> | <code>aws-cdk-lib.Duration</code> | `max-age` of the header. |
+| <code><a href="#tm-cdk-constructs.StrictTransportSecuritySettings.property.preload">preload</a></code> | <code>boolean</code> | Adds `preload`. |
+
+---
+
+##### `includeSubdomains`<sup>Optional</sup> <a name="includeSubdomains" id="tm-cdk-constructs.StrictTransportSecuritySettings.property.includeSubdomains"></a>
+
+```typescript
+public readonly includeSubdomains: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Adds `includeSubDomains`.
+
+---
+
+##### `maxAge`<sup>Optional</sup> <a name="maxAge" id="tm-cdk-constructs.StrictTransportSecuritySettings.property.maxAge"></a>
+
+```typescript
+public readonly maxAge: Duration;
+```
+
+- *Type:* aws-cdk-lib.Duration
+- *Default:* Duration.days(365)
+
+`max-age` of the header.
+
+---
+
+##### `preload`<sup>Optional</sup> <a name="preload" id="tm-cdk-constructs.StrictTransportSecuritySettings.property.preload"></a>
+
+```typescript
+public readonly preload: boolean;
+```
+
+- *Type:* boolean
+- *Default:* true
+
+Adds `preload`.
+
+It registers nothing by itself: submitting the domain to
+hstspreload.org requires the header on the apex domain and binds all of
+its subdomains.
 
 ---
 

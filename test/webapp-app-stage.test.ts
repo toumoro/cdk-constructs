@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as cdk from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
+import { HeadersFrameOption, HeadersReferrerPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import * as events from 'aws-cdk-lib/aws-events';
 import {
   BackupResourceType,
@@ -880,8 +881,47 @@ describe('TmWebappAppStage, response headers (cloudfront.responseHeaders opt-in)
     expect(config.SecurityHeadersConfig.ContentSecurityPolicy).toBeUndefined();
     expect(config.SecurityHeadersConfig.FrameOptions.FrameOption).toBe('SAMEORIGIN');
     expect(config.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy).toBe('strict-origin-when-cross-origin');
-    expect(config.CustomHeadersConfig.Items[0].Header).toBe('Permissions-Policy');
+    expect(config.CustomHeadersConfig.Items[0]).toEqual({
+      Header: 'Permissions-Policy',
+      Value: 'accelerometer=(), camera=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), geolocation=()',
+      Override: true,
+    });
     expect(config.RemoveHeadersConfig.Items).toEqual([{ Header: 'Server' }, { Header: 'X-Powered-By' }]);
+  });
+
+  test('permissionsPolicy replaces the default Permissions-Policy', () => {
+    const template = Template.fromStack(synthStage({
+      ...headersSettings,
+      cloudfront: { ...headersSettings.cloudfront!, responseHeaders: { permissionsPolicy: 'camera=(self)' } },
+    }).cloudfrontStack!);
+    const config = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0]
+      .Properties.ResponseHeadersPolicyConfig;
+    expect(config.CustomHeadersConfig.Items[0].Value).toBe('camera=(self)');
+  });
+
+  test('security headers settings replace the defaults', () => {
+    const template = Template.fromStack(synthStage({
+      ...headersSettings,
+      cloudfront: {
+        ...headersSettings.cloudfront!,
+        responseHeaders: {
+          strictTransportSecurity: { maxAge: cdk.Duration.days(30), includeSubdomains: false, preload: false },
+          contentTypeOptions: false,
+          frameOption: HeadersFrameOption.DENY,
+          referrerPolicy: HeadersReferrerPolicy.NO_REFERRER,
+          removeHeaders: ['Server'],
+        },
+      },
+    }).cloudfrontStack!);
+    const config = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0]
+      .Properties.ResponseHeadersPolicyConfig;
+    expect(config.SecurityHeadersConfig.StrictTransportSecurity).toEqual({
+      AccessControlMaxAgeSec: 2592000, IncludeSubdomains: false, Preload: false, Override: true,
+    });
+    expect(config.SecurityHeadersConfig.ContentTypeOptions).toBeUndefined();
+    expect(config.SecurityHeadersConfig.FrameOptions.FrameOption).toBe('DENY');
+    expect(config.SecurityHeadersConfig.ReferrerPolicy.ReferrerPolicy).toBe('no-referrer');
+    expect(config.RemoveHeadersConfig.Items).toEqual([{ Header: 'Server' }]);
   });
 
   test('applies the policy to every behavior, FAL included', () => {

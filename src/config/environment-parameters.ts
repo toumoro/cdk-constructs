@@ -1,3 +1,5 @@
+import { Duration } from 'aws-cdk-lib';
+import { HeadersFrameOption, HeadersReferrerPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { BackupResourceType, ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
 import { TmBackupRule } from '../stacks/backup/tm-backup-stack';
 import { TmSecretField } from '../stacks/compute/tm-ecs-stack';
@@ -618,12 +620,11 @@ export interface CloudfrontSettings {
   /**
    * Response headers policy on every behavior of the www distributions: CORS
    * for the distribution's own domains (`https://<domain>` and its
-   * `additionalDomains`) plus `additionalCorsOrigins`, HSTS (one year,
-   * includeSubDomains, preload), `X-Content-Type-Options: nosniff`,
-   * `Referrer-Policy: strict-origin-when-cross-origin`,
-   * `X-Frame-Options: SAMEORIGIN` and a restrictive `Permissions-Policy`;
-   * removes `Server` and `X-Powered-By`. No Content-Security-Policy: the
-   * application sets it.
+   * `additionalDomains`) plus `additionalCorsOrigins`, HSTS,
+   * `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
+   * `Permissions-Policy`; removes `Server` and `X-Powered-By`. Each one is set
+   * in `ResponseHeadersSettings`. No Content-Security-Policy: the application
+   * sets it.
    *
    * @default - no response headers policy
    */
@@ -641,6 +642,76 @@ export interface ResponseHeadersSettings {
    * @default []
    */
   readonly additionalCorsOrigins?: string[];
+
+  /**
+   * Value of the `Permissions-Policy` header.
+   *
+   * @default 'accelerometer=(), camera=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), geolocation=()'
+   */
+  readonly permissionsPolicy?: string;
+
+  /**
+   * `Strict-Transport-Security` header.
+   *
+   * @default - one year, includeSubDomains and preload
+   */
+  readonly strictTransportSecurity?: StrictTransportSecuritySettings;
+
+  /**
+   * Sets `X-Content-Type-Options: nosniff`.
+   *
+   * @default true
+   */
+  readonly contentTypeOptions?: boolean;
+
+  /**
+   * Value of the `X-Frame-Options` header.
+   *
+   * @default HeadersFrameOption.SAMEORIGIN
+   */
+  readonly frameOption?: HeadersFrameOption;
+
+  /**
+   * Value of the `Referrer-Policy` header.
+   *
+   * @default HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN
+   */
+  readonly referrerPolicy?: HeadersReferrerPolicy;
+
+  /**
+   * Headers removed from the responses of the origin.
+   *
+   * @default ['Server', 'X-Powered-By']
+   */
+  readonly removeHeaders?: string[];
+}
+
+/**
+ * `Strict-Transport-Security` header of the www distributions.
+ */
+export interface StrictTransportSecuritySettings {
+  /**
+   * `max-age` of the header.
+   *
+   * @default Duration.days(365)
+   */
+  readonly maxAge?: Duration;
+
+  /**
+   * Adds `includeSubDomains`.
+   *
+   * @default true
+   */
+  readonly includeSubdomains?: boolean;
+
+  /**
+   * Adds `preload`. It registers nothing by itself: submitting the domain to
+   * hstspreload.org requires the header on the apex domain and binds all of
+   * its subdomains.
+   *
+   * @default true
+   */
+  readonly preload?: boolean;
 }
 
 /**

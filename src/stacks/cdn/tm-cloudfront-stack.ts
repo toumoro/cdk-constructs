@@ -315,23 +315,30 @@ export class TmCloudfrontStack extends cdk.Stack {
       },
       securityHeadersBehavior: {
         strictTransportSecurity: {
-          accessControlMaxAge: cdk.Duration.days(365),
-          includeSubdomains: true,
-          preload: true,
+          accessControlMaxAge: settings.strictTransportSecurity?.maxAge ?? cdk.Duration.days(365),
+          includeSubdomains: settings.strictTransportSecurity?.includeSubdomains ?? true,
+          preload: settings.strictTransportSecurity?.preload ?? true,
           override: true,
         },
-        contentTypeOptions: { override: true },
-        frameOptions: { frameOption: cloudfront.HeadersFrameOption.SAMEORIGIN, override: true },
-        referrerPolicy: { referrerPolicy: cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN, override: true },
+        contentTypeOptions: (settings.contentTypeOptions ?? true) ? { override: true } : undefined,
+        frameOptions: {
+          frameOption: settings.frameOption ?? cloudfront.HeadersFrameOption.SAMEORIGIN,
+          override: true,
+        },
+        referrerPolicy: {
+          referrerPolicy: settings.referrerPolicy ?? cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+          override: true,
+        },
       },
       customHeadersBehavior: {
         customHeaders: [{
           header: 'Permissions-Policy',
-          value: 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()',
+          value: settings.permissionsPolicy
+            ?? 'accelerometer=(), camera=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), geolocation=()',
           override: true,
         }],
       },
-      removeHeaders: ['Server', 'X-Powered-By'],
+      removeHeaders: settings.removeHeaders ?? ['Server', 'X-Powered-By'],
     });
   }
 
