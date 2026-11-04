@@ -105,16 +105,23 @@ export interface TmCloudfrontStackProps extends cdk.StackProps {
 
   /**
    * Serves the FAL content bucket of `TmS3Stack` under this path (e.g.
-   * `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's
-   * `fileadmin/.htaccess`.
+   * `/fileadmin`), path removed, with a strict Content-Security-Policy.
    *
    * @default - the content bucket is not served
    */
   readonly falPath?: string;
 
   /**
+   * Content-Security-Policy of the files under `falPath`.
+   *
+   * @default - a strict, sandboxed policy
+   */
+  readonly falContentSecurityPolicy?: string;
+
+  /**
    * Response headers policy on every behavior (CORS for the distribution's
-   * domains, HSTS and security headers, no CSP).
+   * domains, HSTS and security headers, no CSP); the FAL behavior gets a copy
+   * with its CSP.
    *
    * @default - no response headers policy
    */
@@ -217,6 +224,17 @@ export class TmCloudfrontStack extends cdk.Stack {
     const falFunctionAssociations = props.falPath !== undefined
       ? this.falFunctionAssociations(props.falPath, basicAuthCheck)
       : [];
+    const falCsp = props.falContentSecurityPolicy ?? FAL_CSP;
+    // Without responseHeaders, one CSP-only policy serves every distribution.
+    const falCspOnlyPolicy = props.falPath !== undefined && !props.responseHeaders
+      ? new cloudfront.ResponseHeadersPolicy(this, 'FalResponseHeadersPolicy', {
+        comment: 'Content-Security-Policy of the FAL files',
+        securityHeadersBehavior: {
+          contentSecurityPolicy: { contentSecurityPolicy: falCsp, override: true },
+          contentTypeOptions: { override: true },
+        },
+      })
+      : undefined;
     if (errorBucketOrigin || falOrigin) {
       cdk.Annotations.of(this).acknowledgeWarning('@aws-cdk/aws-cloudfront-origins:updateImportedBucketPolicyOac',
         'TmS3Stack grants the account distributions read access to the bucket.');
@@ -232,6 +250,10 @@ export class TmCloudfrontStack extends cdk.Stack {
       const responseHeadersPolicy = props.responseHeaders
         ? this.responseHeadersPolicy(`ResponseHeadersPolicy${suffix}`, domainNames, props.responseHeaders)
         : undefined;
+      // A behavior takes a single policy: the FAL one repeats the headers above and adds the CSP.
+      const falResponseHeadersPolicy = props.falPath !== undefined && props.responseHeaders
+        ? this.responseHeadersPolicy(`FalResponseHeadersPolicy${suffix}`, domainNames, props.responseHeaders, falCsp)
+        : falCspOnlyPolicy;
 
       const distribution = new cloudfront.Distribution(this, `CloudFrontDistribution${suffix}`, {
         domainNames,
@@ -276,7 +298,7 @@ export class TmCloudfrontStack extends cdk.Stack {
           allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
           cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           functionAssociations: falFunctionAssociations,
-          responseHeadersPolicy,
+          responseHeadersPolicy: falResponseHeadersPolicy,
         });
       }
 
@@ -296,12 +318,15 @@ export class TmCloudfrontStack extends cdk.Stack {
 
   /**
    * CORS for the distribution's domains plus the additional origins, HSTS and
-   * security headers. No Content-Security-Policy, which the application sets;
-   * the CORS headers of the origin win, the security headers of CloudFront do.
+   * security headers; the CORS headers of the origin win, the security headers
+   * of CloudFront do. No Content-Security-Policy, which the application sets,
+   * except `falCsp` for the FAL files (with `nosniff` in any case).
    */
-  private responseHeadersPolicy(id: string, domainNames: string[], settings: ResponseHeadersSettings) {
+  private responseHeadersPolicy(id: string, domainNames: string[], settings: ResponseHeadersSettings, falCsp?: string) {
     return new cloudfront.ResponseHeadersPolicy(this, id, {
-      comment: `CORS for ${domainNames[0]}, HSTS and security headers`,
+      comment: falCsp !== undefined
+        ? `FAL files of ${domainNames[0]}: CSP, CORS, HSTS and security headers`
+        : `CORS for ${domainNames[0]}, HSTS and security headers`,
       corsBehavior: {
         accessControlAllowOrigins: [
           ...domainNames.map(name => `https://${name}`),
@@ -320,7 +345,8 @@ export class TmCloudfrontStack extends cdk.Stack {
           preload: settings.strictTransportSecurity?.preload ?? true,
           override: true,
         },
-        contentTypeOptions: (settings.contentTypeOptions ?? true) ? { override: true } : undefined,
+        contentSecurityPolicy: falCsp !== undefined ? { contentSecurityPolicy: falCsp, override: true } : undefined,
+        contentTypeOptions: (falCsp !== undefined || (settings.contentTypeOptions ?? true)) ? { override: true } : undefined,
         frameOptions: {
           frameOption: settings.frameOption ?? cloudfront.HeadersFrameOption.SAMEORIGIN,
           override: true,
@@ -343,11 +369,8 @@ export class TmCloudfrontStack extends cdk.Stack {
   }
 
   /**
-   * Viewer functions of the FAL behavior: the request one checks basic auth
-   * (if any) and removes the path, since the bucket keys have no prefix; the
-   * response one adds the CSP, choosing the PDF variant by extension, in any
-   * case (CloudFront path patterns are case-sensitive, hence a function rather
-   * than a behavior per extension).
+   * Viewer request function of the FAL behavior: checks basic auth (if any)
+   * and removes the path, since the bucket keys have no prefix.
    */
   private falFunctionAssociations(falPath: string, basicAuthCheck: string): cloudfront.FunctionAssociation[] {
     const request = new cloudfront.Function(this, 'FalRequestFunction', {
@@ -361,30 +384,13 @@ export class TmCloudfrontStack extends cdk.Stack {
           }
         `),
     });
-    const response = new cloudfront.Function(this, 'FalResponseFunction', {
-      runtime: cloudfront.FunctionRuntime.JS_2_0,
-      comment: 'Content-Security-Policy of the FAL files',
-      code: cloudfront.FunctionCode.fromInline(`
-          function handler(event) {
-            var response = event.response;
-            var pdf = /\\.pdf$/i.test(event.request.uri);
-            response.headers['content-security-policy'] = { value: pdf ? ${JSON.stringify(FAL_PDF_CSP)} : ${JSON.stringify(FAL_CSP)} };
-            response.headers['x-content-type-options'] = { value: 'nosniff' };
-            return response;
-          }
-        `),
-    });
-    return [
-      { function: request, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST },
-      { function: response, eventType: cloudfront.FunctionEventType.VIEWER_RESPONSE },
-    ];
+    return [{ function: request, eventType: cloudfront.FunctionEventType.VIEWER_REQUEST }];
   }
 }
 
-/** Content-Security-Policy of the files under the FAL path, from TYPO3's `fileadmin/.htaccess`. */
-const FAL_CSP = "default-src 'self'; script-src 'none'; style-src 'unsafe-inline'; object-src 'none'; sandbox;";
-/** The same for PDF files, which browsers refuse to display in a sandbox. */
-const FAL_PDF_CSP = "default-src 'self' 'unsafe-inline'; script-src 'none'; object-src 'self'; plugin-types application/pdf;";
+/** Default Content-Security-Policy of the files under the FAL path. */
+const FAL_CSP = "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; "
+  + "frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox";
 
 function errorResponses(): cloudfront.ErrorResponse[] {
   return [400, 403, 500, 501, 502, 503, 504].map(code => ({

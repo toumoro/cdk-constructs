@@ -361,6 +361,7 @@ export class TmWebappAppStage extends cdk.Stage {
         accessLogs,
         errorPages: props.errorPagesPath !== undefined,
         falPath: cloudfront.falPath,
+        falContentSecurityPolicy: cloudfront.falContentSecurityPolicy,
         responseHeaders: cloudfront.responseHeaders,
         distributionIds: params.cdn ? undefined : distributionIds,
       });

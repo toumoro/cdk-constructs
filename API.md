@@ -22255,7 +22255,8 @@ const cloudfrontSettings: CloudfrontSettings = { ... }
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.createCertificate">createCertificate</a></code> | <code>boolean</code> | Creates each distribution's ACM certificate (us-east-1) with manual DNS validation, instead of requiring a pre-made certificate ARN. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsFormat">distributionIdsFormat</a></code> | <code><a href="#tm-cdk-constructs.DistributionIdsFormat">DistributionIdsFormat</a></code> | Value format of the distribution-ID parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.distributionIdsParameterName">distributionIdsParameterName</a></code> | <code>string</code> | Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline invalidation step. |
-| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry the Content-Security-Policy of TYPO3's `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can display) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.falContentSecurityPolicy">falContentSecurityPolicy</a></code> | <code>string</code> | Content-Security-Policy of every file under `falPath`, PDFs included. |
+| <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry a strict Content-Security-Policy (see `falContentSecurityPolicy`) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.generateOriginCustomHeader">generateOriginCustomHeader</a></code> | <code>boolean</code> | Generates the CloudFront origin custom-header value instead of requiring a pre-seeded SSM parameter. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.originCustomHeaderParameterName">originCustomHeaderParameterName</a></code> | <code>string</code> | SSM parameter holding the secret header value CloudFront sends to the load balancer. |
 | <code><a href="#tm-cdk-constructs.CloudfrontSettings.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy`; |
@@ -22396,6 +22397,25 @@ Name of the distribution-ID parameter read by tm_cloudfront and by the pipeline 
 
 ---
 
+##### `falContentSecurityPolicy`<sup>Optional</sup> <a name="falContentSecurityPolicy" id="tm-cdk-constructs.CloudfrontSettings.property.falContentSecurityPolicy"></a>
+
+```typescript
+public readonly falContentSecurityPolicy: string;
+```
+
+- *Type:* string
+- *Default:* "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox"
+
+Content-Security-Policy of every file under `falPath`, PDFs included.
+
+It
+applies when a file is opened as a document (directly or in a frame), not
+when a page embeds it as an image or a video. The default loads nothing
+but same-origin images and media (an image or a video opened directly)
+and inline styles (SVG); no script, form or plugin, and sandboxed.
+
+---
+
 ##### `falPath`<sup>Optional</sup> <a name="falPath" id="tm-cdk-constructs.CloudfrontSettings.property.falPath"></a>
 
 ```typescript
@@ -22405,7 +22425,7 @@ public readonly falPath: string;
 - *Type:* string
 - *Default:* the bucket is not served by the www distributions
 
-Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry the Content-Security-Policy of TYPO3's `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can display) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`.
+Serves the FAL content bucket under this path of the www distributions (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs as `public/fileadmin` and same host as the site. The path is removed before the request reaches the bucket (keys have no prefix), and the responses carry a strict Content-Security-Policy (see `falContentSecurityPolicy`) and `X-Content-Type-Options: nosniff`. The FAL public base URL becomes `<first domain><falPath>`. Requires `fal.storage` `FalStorage.S3`; exclusive with `cdn`.
 
 ---
 
@@ -22453,8 +22473,9 @@ public readonly responseHeaders: ResponseHeadersSettings;
 Response headers policy on every behavior of the www distributions: CORS for the distribution's own domains (`https://<domain>` and its `additionalDomains`) plus `additionalCorsOrigins`, HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and `Permissions-Policy`;
 
 removes `Server` and `X-Powered-By`. Each one is set
-in `ResponseHeadersSettings`. No Content-Security-Policy: the application
-sets it.
+in `ResponseHeadersSettings`. No Content-Security-Policy, which the
+application sets, except on `falPath` (its own policy, a copy of this one
+with `falContentSecurityPolicy`).
 
 ---
 
@@ -27044,8 +27065,9 @@ const tmCloudfrontStackProps: TmCloudfrontStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.certificateArns">certificateArns</a></code> | <code>{[ key: string ]: string}</code> | ACM certificate ARNs (us-east-1), keyed by an entry of `domains`. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.distributionIds">distributionIds</a></code> | <code><a href="#tm-cdk-constructs.TmDistributionIdsOptions">TmDistributionIdsOptions</a></code> | Writes the distribution-ID parameter for these distributions. |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.errorPages">errorPages</a></code> | <code>boolean</code> | Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for 4xx and 5xx responses. |
-| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's `fileadmin/.htaccess`. |
-| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior (CORS for the distribution's domains, HSTS and security headers, no CSP). |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.falContentSecurityPolicy">falContentSecurityPolicy</a></code> | <code>string</code> | Content-Security-Policy of the files under `falPath`. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.falPath">falPath</a></code> | <code>string</code> | Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with a strict Content-Security-Policy. |
+| <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.responseHeaders">responseHeaders</a></code> | <code><a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a></code> | Response headers policy on every behavior (CORS for the distribution's domains, HSTS and security headers, no CSP); |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOrigin">vpcOrigin</a></code> | <code>boolean</code> | Reaches the load balancer through a CloudFront VPC origin over HTTPS 443, its ARN and DNS name read from the `vpc-origin` SSM parameters published by `TmEcsStack` (the internal load balancer, or the bridge during the migration). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.vpcOriginViaBridge">vpcOriginViaBridge</a></code> | <code>boolean</code> | The `vpc-origin` SSM parameters point at the migration bridge rather than the service load balancer (`vpcOriginBridge` without `vpcOrigin`). |
 | <code><a href="#tm-cdk-constructs.TmCloudfrontStackProps.property.webAcl">webAcl</a></code> | <code>boolean</code> | Associates the WebACL of `TmWafStack` (ARN read from SSM). |
@@ -27428,6 +27450,19 @@ Serves `/errors/*` from the error bucket of `TmS3Stack` and uses those pages for
 
 ---
 
+##### `falContentSecurityPolicy`<sup>Optional</sup> <a name="falContentSecurityPolicy" id="tm-cdk-constructs.TmCloudfrontStackProps.property.falContentSecurityPolicy"></a>
+
+```typescript
+public readonly falContentSecurityPolicy: string;
+```
+
+- *Type:* string
+- *Default:* a strict, sandboxed policy
+
+Content-Security-Policy of the files under `falPath`.
+
+---
+
 ##### `falPath`<sup>Optional</sup> <a name="falPath" id="tm-cdk-constructs.TmCloudfrontStackProps.property.falPath"></a>
 
 ```typescript
@@ -27437,7 +27472,7 @@ public readonly falPath: string;
 - *Type:* string
 - *Default:* the content bucket is not served
 
-Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with the Content-Security-Policy of TYPO3's `fileadmin/.htaccess`.
+Serves the FAL content bucket of `TmS3Stack` under this path (e.g. `/fileadmin`), path removed, with a strict Content-Security-Policy.
 
 ---
 
@@ -27450,7 +27485,10 @@ public readonly responseHeaders: ResponseHeadersSettings;
 - *Type:* <a href="#tm-cdk-constructs.ResponseHeadersSettings">ResponseHeadersSettings</a>
 - *Default:* no response headers policy
 
-Response headers policy on every behavior (CORS for the distribution's domains, HSTS and security headers, no CSP).
+Response headers policy on every behavior (CORS for the distribution's domains, HSTS and security headers, no CSP);
+
+the FAL behavior gets a copy
+with its CSP.
 
 ---
 

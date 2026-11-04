@@ -600,15 +600,26 @@ export interface CloudfrontSettings {
    * (e.g. `/fileadmin`), instead of a separate `cdn` distribution: same URLs
    * as `public/fileadmin` and same host as the site. The path is removed
    * before the request reaches the bucket (keys have no prefix), and the
-   * responses carry the Content-Security-Policy of TYPO3's
-   * `fileadmin/.htaccess` (sandboxed, with a PDF variant browsers can
-   * display) and `X-Content-Type-Options: nosniff`. The FAL public base URL
+   * responses carry a strict Content-Security-Policy (see
+   * `falContentSecurityPolicy`) and `X-Content-Type-Options: nosniff`. The
+   * FAL public base URL
    * becomes `<first domain><falPath>`. Requires `fal.storage`
    * `FalStorage.S3`; exclusive with `cdn`.
    *
    * @default - the bucket is not served by the www distributions
    */
   readonly falPath?: string;
+
+  /**
+   * Content-Security-Policy of every file under `falPath`, PDFs included. It
+   * applies when a file is opened as a document (directly or in a frame), not
+   * when a page embeds it as an image or a video. The default loads nothing
+   * but same-origin images and media (an image or a video opened directly)
+   * and inline styles (SVG); no script, form or plugin, and sandboxed.
+   *
+   * @default "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox"
+   */
+  readonly falContentSecurityPolicy?: string;
 
   /**
    * Writes CloudFront access logs to the log bucket.
@@ -623,8 +634,9 @@ export interface CloudfrontSettings {
    * `additionalDomains`) plus `additionalCorsOrigins`, HSTS,
    * `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options` and
    * `Permissions-Policy`; removes `Server` and `X-Powered-By`. Each one is set
-   * in `ResponseHeadersSettings`. No Content-Security-Policy: the application
-   * sets it.
+   * in `ResponseHeadersSettings`. No Content-Security-Policy, which the
+   * application sets, except on `falPath` (its own policy, a copy of this one
+   * with `falContentSecurityPolicy`).
    *
    * @default - no response headers policy
    */

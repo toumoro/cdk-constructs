@@ -800,7 +800,6 @@ describe('TmWebappAppStage, FAL bucket on the www distribution (cloudfront.falPa
           AllowedMethods: ['GET', 'HEAD'],
           FunctionAssociations: [
             Match.objectLike({ EventType: 'viewer-request' }),
-            Match.objectLike({ EventType: 'viewer-response' }),
           ],
         })]),
       }),
@@ -808,19 +807,39 @@ describe('TmWebappAppStage, FAL bucket on the www distribution (cloudfront.falPa
     template.resourceCountIs('AWS::CloudFront::OriginAccessControl', 1);
   });
 
-  test('removes the path before the bucket and adds the fileadmin CSP, PDF variant in any case', () => {
+  test('removes the path before the bucket and adds the strict CSP and nosniff with a policy', () => {
     const template = Template.fromStack(synthStage(falSettings).cloudfrontStack!);
     const request = cloudfrontFunction(template, 'Removes /fileadmin');
     expect(request({ request: { uri: '/fileadmin/user_upload/a b.jpg', headers: {} } }).uri).toBe('/user_upload/a b.jpg');
 
-    const response = cloudfrontFunction(template, 'Content-Security-Policy');
-    const headers = (uri: string) => response({ request: { uri }, response: { headers: {} } }).headers;
-    expect(headers('/fileadmin/a.svg')['content-security-policy'].value).toContain('sandbox');
-    expect(headers('/fileadmin/a.svg')['x-content-type-options'].value).toBe('nosniff');
-    for (const uri of ['/fileadmin/a.pdf', '/fileadmin/A.PDF', '/a.Pdf']) {
-      expect(headers(uri)['content-security-policy'].value).toContain('plugin-types application/pdf');
-      expect(headers(uri)['content-security-policy'].value).not.toContain('sandbox');
-    }
+    template.resourceCountIs('AWS::CloudFront::ResponseHeadersPolicy', 1);
+    const [policyId, policy] = Object.entries(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0];
+    expect(policy.Properties.ResponseHeadersPolicyConfig.SecurityHeadersConfig).toEqual({
+      ContentSecurityPolicy: {
+        ContentSecurityPolicy: "default-src 'none'; img-src 'self' data:; media-src 'self'; style-src 'unsafe-inline'; "
+          + "frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox",
+        Override: true,
+      },
+      ContentTypeOptions: { Override: true },
+    });
+    const config = Object.values(template.findResources('AWS::CloudFront::Distribution'))[0].Properties.DistributionConfig;
+    expect(config.DefaultCacheBehavior.ResponseHeadersPolicyId).toBeUndefined();
+    expect(config.CacheBehaviors.find((b: any) => b.PathPattern === '/fileadmin/*').ResponseHeadersPolicyId)
+      .toEqual({ Ref: policyId });
+  });
+
+  test('falContentSecurityPolicy replaces the policy', () => {
+    const template = Template.fromStack(synthStage({
+      ...falSettings,
+      cloudfront: { ...falSettings.cloudfront!, falContentSecurityPolicy: "default-src 'none'" },
+    }).cloudfrontStack!);
+    template.hasResourceProperties('AWS::CloudFront::ResponseHeadersPolicy', {
+      ResponseHeadersPolicyConfig: Match.objectLike({
+        SecurityHeadersConfig: Match.objectLike({
+          ContentSecurityPolicy: { ContentSecurityPolicy: "default-src 'none'", Override: true },
+        }),
+      }),
+    });
   });
 
   test('with basic auth, the FAL request function checks the credentials too', () => {
@@ -865,12 +884,15 @@ describe('TmWebappAppStage, response headers (cloudfront.responseHeaders opt-in)
     },
     cdn: undefined,
   };
+  const policies = (template: Template) => Object.entries(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'));
+  const sitePolicy = (template: Template) => policies(template)
+    .find(([, p]) => p.Properties.ResponseHeadersPolicyConfig.Comment.startsWith('CORS'))![1]
+    .Properties.ResponseHeadersPolicyConfig;
 
   test('allows CORS from the distribution domains and the additional origins, with HSTS and no CSP', () => {
     const template = Template.fromStack(synthStage(headersSettings).cloudfrontStack!);
-    template.resourceCountIs('AWS::CloudFront::ResponseHeadersPolicy', 1);
-    const config = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0]
-      .Properties.ResponseHeadersPolicyConfig;
+    template.resourceCountIs('AWS::CloudFront::ResponseHeadersPolicy', 2);
+    const config = sitePolicy(template);
     expect(config.CorsConfig.AccessControlAllowOrigins.Items)
       .toEqual(['https://www.example.com', 'https://example.com', 'https://other.example.org']);
     expect(config.CorsConfig.AccessControlAllowCredentials).toBe(false);
@@ -894,8 +916,7 @@ describe('TmWebappAppStage, response headers (cloudfront.responseHeaders opt-in)
       ...headersSettings,
       cloudfront: { ...headersSettings.cloudfront!, responseHeaders: { permissionsPolicy: 'camera=(self)' } },
     }).cloudfrontStack!);
-    const config = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0]
-      .Properties.ResponseHeadersPolicyConfig;
+    const config = sitePolicy(template);
     expect(config.CustomHeadersConfig.Items[0].Value).toBe('camera=(self)');
   });
 
@@ -913,8 +934,7 @@ describe('TmWebappAppStage, response headers (cloudfront.responseHeaders opt-in)
         },
       },
     }).cloudfrontStack!);
-    const config = Object.values(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0]
-      .Properties.ResponseHeadersPolicyConfig;
+    const config = sitePolicy(template);
     expect(config.SecurityHeadersConfig.StrictTransportSecurity).toEqual({
       AccessControlMaxAgeSec: 2592000, IncludeSubdomains: false, Preload: false, Override: true,
     });
@@ -924,15 +944,35 @@ describe('TmWebappAppStage, response headers (cloudfront.responseHeaders opt-in)
     expect(config.RemoveHeadersConfig.Items).toEqual([{ Header: 'Server' }]);
   });
 
-  test('applies the policy to every behavior, FAL included', () => {
+  test('applies the policy to every behavior, and to FAL its copy with the CSP', () => {
     const template = Template.fromStack(synthStage(headersSettings).cloudfrontStack!);
-    const policyId = Object.keys(template.findResources('AWS::CloudFront::ResponseHeadersPolicy'))[0];
+    const [siteId] = policies(template).find(([, p]) => p.Properties.ResponseHeadersPolicyConfig.Comment.startsWith('CORS'))!;
+    const [falId, fal] = policies(template).find(([, p]) => p.Properties.ResponseHeadersPolicyConfig.Comment.startsWith('FAL'))!;
     const config = Object.values(template.findResources('AWS::CloudFront::Distribution'))[0].Properties.DistributionConfig;
     const behaviors = [config.DefaultCacheBehavior, ...config.CacheBehaviors];
-    expect(behaviors.map((b: any) => b.PathPattern)).toEqual([undefined, '/typo3/*', '/fileadmin/*']);
-    for (const behavior of behaviors) {
-      expect(behavior.ResponseHeadersPolicyId).toEqual({ Ref: policyId });
-    }
+    expect(behaviors.map((b: any) => [b.PathPattern, b.ResponseHeadersPolicyId])).toEqual([
+      [undefined, { Ref: siteId }],
+      ['/typo3/*', { Ref: siteId }],
+      ['/fileadmin/*', { Ref: falId }],
+    ]);
+    const site = sitePolicy(template);
+    const falConfig = fal.Properties.ResponseHeadersPolicyConfig;
+    expect(falConfig.SecurityHeadersConfig.ContentSecurityPolicy.ContentSecurityPolicy).toContain('sandbox');
+    const { ContentSecurityPolicy, ...falSecurityHeaders } = falConfig.SecurityHeadersConfig;
+    expect(falSecurityHeaders).toEqual(site.SecurityHeadersConfig);
+    expect(falConfig.CorsConfig).toEqual(site.CorsConfig);
+    expect(falConfig.CustomHeadersConfig).toEqual(site.CustomHeadersConfig);
+    expect(falConfig.RemoveHeadersConfig).toEqual(site.RemoveHeadersConfig);
+  });
+
+  test('the FAL policy keeps nosniff when contentTypeOptions is false', () => {
+    const template = Template.fromStack(synthStage({
+      ...headersSettings,
+      cloudfront: { ...headersSettings.cloudfront!, responseHeaders: { contentTypeOptions: false } },
+    }).cloudfrontStack!);
+    const [, fal] = policies(template).find(([, p]) => p.Properties.ResponseHeadersPolicyConfig.Comment.startsWith('FAL'))!;
+    expect(fal.Properties.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentTypeOptions).toEqual({ Override: true });
+    expect(sitePolicy(template).SecurityHeadersConfig.ContentTypeOptions).toBeUndefined();
   });
 
   test('default (no responseHeaders) creates no policy', () => {
