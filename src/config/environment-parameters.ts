@@ -1,6 +1,7 @@
 import { BackupResourceType, ContainerTopology, DistributionIdsFormat, FalS3Driver, FalStorage, PipelineSourceType, ServiceIamUser } from './enums';
 import { TmBackupRule } from '../stacks/backup/tm-backup-stack';
 import { TmSecretField } from '../stacks/compute/tm-ecs-stack';
+import { WafIpRestrictedPath } from '../stacks/security/tm-waf-stack';
 
 export { TmBackupRule } from '../stacks/backup/tm-backup-stack';
 
@@ -689,6 +690,15 @@ export interface WafSettings {
    * @default []
    */
   readonly blockedCountryCodes?: string[];
+
+  /**
+   * Paths reachable only from the given IP ranges (at most 4), e.g. the TYPO3
+   * backend `/typo3/` limited to the client's offices. Other IPs are blocked
+   * before any other rule.
+   *
+   * @default []
+   */
+  readonly ipRestrictedPaths?: WafIpRestrictedPath[];
 
   /**
    * Associates the WebACL with the CDN distribution too.

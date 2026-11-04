@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
-import { CfnLoggingConfiguration, CfnWebACL } from 'aws-cdk-lib/aws-wafv2';
+import { CfnIPSet, CfnLoggingConfiguration, CfnWebACL } from 'aws-cdk-lib/aws-wafv2';
 import * as cr from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import { TmParameterNames } from '../../config/parameter-names';
@@ -35,12 +35,42 @@ export interface TmWafStackProps extends cdk.StackProps {
   readonly blockedCountryCodes?: string[];
 
   /**
+   * Paths reachable only from the given IP ranges.
+   *
+   * @default []
+   */
+  readonly ipRestrictedPaths?: WafIpRestrictedPath[];
+
+  /**
    * Sends the WebACL logs to CloudWatch Logs (30-day retention).
    *
    * @default true
    */
   readonly logging?: boolean;
 }
+
+/**
+ * A path prefix that only some IP ranges may reach. Requests from other IPs are
+ * blocked.
+ */
+export interface WafIpRestrictedPath {
+  /**
+   * Prefix of the URI path, e.g. `/typo3/`. Matched after URL decoding and
+   * lowercasing, so `/%54YPO3/` is caught too: give it in lowercase.
+   */
+  readonly pathPrefix: string;
+
+  /**
+   * IPv4 or IPv6 ranges in CIDR notation (`/32` or `/128` for a single
+   * address).
+   */
+  readonly allowedCidrs: string[];
+}
+
+/**
+ * Priorities free between the country block (0) and the anti-DDoS rule (5).
+ */
+const MAX_IP_RESTRICTED_PATHS = 4;
 
 /**
  * Static files and API calls: they can't answer a browser challenge.
@@ -50,7 +80,7 @@ const NO_CHALLENGE_URI_REGEX = '\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|
 /**
  * Baseline CloudFront-scope WebACL, derived from pgu's: AWS anti-DDoS, IP
  * reputation, known bad inputs, a per-IP rate limit, and the common, SQL
- * injection and PHP rule sets. Anonymous IPs are counted only, but
+ * injection and PHP rule sets. Optional paths are restricted to IP ranges. Anonymous IPs are counted only, but
  * hosting-provider IPs (except Site24x7 monitoring) get a challenge on pages.
  * Solr searches (`tx_solr`) are rate limited per IP, and facet filters
  * challenged.
@@ -78,6 +108,55 @@ export class TmWafStack extends cdk.Stack {
         visibilityConfig: visibility('Block-countries'),
       });
     }
+
+    const ipRestrictedPaths = props.ipRestrictedPaths ?? [];
+    if (ipRestrictedPaths.length > MAX_IP_RESTRICTED_PATHS) {
+      throw new Error(`waf.ipRestrictedPaths: at most ${MAX_IP_RESTRICTED_PATHS} paths`);
+    }
+    ipRestrictedPaths.forEach((restriction, index) => {
+      if (restriction.allowedCidrs.length === 0) {
+        throw new Error(`waf.ipRestrictedPaths: no allowedCidrs for ${restriction.pathPrefix}`);
+      }
+      const name = `Restrict-path-${index + 1}`;
+      const ipSetReferences = (['IPV4', 'IPV6'] as const).flatMap(version => {
+        const addresses = restriction.allowedCidrs.filter(cidr => cidr.includes(':') === (version === 'IPV6'));
+        if (addresses.length === 0) {
+          return [];
+        }
+        const ipSet = new CfnIPSet(this, `${name}-${version}`, {
+          scope: 'CLOUDFRONT',
+          ipAddressVersion: version,
+          addresses,
+          description: `Allowed on ${restriction.pathPrefix}`,
+        });
+        return [{ ipSetReferenceStatement: { arn: ipSet.attrArn } }];
+      });
+      rules.push({
+        name,
+        priority: index + 1,
+        action: { block: {} },
+        statement: {
+          andStatement: {
+            statements: [
+              {
+                byteMatchStatement: {
+                  searchString: restriction.pathPrefix,
+                  fieldToMatch: { uriPath: {} },
+                  textTransformations: [{ priority: 0, type: 'URL_DECODE' }, { priority: 1, type: 'LOWERCASE' }],
+                  positionalConstraint: 'STARTS_WITH',
+                },
+              },
+              {
+                notStatement: {
+                  statement: ipSetReferences.length > 1 ? { orStatement: { statements: ipSetReferences } } : ipSetReferences[0],
+                },
+              },
+            ],
+          },
+        },
+        visibilityConfig: visibility(name),
+      });
+    });
 
     rules.push(
       // Challenges suspicious browsers and blocks the most likely DDoS requests.

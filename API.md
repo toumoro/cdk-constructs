@@ -20439,7 +20439,7 @@ The VPC.
 
 Baseline CloudFront-scope WebACL, derived from pgu's: AWS anti-DDoS, IP reputation, known bad inputs, a per-IP rate limit, and the common, SQL injection and PHP rule sets.
 
-Anonymous IPs are counted only, but
+Optional paths are restricted to IP ranges. Anonymous IPs are counted only, but
 hosting-provider IPs (except Site24x7 monitoring) get a challenge on pages.
 Solr searches (`tx_solr`) are rate limited per IP, and facet filters
 challenged.
@@ -33822,6 +33822,7 @@ const tmWafStackProps: TmWafStackProps = { ... }
 | <code><a href="#tm-cdk-constructs.TmWafStackProps.property.environmentName">environmentName</a></code> | <code>string</code> | Environment segment of the SSM parameter names. |
 | <code><a href="#tm-cdk-constructs.TmWafStackProps.property.parameterRegion">parameterRegion</a></code> | <code>string</code> | Region where the WebACL ARN is published in SSM (the application region). |
 | <code><a href="#tm-cdk-constructs.TmWafStackProps.property.blockedCountryCodes">blockedCountryCodes</a></code> | <code>string[]</code> | Country codes whose requests are blocked. |
+| <code><a href="#tm-cdk-constructs.TmWafStackProps.property.ipRestrictedPaths">ipRestrictedPaths</a></code> | <code><a href="#tm-cdk-constructs.WafIpRestrictedPath">WafIpRestrictedPath</a>[]</code> | Paths reachable only from the given IP ranges. |
 | <code><a href="#tm-cdk-constructs.TmWafStackProps.property.logging">logging</a></code> | <code>boolean</code> | Sends the WebACL logs to CloudWatch Logs (30-day retention). |
 | <code><a href="#tm-cdk-constructs.TmWafStackProps.property.rateLimit">rateLimit</a></code> | <code>number</code> | Maximum requests per client IP in any 5-minute window. |
 
@@ -34105,6 +34106,19 @@ public readonly blockedCountryCodes: string[];
 - *Default:* []
 
 Country codes whose requests are blocked.
+
+---
+
+##### `ipRestrictedPaths`<sup>Optional</sup> <a name="ipRestrictedPaths" id="tm-cdk-constructs.TmWafStackProps.property.ipRestrictedPaths"></a>
+
+```typescript
+public readonly ipRestrictedPaths: WafIpRestrictedPath[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.WafIpRestrictedPath">WafIpRestrictedPath</a>[]
+- *Default:* []
+
+Paths reachable only from the given IP ranges.
 
 ---
 
@@ -34594,6 +34608,54 @@ Name of the private hosted zone attached to the VPC, e.g. `epq-site-web.internal
 
 ---
 
+### WafIpRestrictedPath <a name="WafIpRestrictedPath" id="tm-cdk-constructs.WafIpRestrictedPath"></a>
+
+A path prefix that only some IP ranges may reach.
+
+Requests from other IPs are
+blocked.
+
+#### Initializer <a name="Initializer" id="tm-cdk-constructs.WafIpRestrictedPath.Initializer"></a>
+
+```typescript
+import { WafIpRestrictedPath } from 'tm-cdk-constructs'
+
+const wafIpRestrictedPath: WafIpRestrictedPath = { ... }
+```
+
+#### Properties <a name="Properties" id="Properties"></a>
+
+| **Name** | **Type** | **Description** |
+| --- | --- | --- |
+| <code><a href="#tm-cdk-constructs.WafIpRestrictedPath.property.allowedCidrs">allowedCidrs</a></code> | <code>string[]</code> | IPv4 or IPv6 ranges in CIDR notation (`/32` or `/128` for a single address). |
+| <code><a href="#tm-cdk-constructs.WafIpRestrictedPath.property.pathPrefix">pathPrefix</a></code> | <code>string</code> | Prefix of the URI path, e.g. `/typo3/`. Matched after URL decoding and lowercasing, so `/%54YPO3/` is caught too: give it in lowercase. |
+
+---
+
+##### `allowedCidrs`<sup>Required</sup> <a name="allowedCidrs" id="tm-cdk-constructs.WafIpRestrictedPath.property.allowedCidrs"></a>
+
+```typescript
+public readonly allowedCidrs: string[];
+```
+
+- *Type:* string[]
+
+IPv4 or IPv6 ranges in CIDR notation (`/32` or `/128` for a single address).
+
+---
+
+##### `pathPrefix`<sup>Required</sup> <a name="pathPrefix" id="tm-cdk-constructs.WafIpRestrictedPath.property.pathPrefix"></a>
+
+```typescript
+public readonly pathPrefix: string;
+```
+
+- *Type:* string
+
+Prefix of the URI path, e.g. `/typo3/`. Matched after URL decoding and lowercasing, so `/%54YPO3/` is caught too: give it in lowercase.
+
+---
+
 ### WafSettings <a name="WafSettings" id="tm-cdk-constructs.WafSettings"></a>
 
 Baseline WebACL associated with the distributions.
@@ -34614,6 +34676,7 @@ const wafSettings: WafSettings = { ... }
 | **Name** | **Type** | **Description** |
 | --- | --- | --- |
 | <code><a href="#tm-cdk-constructs.WafSettings.property.blockedCountryCodes">blockedCountryCodes</a></code> | <code>string[]</code> | Country codes (ISO 3166-1 alpha-2) whose requests are blocked. |
+| <code><a href="#tm-cdk-constructs.WafSettings.property.ipRestrictedPaths">ipRestrictedPaths</a></code> | <code><a href="#tm-cdk-constructs.WafIpRestrictedPath">WafIpRestrictedPath</a>[]</code> | Paths reachable only from the given IP ranges (at most 4), e.g. the TYPO3 backend `/typo3/` limited to the client's offices. Other IPs are blocked before any other rule. |
 | <code><a href="#tm-cdk-constructs.WafSettings.property.logging">logging</a></code> | <code>boolean</code> | Sends WebACL logs to CloudWatch Logs (30-day retention). |
 | <code><a href="#tm-cdk-constructs.WafSettings.property.protectCdn">protectCdn</a></code> | <code>boolean</code> | Associates the WebACL with the CDN distribution too. |
 | <code><a href="#tm-cdk-constructs.WafSettings.property.rateLimit">rateLimit</a></code> | <code>number</code> | Maximum requests per client IP in any 5-minute window. |
@@ -34630,6 +34693,19 @@ public readonly blockedCountryCodes: string[];
 - *Default:* []
 
 Country codes (ISO 3166-1 alpha-2) whose requests are blocked.
+
+---
+
+##### `ipRestrictedPaths`<sup>Optional</sup> <a name="ipRestrictedPaths" id="tm-cdk-constructs.WafSettings.property.ipRestrictedPaths"></a>
+
+```typescript
+public readonly ipRestrictedPaths: WafIpRestrictedPath[];
+```
+
+- *Type:* <a href="#tm-cdk-constructs.WafIpRestrictedPath">WafIpRestrictedPath</a>[]
+- *Default:* []
+
+Paths reachable only from the given IP ranges (at most 4), e.g. the TYPO3 backend `/typo3/` limited to the client's offices. Other IPs are blocked before any other rule.
 
 ---
 

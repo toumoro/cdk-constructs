@@ -307,6 +307,7 @@ export class TmWebappAppStage extends cdk.Stage {
         parameterRegion: region,
         rateLimit: params.waf.rateLimit,
         blockedCountryCodes: params.waf.blockedCountryCodes,
+        ipRestrictedPaths: params.waf.ipRestrictedPaths,
         logging: params.waf.logging,
       });
     }

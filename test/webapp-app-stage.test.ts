@@ -276,6 +276,29 @@ describe('TmWebappAppStage, greenfield settings', () => {
 });
 
 describe('TmWebappAppStage, options', () => {
+  test('waf.ipRestrictedPaths blocks the path outside the allowed IPv4 and IPv6 ranges', () => {
+    const stage = synthStage({
+      ...greenfield,
+      waf: { ipRestrictedPaths: [{ pathPrefix: '/typo3/', allowedCidrs: ['203.0.113.0/29', '198.51.100.7/32', '2001:db8::/32'] }] },
+    });
+    const template = Template.fromStack(stage.wafStack!);
+    template.hasResourceProperties('AWS::WAFv2::IPSet', { Scope: 'CLOUDFRONT', IPAddressVersion: 'IPV4', Addresses: ['203.0.113.0/29', '198.51.100.7/32'] });
+    template.hasResourceProperties('AWS::WAFv2::IPSet', { IPAddressVersion: 'IPV6', Addresses: ['2001:db8::/32'] });
+    const rules: any[] = Object.values(template.findResources('AWS::WAFv2::WebACL'))[0].Properties.Rules;
+    const restrict = rules.find(rule => rule.Name === 'Restrict-path-1');
+    expect(restrict.Priority).toBeLessThan(rules.find(rule => rule.Name === 'AWS-AWSManagedRulesAntiDDoSRuleSet').Priority);
+    expect(restrict.Action).toEqual({ Block: {} });
+    const [pathMatch, notAllowed] = restrict.Statement.AndStatement.Statements;
+    expect(pathMatch.ByteMatchStatement).toMatchObject({ SearchString: '/typo3/', PositionalConstraint: 'STARTS_WITH' });
+    expect(pathMatch.ByteMatchStatement.TextTransformations.map((t: any) => t.Type)).toEqual(['URL_DECODE', 'LOWERCASE']);
+    expect(notAllowed.NotStatement.Statement.OrStatement.Statements).toHaveLength(2);
+  });
+
+  test('waf.ipRestrictedPaths rejects more than four paths', () => {
+    const restriction = { pathPrefix: '/typo3/', allowedCidrs: ['203.0.113.0/29'] };
+    expect(() => synthStage({ ...greenfield, waf: { ipRestrictedPaths: [restriction, restriction, restriction, restriction, restriction] } })).toThrow(/at most 4/);
+  });
+
   test('the SINGLE topology keeps one web container', () => {
     const stage = synthStage({
       ...greenfield,
