@@ -247,6 +247,12 @@ describe('TmWebappAppStage, greenfield settings', () => {
     expect(sqli.Action).toEqual({ Block: {} });
     expect(sqli.Statement.AndStatement.Statements[0].LabelMatchStatement.Key).toBe('awswaf:managed:aws:sql-database:SQLi_Body');
     expect(JSON.stringify(sqli.Statement)).toContain('/typo3/file/commit');
+    expect(counted('AWS-AWSManagedRulesCommonRuleSet')).toContain('SizeRestrictions_QUERYSTRING');
+    const queryString = rule('TYPO3_SizeRestrictions_QueryString');
+    expect(queryString.Action).toEqual({ Block: {} });
+    expect(queryString.Statement.AndStatement.Statements[0].LabelMatchStatement.Key)
+      .toBe('awswaf:managed:aws:core-rule-set:SizeRestrictions_QueryString');
+    expect(JSON.stringify(queryString.Statement.AndStatement.Statements[1].NotStatement)).toContain('/typo3/');
   });
 
   test('rate limits Solr searches per IP, and per IP and JA4 fingerprint', () => {

@@ -84,7 +84,7 @@ const NO_CHALLENGE_URI_REGEX = '\\/api\\/|\\.(acc|avi|css|gif|ico|jpe?g|js|json|
  * hosting-provider IPs (except Site24x7 monitoring) get a challenge on pages.
  * Solr searches (`tx_solr`) are rate limited per IP, and facet filters
  * challenged.
- * The body rules of the common, SQL injection and PHP sets only count; the
+ * The body and query string size rules of the common, SQL injection and PHP sets only count; the
  * TYPO3 rules, from sqnim's TYPO3Overrider, block their matches except where
  * TYPO3 legitimately posts such bodies. Must be deployed in us-east-1. The ARN
  * is published in SSM in the application region.
@@ -261,9 +261,9 @@ export class TmWafStack extends cdk.Stack {
         visibilityConfig: visibility('Challenge-solr-filter'),
       },
       managedRuleGroup('AWSManagedRulesKnownBadInputsRuleSet', 40),
-      // Body rules: counted here, blocked by the TYPO3 rules below.
+      // Body and query string size rules: counted here, blocked by the TYPO3 rules below.
       managedRuleGroup('AWSManagedRulesCommonRuleSet', 50, {
-        countedRules: ['SizeRestrictions_BODY', 'CrossSiteScripting_BODY', 'GenericLFI_BODY'],
+        countedRules: ['SizeRestrictions_BODY', 'SizeRestrictions_QUERYSTRING', 'CrossSiteScripting_BODY', 'GenericLFI_BODY'],
       }),
       managedRuleGroup('AWSManagedRulesSQLiRuleSet', 60, { countedRules: ['SQLi_BODY'] }),
       managedRuleGroup('AWSManagedRulesPHPRuleSet', 70, { countedRules: ['PHPHighRiskMethodsVariables_BODY'] }),
@@ -278,6 +278,8 @@ export class TmWafStack extends cdk.Stack {
       typo3Rule('TYPO3_SQLi_Body', 82, 'sql-database:SQLi_Body', [uriStartsWith('/typo3/file/commit')]),
       typo3Rule('TYPO3_PHPHighRiskMethodsVariables_Body', 83, 'php-app:PHPHighRiskMethodsVariables_Body', [uriStartsWith('/typo3/record/edit')]),
       typo3Rule('TYPO3_GenericLFI_Body', 84, 'core-rule-set:GenericLFI_Body', [uriStartsWith('/typo3/index.php')]),
+      // Backend bulk actions (e.g. deleting 50 redirects) put every record in the query string.
+      typo3Rule('TYPO3_SizeRestrictions_QueryString', 85, 'core-rule-set:SizeRestrictions_QueryString', [uriStartsWith('/typo3/')]),
     );
 
     const webAcl = new CfnWebACL(this, 'WebAcl', {
