@@ -37,6 +37,7 @@ export class TmCachePolicy extends CachePolicy {
       'ADMCMD_prev',
       'SimpleSAML',
       'SimpleSAMLAuthToken',
+      'Typo3InstallTool',
       ...(props.additionalCookies || []),
     ];
 

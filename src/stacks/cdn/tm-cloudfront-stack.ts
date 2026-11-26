@@ -202,6 +202,10 @@ export class TmCloudfrontStack extends cdk.Stack {
     }
 
     const cachePolicy = new TmCachePolicy(this, 'DefaultCachePolicy', {});
+    // TYPO3 checks the Referer (backend, Install Tool); forwarded, not part of the cache key.
+    const originRequestPolicy = new cloudfront.OriginRequestPolicy(this, 'DefaultOriginRequestPolicy', {
+      headerBehavior: cloudfront.OriginRequestHeaderBehavior.allowList('Referer'),
+    });
     const webAclId = props.webAcl ? readParameter(this, TmParameterNames.wafWebAclArn(env)) : undefined;
     const logBucket = props.accessLogs
       ? s3.Bucket.fromBucketAttributes(this, 'LogBucket', {
@@ -269,6 +273,7 @@ export class TmCloudfrontStack extends cdk.Stack {
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
           cachePolicy,
+          originRequestPolicy,
           functionAssociations,
           responseHeadersPolicy,
         },
